@@ -49,7 +49,16 @@ $config['csrf_token_name'] = 'csrf_token';
 $config['csrf_cookie_name'] = 'csrf_cookie';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = TRUE;
-$config['csrf_exclude_uris'] = array('carrito/agregar', 'chat/preguntar');
+$config['csrf_exclude_uris'] = array(
+    'carrito/agregar',
+    'chat/preguntar',
+    'chat/solicitar_vendedora',
+    'chat/enviar',
+    'admin/chats/tomar/\d+',
+    'admin/chats/responder/\d+',
+    'admin/chats/cerrar/\d+',
+    'admin/chats/disponibilidad',
+);
 $config['compress_output'] = FALSE;
 $config['time_reference'] = 'local';
 $config['rewrite_short_tags'] = FALSE;

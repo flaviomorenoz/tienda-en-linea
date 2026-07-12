@@ -59,6 +59,13 @@
         </div>
         <div id="chat-ia-mensajes" class="chat-ia-mensajes"></div>
         <div id="chat-ia-escribiendo" class="chat-ia-escribiendo d-none">Escribiendo...</div>
+        <div id="chat-ia-estado" class="chat-ia-estado d-none"></div>
+        <button id="chat-ia-transferir" type="button" class="chat-ia-transferir">
+            <i class="bi bi-person-heart me-1"></i>Hablar con una vendedora
+        </button>
+        <button id="chat-ia-nueva" type="button" class="chat-ia-transferir d-none">
+            <i class="bi bi-arrow-repeat me-1"></i>Iniciar nueva conversación
+        </button>
         <form id="chat-ia-form" class="chat-ia-form">
             <input type="text" id="chat-ia-input" class="form-control" placeholder="Escribe tu pregunta..." autocomplete="off">
             <button type="submit" class="btn"><i class="bi bi-send-fill"></i></button>
@@ -71,7 +78,12 @@
 <!-- JS Carrito -->
 <script src="<?php echo base_url('assets/js/carrito.js'); ?>"></script>
 <!-- JS Asistente IA -->
-<script>window.CHAT_IA_URL = '<?php echo base_url('chat/preguntar'); ?>';</script>
+<script>
+    window.CHAT_IA_URL = '<?php echo base_url('chat/preguntar'); ?>';
+    window.CHAT_SOLICITAR_URL = '<?php echo base_url('chat/solicitar_vendedora'); ?>';
+    window.CHAT_ENVIAR_URL = '<?php echo base_url('chat/enviar'); ?>';
+    window.CHAT_ESTADO_URL = '<?php echo base_url('chat/estado'); ?>';
+</script>
 <script src="<?php echo base_url('assets/js/chat_ia.js'); ?>"></script>
 
 </body>

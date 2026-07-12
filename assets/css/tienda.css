@@ -347,11 +347,52 @@ main > .container-fluid {
     border-bottom-left-radius: 2px;
 }
 
+.chat-ia-msg-vendedor {
+    align-self: flex-start;
+    background: var(--primary);
+    color: #fff;
+    border-bottom-left-radius: 2px;
+}
+
+.chat-ia-msg-sistema {
+    align-self: center;
+    background: transparent;
+    color: #888;
+    font-size: 0.78rem;
+    text-align: center;
+    max-width: 100%;
+}
+
 .chat-ia-escribiendo {
     padding: 0 0.9rem 0.4rem;
     font-size: 0.75rem;
     color: #888;
     font-style: italic;
+}
+
+.chat-ia-estado {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.78rem;
+    color: #666;
+    background: var(--light-bg);
+    text-align: center;
+    border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.chat-ia-transferir {
+    margin: 0 0.65rem 0.5rem;
+    border: 1px solid var(--primary);
+    background: #fff;
+    color: var(--primary);
+    border-radius: 20px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.chat-ia-transferir:hover {
+    background: var(--primary);
+    color: #fff;
 }
 
 .chat-ia-form {

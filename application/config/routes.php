@@ -17,8 +17,11 @@ $route['carrito/quitar/(:num)'] = 'carrito/quitar/$1';
 $route['carrito/actualizar'] = 'carrito/actualizar';
 $route['carrito/vaciar'] = 'carrito/vaciar';
 
-// Asistente IA
+// Asistente IA / Chat con vendedora
 $route['chat/preguntar'] = 'chat/preguntar';
+$route['chat/solicitar_vendedora'] = 'chat/solicitar_vendedora';
+$route['chat/enviar'] = 'chat/enviar';
+$route['chat/estado'] = 'chat/estado';
 
 // Pago y checkout
 $route['checkout'] = 'pago/checkout';
@@ -36,3 +39,15 @@ $route['admin/estado/(:num)']   = 'admin/actualizar_estado/$1';
 $route['admin/codigos/(:num)']    = 'admin/guardar_codigos/$1';
 $route['admin/pedidos_json']       = 'admin/pedidos_json';
 $route['admin/detalle/(:num)']     = 'admin/detalle_json/$1';
+
+// Panel de chats (vendedoras)
+$route['admin/chats'] = 'vendedora/panel';
+$route['admin/chats/en_espera'] = 'vendedora/en_espera_json';
+$route['admin/chats/mis_conversaciones'] = 'vendedora/mis_conversaciones_json';
+$route['admin/chats/tomar/(:num)'] = 'vendedora/tomar/$1';
+$route['admin/chats/mensajes/(:num)'] = 'vendedora/mensajes/$1';
+$route['admin/chats/responder/(:num)'] = 'vendedora/responder/$1';
+$route['admin/chats/cerrar/(:num)'] = 'vendedora/cerrar/$1';
+$route['admin/chats/disponibilidad'] = 'vendedora/disponibilidad';
+$route['admin/chats/historial'] = 'vendedora/historial';
+$route['admin/chats/historial_json'] = 'vendedora/historial_json';

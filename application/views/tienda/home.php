@@ -132,8 +132,18 @@
             </a>
         </div>
         <div class="flex-grow-1 imagen-movil-oculta hero-logos" style="padding-left: 55px;">
-            <?php for ($i = 0; $i < 6; $i++): ?>
-            <img src="<?php echo base_url('assets/img/logox.png'); ?>" alt="Hero Image">
+            <?php for ($i = 0; $i < 6; $i++): 
+                //$color = ['#ff6b6b', '#6c5ce7', '#00cec9', '#55efc4', '#fdcb6e', '#ff6b6b'];
+                $color = ['#3a0b0b', '#5c1818', '#801c1c', '#a83535', '#da4f4f', '#ff6b6b'];
+            ?>
+            <!--<img src="<?php echo base_url('assets/img/logox.png'); ?>" alt="Hero Image">-->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 1260">
+                <rect x="0" y="0" width="1260" height="1260" rx="185" ry="185" fill="<?php echo $color[$i]; ?>"/>
+                <line x1="835" y1="437" x2="1260" y2="437" stroke="#ffffff" stroke-width="10"/>
+                <line x1="0" y1="691" x2="192" y2="691" stroke="#ffffff" stroke-width="10"/>
+                <text x="192" y="595" font-family="Georgia, 'Times New Roman', serif" font-size="300" fill="#ffffff">Bella</text>
+                <text x="408" y="845" font-family="Georgia, 'Times New Roman', serif" font-size="300" fill="#ffffff">Rosse</text>
+            </svg>
             <?php endfor; ?>
         </div>
     </div>

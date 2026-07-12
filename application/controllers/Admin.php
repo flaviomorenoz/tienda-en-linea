@@ -5,6 +5,7 @@ class Admin extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Pedido_model');
+        $this->load->model('Vendedora_model');
         $this->load->library('form_validation');
     }
 
@@ -36,9 +37,16 @@ class Admin extends CI_Controller {
         if ($admin && password_verify($password, $admin->password_hash)) {
             $this->session->set_userdata(array(
                 'admin_logueado' => TRUE,
+                'admin_id'       => $admin->id,
                 'admin_usuario'  => $admin->usuario,
                 'admin_nombre'   => $admin->nombre,
             ));
+
+            $vendedora = $this->Vendedora_model->get_by_admin($admin->id);
+            if ($vendedora) {
+                $this->Vendedora_model->set_estado($vendedora->id, 'disponible');
+            }
+
             redirect('admin/pedidos');
         } else {
             $this->session->set_flashdata('error', 'Usuario o contraseña incorrectos.');
@@ -47,7 +55,14 @@ class Admin extends CI_Controller {
     }
 
     public function logout() {
+        $admin_id  = $this->session->userdata('admin_id');
+        $vendedora = $admin_id ? $this->Vendedora_model->get_by_admin($admin_id) : null;
+        if ($vendedora) {
+            $this->Vendedora_model->set_estado($vendedora->id, 'desconectada');
+        }
+
         $this->session->unset_userdata('admin_logueado');
+        $this->session->unset_userdata('admin_id');
         $this->session->unset_userdata('admin_usuario');
         $this->session->unset_userdata('admin_nombre');
         redirect('admin');

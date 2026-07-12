@@ -9,6 +9,7 @@ class Chat extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Asistente_model');
+        $this->load->model('Chat_model');
     }
 
     /**
@@ -21,6 +22,7 @@ class Chat extends CI_Controller {
             return;
         }
 
+        $token     = $this->_token_valido($this->input->post('token'));
         $mensaje   = trim((string)$this->input->post('mensaje'));
         $historial = json_decode((string)$this->input->post('historial'), true);
 
@@ -30,6 +32,18 @@ class Chat extends CI_Controller {
 
         if ($mensaje === '') {
             echo json_encode(array('ok' => false, 'error' => 'Escribe una pregunta.'));
+            return;
+        }
+
+        if ($token === false) {
+            echo json_encode(array('ok' => false, 'error' => 'Sesión de chat inválida.'));
+            return;
+        }
+
+        $conversacion = $this->Chat_model->obtener_o_crear($token);
+
+        if ($conversacion->estado !== 'ia') {
+            echo json_encode(array('ok' => false, 'error' => 'Esta conversación ya no está a cargo de la IA.'));
             return;
         }
 
@@ -58,7 +72,116 @@ class Chat extends CI_Controller {
             return;
         }
 
+        $this->Chat_model->guardar_mensaje($conversacion->id, 'cliente', $mensaje);
+        $this->Chat_model->guardar_mensaje($conversacion->id, 'ia', $respuesta);
+
         echo json_encode(array('ok' => true, 'respuesta' => $respuesta));
+    }
+
+    /**
+     * El cliente pide hablar con una vendedora. Pasa la conversación
+     * a la cola de espera (no asigna a nadie todavía).
+     */
+    public function solicitar_vendedora() {
+        if ($this->input->method() !== 'post') {
+            show_404();
+            return;
+        }
+
+        $token  = $this->_token_valido($this->input->post('token'));
+        $motivo = trim((string)$this->input->post('motivo'));
+
+        if ($token === false) {
+            echo json_encode(array('ok' => false, 'error' => 'Sesión de chat inválida.'));
+            return;
+        }
+
+        $conversacion = $this->Chat_model->obtener_o_crear($token);
+
+        if ($conversacion->estado !== 'ia') {
+            echo json_encode(array('ok' => true));
+            return;
+        }
+
+        $this->Chat_model->guardar_mensaje($conversacion->id, 'sistema', 'El cliente solicitó hablar con una vendedora.');
+        $this->Chat_model->solicitar_vendedora($conversacion->id, $motivo !== '' ? $motivo : null);
+
+        echo json_encode(array('ok' => true));
+    }
+
+    /**
+     * Mensaje del cliente mientras está en espera o ya con una
+     * vendedora (no pasa por la IA).
+     */
+    public function enviar() {
+        if ($this->input->method() !== 'post') {
+            show_404();
+            return;
+        }
+
+        $token   = $this->_token_valido($this->input->post('token'));
+        $mensaje = trim((string)$this->input->post('mensaje'));
+
+        if ($token === false || $mensaje === '') {
+            echo json_encode(array('ok' => false, 'error' => 'Datos inválidos.'));
+            return;
+        }
+
+        $conversacion = $this->Chat_model->obtener_por_token($token);
+
+        if (!$conversacion || !in_array($conversacion->estado, array('en_espera', 'vendedor'), true)) {
+            echo json_encode(array('ok' => false, 'error' => 'Esta conversación no admite mensajes en este momento.'));
+            return;
+        }
+
+        $this->Chat_model->guardar_mensaje($conversacion->id, 'cliente', $mensaje);
+
+        echo json_encode(array('ok' => true));
+    }
+
+    /**
+     * Polling del cliente: estado actual de la conversación + mensajes
+     * nuevos desde el último id que ya tiene pintado en pantalla.
+     */
+    public function estado() {
+        $token    = $this->_token_valido($this->input->get('token'));
+        $desde_id = (int)$this->input->get('desde');
+
+        if ($token === false) {
+            echo json_encode(array('ok' => false, 'error' => 'Sesión de chat inválida.'));
+            return;
+        }
+
+        $conversacion = $this->Chat_model->obtener_por_token($token);
+
+        if (!$conversacion) {
+            echo json_encode(array('ok' => true, 'estado' => 'ia', 'vendedor_nombre' => null, 'mensajes' => array()));
+            return;
+        }
+
+        $info     = $this->Chat_model->info_estado($conversacion->id);
+        $mensajes = $this->Chat_model->mensajes_nuevos($conversacion->id, $desde_id);
+
+        $rows = array();
+        foreach ($mensajes as $m) {
+            $rows[] = array(
+                'id'     => (int)$m->id,
+                'emisor' => $m->emisor,
+                'texto'  => $m->mensaje,
+            );
+        }
+
+        echo json_encode(array(
+            'ok'              => true,
+            'estado'          => $info->estado,
+            'vendedor_nombre' => $info->vendedor_nombre,
+            'mensajes'        => $rows,
+        ));
+    }
+
+    private function _token_valido($token) {
+        $token = trim((string)$token);
+        return preg_match('/^[a-zA-Z0-9\-]{10,64}$/', $token) ? $token : false;
     }
 
     private function _system_prompt() {
@@ -68,18 +191,16 @@ class Chat extends CI_Controller {
         $prompt = "Eres el asistente virtual de {$nombre_tienda}, una tienda que vende principalmente " .
             "lencería y prendas de vestir para mujeres de todas las edades, y también boxers/calzoncillos " .
             "para varones.\n\n" .
-            "Responde preguntas de los clientes sobre las prendas (tallas, colores, precios, categorías, " .
+            "Responde preguntas de los clientes sobre las prendas de forma escueta(tallas, colores, precios, categorías, " .
             "material, etc.) usando SOLO la información del catálogo entregado abajo, en formato CSV " .
-            "(separador \";\"). Si el catálogo no indica el material de una prenda, dilo con honestidad y " .
-            "ofrece consultarlo con una vendedora en vez de inventarlo.\n\n" .
+            "(separador \";\"). Si el catálogo no indica el material de una prenda, no lo menciones, asimismo cualquier pregunta que te hagan dilo con honestidad.\n\n" .
             "Reglas:\n" .
-            "- Responde siempre en español, de forma breve, cálida y amable.\n" .
+            "- Responde siempre en español, de forma breve y amable.\n" .
             "- Los precios están en soles (S/).\n" .
             "- La columna \"sexo\" indica: M = mujer, H = hombre.\n" .
             "- La columna \"tallas_disponibles\" lista las tallas con stock; si está vacía, no hay tallas " .
             "registradas para ese producto.\n" .
-            "- Si preguntan por algo que no está en el catálogo, dilo con honestidad y sugiere contactar a " .
-            "una vendedora por WhatsApp.\n\n";
+            "- Si preguntan por algo que no está en el catálogo, dilo con honestidad.\n\n";
 
         if ($catalogo !== '') {
             $prompt .= "Catálogo de productos:\n{$catalogo}";
