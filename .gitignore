@@ -1,0 +1,8 @@
+/traza.txt
+node_modules/
+/assets/img/
+application/logs/
+applications/logs/
+logs/
+.env
+

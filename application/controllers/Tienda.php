@@ -1,0 +1,90 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Tienda extends CI_Controller {
+
+    public function __construct() {
+        parent::__construct();
+        $this->load->model('Producto_model');
+    }
+
+    public function index() {
+        $categoria  = $this->input->get('categoria');
+        $categorias = $this->Producto_model->get_categorias();
+        $productos  = $this->Producto_model->get_todos($categoria ?: NULL);
+        $this->_adjuntar_imagenes($productos);
+
+        $data = array(
+            'titulo'           => $this->config->item('tienda_nombre'),
+            'productos'        => $productos,
+            'categorias'       => $categorias,
+            'categoria_activa' => $categoria,
+            'carrito_count'    => $this->_carrito_count(),
+        );
+
+        $this->load->view('layouts/header', $data);
+        $this->load->view('tienda/home', $data);
+        $this->load->view('layouts/footer');
+    }
+
+    public function categoria($cat) {
+        $cat        = rawurldecode($cat);
+        $categorias = $this->Producto_model->get_categorias();
+        $productos  = $this->Producto_model->get_todos($cat);
+        $this->_adjuntar_imagenes($productos);
+
+        $data = array(
+            'titulo'           => $cat . ' - ' . $this->config->item('tienda_nombre'),
+            'productos'        => $productos,
+            'categorias'       => $categorias,
+            'categoria_activa' => $cat,
+            'carrito_count'    => $this->_carrito_count(),
+        );
+
+        $this->load->view('layouts/header', $data);
+        $this->load->view('tienda/home', $data);
+        $this->load->view('layouts/footer');
+    }
+
+    public function detalle($id) {
+        $id = (int)$id;
+        $producto = $this->Producto_model->get_por_id($id);
+
+        if (!$producto) {
+            show_404();
+            return;
+        }
+
+        $tallas      = $this->Producto_model->get_tallas($id);
+        $relacionados = $this->Producto_model->get_relacionados($id, $producto->categoria);
+
+        $data = array(
+            'titulo'        => $producto->nombre . ' - ' . $this->config->item('tienda_nombre'),
+            'producto'      => $producto,
+            'tallas'        => $tallas,
+            'relacionados'  => $relacionados,
+            'carrito_count' => $this->_carrito_count(),
+        );
+
+        $this->load->view('layouts/header', $data);
+        $this->load->view('tienda/detalle', $data);
+        $this->load->view('layouts/footer');
+    }
+
+    private function _adjuntar_imagenes(&$productos) {
+        if (empty($productos)) return;
+        $ids      = array_map(function($p) { return $p->id; }, $productos);
+        $imagenes = $this->Producto_model->get_imagenes_bulk($ids);
+        foreach ($productos as $p) {
+            $p->imagenes = !empty($imagenes[(int)$p->id])
+                ? $imagenes[(int)$p->id]
+                : [$p->imagen_url];
+        }
+    }
+
+    private function _carrito_count() {
+        $carrito = $this->session->userdata('carrito');
+        if (!is_array($carrito)) return 0;
+        return array_sum(array_column($carrito, 'cantidad'));
+    }
+}

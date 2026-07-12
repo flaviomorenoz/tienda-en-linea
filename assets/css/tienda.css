@@ -1,0 +1,375 @@
+/* ===================================================
+   TIENDA VIRTUAL - Estilos Personalizados
+   Bootstrap 5 Override + Custom
+   =================================================== */
+
+/* Variables */
+:root {
+    --primary:     #5e3e4e;
+    --accent:      #e17055;
+    --accent-dark: #c0392b;
+    --whatsapp:    #25D366;
+    --light-bg:    #f8f9fa;
+    --card-radius: 12px;
+    --font:        'Poppins', sans-serif;
+    --fondo:    rgb(255,27,138);
+}
+
+/* Base */
+body {
+    font-family: var(--font);
+    color: #2d3436;
+    background-color: var(--fondo);
+    /*background-image: url('../img/logox2.jpeg');*/
+    background-repeat: repeat;
+    background-size: 534px 533px;
+    background-attachment: fixed;
+}
+
+/* ===================================================
+   MAIN CONTENT - Fondo sólido sobre el patrón
+   =================================================== */
+main > .container,
+main > .container-fluid {
+    background:  rgba(232,226,177,1);/*rgba(255, 255, 255, 0.95);*/
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    min-height: 60vh;
+}
+
+/* ===================================================
+   NAVBAR
+   =================================================== */
+#navbar-tienda {
+    background: var(--primary);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    padding: 0.6rem 0;
+}
+
+#navbar-tienda .navbar-brand {
+    font-size: 1.1rem;
+    letter-spacing: 0.3px;
+}
+
+#navbar-tienda .nav-link {
+    color: rgba(255,255,255,0.8) !important;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    transition: all 0.2s;
+}
+
+#navbar-tienda .nav-link:hover,
+#navbar-tienda .nav-link.active {
+    color: #fff !important;
+    background: rgba(255,255,255,0.15);
+}
+
+.btn-carrito {
+    border-radius: 50px;
+    padding: 0.4rem 0.9rem;
+    transition: all 0.2s;
+}
+
+/* ===================================================
+   HERO BANNER
+   =================================================== */
+.hero-banner {
+    background: linear-gradient(135deg, var(--primary) 0%, #636e72 100%);
+    /*min-height: 220px;*/
+}
+
+/* ===================================================
+   TARJETAS DE PRODUCTO
+   =================================================== */
+.product-card {
+    border-radius: var(--card-radius) !important;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.12) !important;
+}
+
+.product-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+.product-img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-img {
+    transform: scale(1.04);
+}
+
+.product-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.75rem;
+}
+
+.product-name-link:hover {
+    color: var(--accent) !important;
+}
+
+/* Precio */
+.precio {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* ===================================================
+   BOTONES CUSTOM
+   =================================================== */
+.btn-consultar {
+    background-color: var(--whatsapp);
+    border-color: var(--whatsapp);
+    color: #fff;
+    font-weight: 600;
+}
+
+.btn-consultar:hover {
+    background-color: #1da851;
+    border-color: #1da851;
+    color: #fff;
+}
+
+/* ===================================================
+   DETALLE DE PRODUCTO
+   =================================================== */
+.product-detail-img-wrapper {
+    background: #f0f0f0;
+    max-height: 550px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-detail-img {
+    width: 100%;
+    max-height: 550px;
+    object-fit: cover;
+    display: block;
+}
+
+.precio-grande {
+    color: var(--primary);
+}
+
+/* Selector de tallas */
+.btn-talla {
+    min-width: 52px;
+    height: 44px;
+    font-weight: 600;
+    border-radius: 8px !important;
+    font-size: 0.875rem;
+    transition: all 0.15s;
+}
+
+.btn-check:checked + .btn-talla {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+/* ===================================================
+   CHECKOUT
+   =================================================== */
+.checkout-steps {
+    gap: 8px;
+    font-size: 0.875rem;
+}
+
+.step-done {
+    color: #198754;
+    font-weight: 600;
+}
+
+.step-active {
+    color: var(--primary);
+    font-weight: 700;
+    background: #e9ecef;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.step-pending {
+    color: #adb5bd;
+}
+
+.step-line {
+    flex: 1;
+    height: 1px;
+    background: #dee2e6;
+    max-width: 40px;
+}
+
+/* Tarjeta de pago visual */
+.payment-card-preview {
+    background: linear-gradient(135deg, #2d3436, #636e72);
+}
+
+.form-control-card {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+.form-control-card::placeholder { color: rgba(255,255,255,0.5); }
+.form-control-card:focus {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.6);
+    color: #fff;
+    box-shadow: none;
+}
+
+/* ===================================================
+   FOOTER
+   =================================================== */
+.footer-tienda {
+    background: var(--primary);
+}
+
+.footer-cat-link:hover {
+    color: rgba(255,255,255,0.9) !important;
+}
+
+/* ===================================================
+   RESPONSIVE / MOBILE
+   =================================================== */
+@media (max-width: 576px) {
+    .hero-banner {
+        min-height: 160px;
+        padding: 2rem 1.5rem !important;
+    }
+    .hero-banner h1 { font-size: 1.6rem; }
+    .product-img { aspect-ratio: 1 / 1; }
+    .checkout-steps { display: none !important; }
+}
+
+/* ===================================================
+   ASISTENTE IA (chat flotante)
+   =================================================== */
+#chat-ia-widget {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 1050;
+}
+
+.chat-ia-toggle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 1.4rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.chat-ia-toggle:hover {
+    transform: scale(1.06);
+}
+
+.chat-ia-panel {
+    width: 320px;
+    max-width: calc(100vw - 2rem);
+    height: 440px;
+    max-height: calc(100vh - 2rem);
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-ia-header {
+    background: var(--primary);
+    color: #fff;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.chat-ia-mensajes {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.9rem;
+    background: var(--light-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chat-ia-msg {
+    max-width: 85%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    line-height: 1.35;
+}
+
+.chat-ia-msg-user {
+    align-self: flex-end;
+    background: var(--accent);
+    color: #fff;
+    border-bottom-right-radius: 2px;
+}
+
+.chat-ia-msg-bot {
+    align-self: flex-start;
+    background: #fff;
+    color: #2d3436;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-bottom-left-radius: 2px;
+}
+
+.chat-ia-escribiendo {
+    padding: 0 0.9rem 0.4rem;
+    font-size: 0.75rem;
+    color: #888;
+    font-style: italic;
+}
+
+.chat-ia-form {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.65rem;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    background: #fff;
+}
+
+.chat-ia-form .btn {
+    background: var(--primary);
+    color: #fff;
+    flex-shrink: 0;
+}
+
+@media (max-width: 400px) {
+    .chat-ia-panel {
+        width: calc(100vw - 2rem);
+    }
+}
