@@ -122,6 +122,7 @@ class Vendedora extends CI_Controller {
                 'id'     => (int)$m->id,
                 'emisor' => $m->emisor,
                 'texto'  => $m->mensaje,
+                'imagen' => $m->imagen ? base_url('chat/imagen/' . $m->imagen) : null,
             );
         }
 

@@ -23,6 +23,7 @@
         .msg-vendedor { background: #2d3436; color: #fff; margin-left: auto; }
         .msg-ia { background: #eef6ff; margin-right: auto; border: 1px dashed #90caf9; }
         .msg-sistema { background: transparent; color: #adb5bd; font-size: .78rem; text-align: center; margin: .5rem auto; max-width: 100%; }
+        .msg-img { display: block; max-width: 100%; border-radius: 8px; cursor: zoom-in; margin-bottom: .3rem; }
     </style>
 </head>
 <body>
@@ -198,7 +199,18 @@ function ver_transcripcion(id_conversacion) {
             data.mensajes.forEach(function(m) {
                 var div = document.createElement('div');
                 div.className = 'msg msg-' + m.emisor;
-                div.textContent = m.texto;
+                if (m.imagen) {
+                    var img = document.createElement('img');
+                    img.src = m.imagen;
+                    img.className = 'msg-img';
+                    img.alt = 'Imagen enviada por el cliente';
+                    div.appendChild(img);
+                }
+                if (m.texto) {
+                    var texto = document.createElement('div');
+                    texto.textContent = m.texto;
+                    div.appendChild(texto);
+                }
                 cont.appendChild(div);
             });
             cont.classList.remove('d-none');

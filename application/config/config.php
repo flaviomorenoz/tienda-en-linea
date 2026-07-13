@@ -54,6 +54,7 @@ $config['csrf_exclude_uris'] = array(
     'chat/preguntar',
     'chat/solicitar_vendedora',
     'chat/enviar',
+    'chat/subir_imagen',
     'admin/chats/tomar/\d+',
     'admin/chats/responder/\d+',
     'admin/chats/cerrar/\d+',

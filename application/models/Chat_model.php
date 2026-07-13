@@ -31,13 +31,22 @@ class Chat_model extends CI_Model {
         return $this->db->get('chat_conversaciones')->row();
     }
 
-    public function guardar_mensaje($id_conversacion, $emisor, $mensaje, $id_vendedor = null) {
-        $this->db->insert('chat_mensajes', array(
+    public function guardar_mensaje($id_conversacion, $emisor, $mensaje, $id_vendedor = null, $imagen = null) {
+        $datos = array(
             'id_conversacion' => $id_conversacion,
             'emisor'          => $emisor,
             'id_vendedor'     => $id_vendedor,
             'mensaje'         => $mensaje,
-        ));
+        );
+
+        // Solo se incluye si viene con valor: evita romper la inserción
+        // de mensajes de texto en instalaciones donde todavía no se
+        // corrió database/chat_imagenes.sql (columna "imagen" nueva).
+        if ($imagen !== null) {
+            $datos['imagen'] = $imagen;
+        }
+
+        $this->db->insert('chat_mensajes', $datos);
 
         $this->db->where('id', $id_conversacion);
         $this->db->update('chat_conversaciones', array('ultima_actividad' => date('Y-m-d H:i:s')));
@@ -65,7 +74,7 @@ class Chat_model extends CI_Model {
      * vendedora asignada, si la hay. Usado para el polling del cliente.
      */
     public function mensajes_nuevos($id_conversacion, $desde_id = 0) {
-        $this->db->select('m.id, m.emisor, m.mensaje, m.creado_en');
+        $this->db->select('m.id, m.emisor, m.mensaje, m.imagen, m.creado_en');
         $this->db->from('chat_mensajes m');
         $this->db->where('m.id_conversacion', $id_conversacion);
         $this->db->where('m.id >', (int)$desde_id);

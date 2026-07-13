@@ -5,6 +5,8 @@ class Chat extends CI_Controller {
 
     private $deepseek_url   = 'https://api.deepseek.com/chat/completions';
     private $deepseek_model = 'deepseek-chat';
+    private $upload_dir     = APPPATH . '../uploads/';
+    private $max_imagen_bytes = 5242880; // 5 MB
 
     public function __construct() {
         parent::__construct();
@@ -140,6 +142,114 @@ class Chat extends CI_Controller {
     }
 
     /**
+     * El cliente pega/adjunta una imagen mientras está en espera o con
+     * una vendedora. Se guarda en application/uploads/ con el nombre
+     * imgYYYY-mm-dd_His.ext (ext detectada a partir del contenido real
+     * del archivo, no del nombre que mande el navegador).
+     */
+    public function subir_imagen() {
+        if ($this->input->method() !== 'post') {
+            show_404();
+            return;
+        }
+
+        $token = $this->_token_valido($this->input->post('token'));
+
+        if ($token === false) {
+            echo json_encode(array('ok' => false, 'error' => 'Sesión de chat inválida.'));
+            return;
+        }
+
+        $conversacion = $this->Chat_model->obtener_por_token($token);
+
+        if (!$conversacion || !in_array($conversacion->estado, array('en_espera', 'vendedor'), true)) {
+            echo json_encode(array('ok' => false, 'error' => 'Solo puedes enviar imágenes hablando con una vendedora.'));
+            return;
+        }
+
+        if (empty($_FILES['imagen']) || $_FILES['imagen']['error'] !== UPLOAD_ERR_OK) {
+            echo json_encode(array('ok' => false, 'error' => 'No se recibió ninguna imagen.'));
+            return;
+        }
+
+        $archivo = $_FILES['imagen'];
+
+        if ($archivo['size'] > $this->max_imagen_bytes) {
+            echo json_encode(array('ok' => false, 'error' => 'La imagen no debe superar 5 MB.'));
+            return;
+        }
+
+        $info = @getimagesize($archivo['tmp_name']);
+        $extensiones = array(
+            IMAGETYPE_JPEG => 'jpg',
+            IMAGETYPE_PNG  => 'png',
+            IMAGETYPE_GIF  => 'gif',
+            IMAGETYPE_WEBP => 'webp',
+        );
+
+        if ($info === false || !isset($extensiones[$info[2]])) {
+            echo json_encode(array('ok' => false, 'error' => 'El archivo no es una imagen válida.'));
+            return;
+        }
+
+        if (!is_dir($this->upload_dir)) {
+            mkdir($this->upload_dir, 0755, true);
+        }
+
+        $nombre = $this->_nombre_imagen_disponible($extensiones[$info[2]]);
+
+        if (!move_uploaded_file($archivo['tmp_name'], $this->upload_dir . $nombre)) {
+            echo json_encode(array('ok' => false, 'error' => 'No se pudo guardar la imagen.'));
+            return;
+        }
+
+        $mensaje = trim((string)$this->input->post('mensaje'));
+        $id_mensaje = $this->Chat_model->guardar_mensaje($conversacion->id, 'cliente', $mensaje !== '' ? $mensaje : null, null, $nombre);
+
+        echo json_encode(array('ok' => true, 'id' => (int)$id_mensaje, 'imagen' => $nombre, 'url' => base_url('chat/imagen/' . $nombre)));
+    }
+
+    /**
+     * Sirve una imagen del chat. application/ no es accesible
+     * directamente por Apache, así que se entrega por este endpoint.
+     */
+    public function imagen($nombre) {
+        $nombre = basename((string)$nombre);
+
+        if (!preg_match('/^img\d{4}-\d{2}-\d{2}_\d{6}(_\d+)?\.(jpg|png|gif|webp)$/', $nombre)) {
+            show_404();
+            return;
+        }
+
+        $ruta = $this->upload_dir . $nombre;
+
+        if (!is_file($ruta)) {
+            show_404();
+            return;
+        }
+
+        $tipos = array('jpg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp');
+        $ext   = strtolower(pathinfo($ruta, PATHINFO_EXTENSION));
+
+        $this->output
+             ->set_content_type(isset($tipos[$ext]) ? $tipos[$ext] : 'application/octet-stream')
+             ->set_output(file_get_contents($ruta));
+    }
+
+    private function _nombre_imagen_disponible($ext) {
+        $base   = 'img' . date('Y-m-d_His');
+        $nombre = $base . '.' . $ext;
+        $i      = 1;
+
+        while (file_exists($this->upload_dir . $nombre)) {
+            $nombre = $base . '_' . $i . '.' . $ext;
+            $i++;
+        }
+
+        return $nombre;
+    }
+
+    /**
      * Polling del cliente: estado actual de la conversación + mensajes
      * nuevos desde el último id que ya tiene pintado en pantalla.
      */
@@ -168,6 +278,7 @@ class Chat extends CI_Controller {
                 'id'     => (int)$m->id,
                 'emisor' => $m->emisor,
                 'texto'  => $m->mensaje,
+                'imagen' => $m->imagen ? base_url('chat/imagen/' . $m->imagen) : null,
             );
         }
 
@@ -200,8 +311,9 @@ class Chat extends CI_Controller {
             "- La columna \"sexo\" indica: M = mujer, H = hombre.\n" .
             "- La columna \"tallas_disponibles\" lista las tallas con stock; si está vacía, no hay tallas " .
             "registradas para ese producto.\n" .
-            "- Si preguntan por algo que no está en el catálogo, dilo con honestidad.\n\n";
-
+            "- Si preguntan por algo que no está en el catálogo, dilo con honestidad.\n".
+            "- Si te dicen \"Quiero tal prenda\" y la puedes identificar estonces respóndele que se está mandando su orden con una vendedora y que por favor haga el deposito correspondiente al Yape con Nro. de telefono 989856501 y que copie la foto del pago.\n".
+            "-Evitar decir \"lamento informarte\" etc etc.\n\n";
         if ($catalogo !== '') {
             $prompt .= "Catálogo de productos:\n{$catalogo}";
         } else {

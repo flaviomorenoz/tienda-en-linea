@@ -99,7 +99,20 @@
     function pintarMensaje(m) {
         var div = document.createElement('div');
         div.className = 'msg msg-' + m.emisor;
-        div.textContent = m.texto;
+
+        if (m.imagen) {
+            var img = document.createElement('img');
+            img.src = m.imagen;
+            img.className = 'msg-img';
+            img.alt = 'Imagen enviada por el cliente';
+            div.appendChild(img);
+        }
+        if (m.texto) {
+            var texto = document.createElement('div');
+            texto.textContent = m.texto;
+            div.appendChild(texto);
+        }
+
         mensajesEl.appendChild(div);
     }
 

@@ -67,11 +67,20 @@
 
     var CLASE_POR_EMISOR = { user: 'user', assistant: 'bot', cliente: 'user', ia: 'bot', vendedor: 'vendedor', sistema: 'sistema' };
 
-    function pintarMensaje(emisor, texto) {
+    function pintarMensaje(emisor, texto, imagenUrl) {
         var clase = CLASE_POR_EMISOR[emisor] || 'bot';
         var burbuja = document.createElement('div');
         burbuja.className = 'chat-ia-msg chat-ia-msg-' + clase;
-        burbuja.innerHTML = escapeHtml(texto).replace(/\n/g, '<br>');
+
+        var html = '';
+        if (imagenUrl) {
+            html += '<img src="' + escapeHtml(imagenUrl) + '" class="chat-ia-img" alt="Imagen enviada">';
+        }
+        if (texto) {
+            html += escapeHtml(texto).replace(/\n/g, '<br>');
+        }
+        burbuja.innerHTML = html;
+
         mensajesEl.appendChild(burbuja);
         mensajesEl.scrollTop = mensajesEl.scrollHeight;
     }
@@ -150,7 +159,7 @@
                 nombreVendedoraActual = data.vendedor_nombre;
 
                 data.mensajes.forEach(function (m) {
-                    pintarMensaje(m.emisor, m.texto);
+                    pintarMensaje(m.emisor, m.texto, m.imagen);
                     ultimoMsgId = Math.max(ultimoMsgId, m.id);
                 });
 
@@ -223,6 +232,46 @@
         mensajesEl.innerHTML = '';
         pintarHistorialLocal();
         actualizarModoUI();
+    });
+
+    function subirImagen(archivo) {
+        if (estadoActual !== 'en_espera' && estadoActual !== 'vendedor') {
+            pintarMensaje('sistema', 'Para enviar imágenes primero pulsa "Hablar con una vendedora".');
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('token', token);
+        formData.append('imagen', archivo);
+
+        fetch(window.CHAT_SUBIR_IMAGEN_URL, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            body: formData
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data && data.ok) {
+                pintarMensaje('cliente', '', data.url);
+                ultimoMsgId = Math.max(ultimoMsgId, data.id || 0);
+            } else {
+                pintarMensaje('sistema', (data && data.error) || 'No se pudo enviar la imagen.');
+            }
+        })
+        .catch(function () {
+            pintarMensaje('sistema', 'No se pudo enviar la imagen.');
+        });
+    }
+
+    input.addEventListener('paste', function (e) {
+        var items = (e.clipboardData && e.clipboardData.items) || [];
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type && items[i].type.indexOf('image/') === 0) {
+                e.preventDefault();
+                subirImagen(items[i].getAsFile());
+                return;
+            }
+        }
     });
 
     form.addEventListener('submit', function (e) {

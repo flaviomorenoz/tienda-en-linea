@@ -34,6 +34,7 @@
         .msg-vendedor { background: #2d3436; color: #fff; margin-left: auto; }
         .msg-ia { background: #eef6ff; margin-right: auto; border: 1px dashed #90caf9; }
         .msg-sistema { background: transparent; color: #adb5bd; font-size: .78rem; text-align: center; margin: .5rem auto; max-width: 100%; }
+        .msg-img { display: block; max-width: 100%; border-radius: 8px; cursor: zoom-in; margin-bottom: .3rem; }
 
         .chats-form { border-top: 1px solid #eee; padding: .75rem; display: none; }
         .badge-espera { background: #dc3545; }

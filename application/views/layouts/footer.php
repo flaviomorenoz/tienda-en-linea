@@ -83,6 +83,7 @@
     window.CHAT_SOLICITAR_URL = '<?php echo base_url('chat/solicitar_vendedora'); ?>';
     window.CHAT_ENVIAR_URL = '<?php echo base_url('chat/enviar'); ?>';
     window.CHAT_ESTADO_URL = '<?php echo base_url('chat/estado'); ?>';
+    window.CHAT_SUBIR_IMAGEN_URL = '<?php echo base_url('chat/subir_imagen'); ?>';
 </script>
 <script src="<?php echo base_url('assets/js/chat_ia.js'); ?>"></script>
 

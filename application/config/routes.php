@@ -22,6 +22,8 @@ $route['chat/preguntar'] = 'chat/preguntar';
 $route['chat/solicitar_vendedora'] = 'chat/solicitar_vendedora';
 $route['chat/enviar'] = 'chat/enviar';
 $route['chat/estado'] = 'chat/estado';
+$route['chat/subir_imagen'] = 'chat/subir_imagen';
+$route['chat/imagen/(:any)'] = 'chat/imagen/$1';
 
 // Pago y checkout
 $route['checkout'] = 'pago/checkout';
