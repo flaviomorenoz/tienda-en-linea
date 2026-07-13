@@ -53,3 +53,4 @@ $route['admin/chats/cerrar/(:num)'] = 'vendedora/cerrar/$1';
 $route['admin/chats/disponibilidad'] = 'vendedora/disponibilidad';
 $route['admin/chats/historial'] = 'vendedora/historial';
 $route['admin/chats/historial_json'] = 'vendedora/historial_json';
+$route['admin/chats/actualizar_cliente/(:num)'] = 'vendedora/actualizar_cliente/$1';

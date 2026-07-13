@@ -113,14 +113,46 @@
     </div>
 </div>
 
+<!-- Modal editar datos del cliente -->
+<div class="modal fade" id="modalEditarCliente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title fw-bold" id="modalEditarClienteLabel">Datos del cliente</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="form-editar-cliente">
+                <div class="modal-body">
+                    <div id="editar-cliente-error" class="alert alert-danger py-2 small d-none"></div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nombre</label>
+                        <input type="text" id="input-nombre-cliente" class="form-control" maxlength="200" placeholder="Nombre del cliente">
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label fw-semibold">Celular</label>
+                        <input type="text" id="input-celular-cliente" class="form-control" maxlength="20" placeholder="Ej: 987654321">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-dark btn-sm">
+                        <i class="bi bi-save me-1"></i>Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-const ajaxUrl     = <?php echo json_encode(base_url('admin/chats/historial_json')); ?>;
-const mensajesUrl = <?php echo json_encode(base_url('admin/chats/mensajes/')); ?>;
+const ajaxUrl        = <?php echo json_encode(base_url('admin/chats/historial_json')); ?>;
+const mensajesUrl    = <?php echo json_encode(base_url('admin/chats/mensajes/')); ?>;
+const actualizarUrl  = <?php echo json_encode(base_url('admin/chats/actualizar_cliente/')); ?>;
 
 function escHtml(str) {
     if (str === null || str === undefined) return '';
@@ -161,8 +193,11 @@ const table = $('#tabla-historial').DataTable({
             className: 'text-center',
             render: function(d, type, row) {
                 if (type !== 'display') return '';
-                return '<a href="#" onclick="ver_transcripcion(' + row.id + ');return false;" title="Ver conversación">' +
+                let cad = '<a href="#" onclick="ver_transcripcion(' + row.id + ');return false;" title="Ver conversación">' +
                        '<i class="bi bi-chat-square-text" style="font-size:18px"></i></a>';
+                cad = cad + '&nbsp;<a href="#" onclick="modificar_datos(' + row.id + ');return false;" title="Modificar datos" class="ms-2">' +
+                       '<i class="bi bi-pencil-square" style="font-size:18px"></i></a>';
+                return cad;
             }
         }
     ],
@@ -220,6 +255,54 @@ function ver_transcripcion(id_conversacion) {
             document.getElementById('transcripcion-error').classList.remove('d-none');
         });
 }
+
+let conversacionEditando = null;
+
+function modificar_datos(id_conversacion) {
+    const fila = table.rows().data().toArray().find(function(r) { return r.id === id_conversacion; });
+
+    conversacionEditando = id_conversacion;
+    document.getElementById('modalEditarClienteLabel').textContent = 'Datos del cliente #' + id_conversacion;
+    document.getElementById('input-nombre-cliente').value = (fila && fila.nombre_cliente) || '';
+    document.getElementById('input-celular-cliente').value = (fila && fila.celular_cliente) || '';
+    document.getElementById('editar-cliente-error').classList.add('d-none');
+
+    var modal = new bootstrap.Modal(document.getElementById('modalEditarCliente'));
+    modal.show();
+}
+
+document.getElementById('form-editar-cliente').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    if (!conversacionEditando) return;
+
+    const errorEl = document.getElementById('editar-cliente-error');
+    errorEl.classList.add('d-none');
+
+    const formData = new FormData();
+    formData.append('nombre_cliente', document.getElementById('input-nombre-cliente').value.trim());
+    formData.append('celular_cliente', document.getElementById('input-celular-cliente').value.trim());
+
+    fetch(actualizarUrl + conversacionEditando, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data && data.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('modalEditarCliente')).hide();
+            table.ajax.reload(null, false);
+        } else {
+            errorEl.textContent = (data && data.error) || 'No se pudo guardar.';
+            errorEl.classList.remove('d-none');
+        }
+    })
+    .catch(function() {
+        errorEl.textContent = 'No se pudo guardar.';
+        errorEl.classList.remove('d-none');
+    });
+});
 </script>
 
 </body>

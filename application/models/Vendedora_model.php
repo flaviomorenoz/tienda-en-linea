@@ -53,6 +53,21 @@ class Vendedora_model extends CI_Model {
     }
 
     /**
+     * Actualiza nombre/celular del cliente de una conversación propia
+     * de esta vendedora (cerrada o no).
+     */
+    public function actualizar_cliente($id_conversacion, $id_vendedora, $nombre_cliente, $celular_cliente) {
+        $this->db->where('id', $id_conversacion);
+        $this->db->where('id_vendedor', $id_vendedora);
+        $this->db->update('chat_conversaciones', array(
+            'nombre_cliente'  => $nombre_cliente,
+            'celular_cliente' => $celular_cliente,
+        ));
+
+        return $this->db->affected_rows() > 0;
+    }
+
+    /**
      * Conversaciones activas asignadas a esta vendedora.
      */
     public function asignadas($id_vendedora) {

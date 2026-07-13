@@ -79,6 +79,42 @@ class Vendedora extends CI_Controller {
              ->set_output(json_encode(array('data' => $rows)));
     }
 
+    public function actualizar_cliente($id_conversacion) {
+        $this->_check_vendedora();
+
+        if ($this->input->method() !== 'post') {
+            show_404();
+            return;
+        }
+
+        $nombre  = trim((string)$this->input->post('nombre_cliente'));
+        $celular = trim((string)$this->input->post('celular_cliente'));
+
+        if ($nombre !== '' && mb_strlen($nombre) > 200) {
+            echo json_encode(array('ok' => false, 'error' => 'El nombre es demasiado largo.'));
+            return;
+        }
+
+        if ($celular !== '' && !preg_match('/^[\d\s\-\+]{6,20}$/', $celular)) {
+            echo json_encode(array('ok' => false, 'error' => 'El celular no es válido.'));
+            return;
+        }
+
+        $ok = $this->Vendedora_model->actualizar_cliente(
+            (int)$id_conversacion,
+            $this->vendedora->id,
+            $nombre !== '' ? $nombre : null,
+            $celular !== '' ? $celular : null
+        );
+
+        if (!$ok) {
+            echo json_encode(array('ok' => false, 'error' => 'Conversación no encontrada.'));
+            return;
+        }
+
+        echo json_encode(array('ok' => true));
+    }
+
     public function mis_conversaciones_json() {
         $this->_check_vendedora();
 

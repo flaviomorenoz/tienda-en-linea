@@ -59,6 +59,7 @@ $config['csrf_exclude_uris'] = array(
     'admin/chats/responder/\d+',
     'admin/chats/cerrar/\d+',
     'admin/chats/disponibilidad',
+    'admin/chats/actualizar_cliente/\d+',
 );
 $config['compress_output'] = FALSE;
 $config['time_reference'] = 'local';
