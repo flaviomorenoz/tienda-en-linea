@@ -73,10 +73,12 @@
             <table id="tabla-historial" class="table table-hover align-middle w-100">
                 <thead class="table-light">
                     <tr>
+                        <th>Id</th>
                         <th>Cliente</th>
                         <th>Celular</th>
                         <th>Motivo</th>
                         <th>Iniciado</th>
+
                         <th>Cerrado</th>
                         <th class="text-center">Mensajes</th>
                         <th class="text-center">Acción</th>
@@ -174,9 +176,10 @@ const table = $('#tabla-historial').DataTable({
     ajax: { url: ajaxUrl, type: 'GET', dataSrc: 'data' },
     processing: true,
     columns: [
+        { data: 'id', className: 'text-center' },
         { data: 'nombre_cliente', render: function(d) { return escHtml(d || 'Cliente sin nombre'); } },
-        { data: 'celular_cliente', render: function(d) { return escHtml(d || '—'); } },
-        { data: 'motivo', render: function(d) { return escHtml(d || '—'); } },
+        { data: 'celular_cliente', render: function(d, type, row) { return escHtml(row.celular_cliente || '—'); } },
+        { data: 'motivo', render: function(d, type, row) { return escHtml(row.motivo || '—'); } },
         {
             data: 'iniciado_en', className: 'small text-muted',
             render: function(d, type) { return type === 'display' ? fmtFecha(d) : d; }

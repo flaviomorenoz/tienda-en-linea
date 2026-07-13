@@ -31,6 +31,28 @@ class Chat_model extends CI_Model {
         return $this->db->get('chat_conversaciones')->row();
     }
 
+    public function obtener_por_id($id_conversacion) {
+        //$this->db->where('id', $id_conversacion);
+        //return $this->db->get('chat_conversaciones')->row();
+        /*
+        $this->db->select('a.id, a.nombre_cliente, a.celular_cliente, STRING_AGG(DISTINCT b.imagen, ',') AS imagenes');
+        $this->db->from('chat_conversaciones a');
+        $this->db->join('chat_mensajes b', 'a.id = b.id_conversacion', 'left');
+        $this->db->where('a.id', $id_conversacion);
+        $this->db->group_by('a.id, a.nombre_cliente, a.celular_cliente');
+        */
+        //echo $this->db->get_compiled_select(); // Para depuración: muestra la consulta SQL generada
+        //return $this->db->get()->row();
+
+        $cSql = "SELECT a.id, a.nombre_cliente, a.celular_cliente, STRING_AGG(DISTINCT b.imagen, ',') imagenes 
+            FROM chat_conversaciones a 
+            LEFT JOIN chat_mensajes b ON a.id = b.id_conversacion 
+            WHERE a.id = ? 
+            GROUP BY a.id, a.nombre_cliente, a.celular_cliente";
+
+        return $this->db->query($cSql, array($id_conversacion))->row();
+    }
+
     public function guardar_mensaje($id_conversacion, $emisor, $mensaje, $id_vendedor = null, $imagen = null) {
         $datos = array(
             'id_conversacion' => $id_conversacion,

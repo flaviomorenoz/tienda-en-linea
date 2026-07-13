@@ -51,6 +51,7 @@ $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = TRUE;
 $config['csrf_exclude_uris'] = array(
     'carrito/agregar',
+    'carrito/actualizar_datos_cliente/\d+',
     'chat/preguntar',
     'chat/solicitar_vendedora',
     'chat/enviar',

@@ -16,6 +16,7 @@ $route['carrito/agregar'] = 'carrito/agregar';
 $route['carrito/quitar/(:num)'] = 'carrito/quitar/$1';
 $route['carrito/actualizar'] = 'carrito/actualizar';
 $route['carrito/vaciar'] = 'carrito/vaciar';
+$route['carrito/actualizar_datos_cliente/(:num)'] = 'carrito/actualizar_datos_cliente/$1';
 
 // Asistente IA / Chat con vendedora
 $route['chat/preguntar'] = 'chat/preguntar';

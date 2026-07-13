@@ -6,6 +6,7 @@ class Carrito extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Producto_model');
+        $this->load->model('Chat_model');
     }
 
     public function ver() {
@@ -119,6 +120,30 @@ class Carrito extends CI_Controller {
         $this->session->set_userdata('carrito', $carrito);
         $this->session->set_flashdata('success', 'Carrito actualizado.');
         redirect('carrito');
+    }
+
+    /**
+     * Autocompleta nombres/celular del checkout con los datos que el
+     * cliente ya dio en su conversación de chat (chat_conversaciones).
+     */
+    public function actualizar_datos_cliente($id_conversacion) {
+        /*if ($this->input->method() !== 'post') {
+            show_404();
+            return;
+        }*/
+
+        $conversacion = $this->Chat_model->obtener_por_id((int)$id_conversacion);
+        if (!$conversacion) {
+            echo json_encode(array('ok' => false, 'error' => 'Conversación no encontrada.'));
+            return;
+        }
+
+        echo json_encode(array(
+            'ok'              => true,
+            'nombre_cliente'  => $conversacion->nombre_cliente,
+            'celular_cliente' => $conversacion->celular_cliente,
+            'imagenes'        => $conversacion->imagenes,
+        ));
     }
 
     public function vaciar() {

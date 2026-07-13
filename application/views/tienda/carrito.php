@@ -168,7 +168,7 @@
                                     <div class="col-md-5">
                                         <label class="form-label">DNI <span class="text-danger">*</span></label>
                                         <input type="text" name="dni" id="dni" class="form-control <?php echo form_error('dni') ? 'is-invalid' : ''; ?>"
-                                            placeholder="12345678" maxlength="15"
+                                            placeholder="" maxlength="15"
                                             value="<?php echo set_value('dni'); ?>" required>
                                         <div class="invalid-feedback"><?php echo form_error('dni'); ?></div>
                                     </div>
@@ -183,7 +183,7 @@
                                         <label class="form-label">Dirección de envío <span class="text-danger">*</span></label>
                                         <input type="text" name="direccion_envio" id="direccion_envio"
                                             class="form-control <?php echo form_error('direccion_envio') ? 'is-invalid' : ''; ?>"
-                                            placeholder="Av. Los Olivos 123, Lima"
+                                            placeholder="sitio..."
                                             value="<?php echo set_value('direccion_envio'); ?>" required>
                                         <div class="invalid-feedback"><?php echo form_error('direccion_envio'); ?></div>
                                     </div>
@@ -200,12 +200,20 @@
                                         <textarea name="observaciones" id="observaciones" class="form-control" rows="2"
                                                 placeholder="Cerca al parque, piso 2, etc."><?php echo set_value('observaciones'); ?></textarea>
                                     </div>
-                                    <div class="col-12 text-center">
+                                </div>
+                                <div class="row g-3" style="margin-top: 10px;">
+                                    <div class="col-10 text-center">
                                         <button type="button" onclick="previo(0)" class="btn btn-dark btn-lg">
                                             <i class="bi bi-lock-fill me-2"></i>Pagar ahora
                                         </a>
-                                        <input type="text" name="tipo_pago" id="tipo_pago" value="1">
+                                        <input type="hidden" name="tipo_pago" id="tipo_pago" value="1">
                                     </div>
+                                    <div class="col-2">
+                                        <input type="text" name="id_c" id="id_c" placeholder="Id Conversacion" class="form-control" onblur="traer_datos()">
+                                    </div>
+                                </div>
+                                <div class="row g-3" style="margin-top: 10px;">
+                                    <img src="" id="img_pago" class="img-fluid" style="display:none; max-width: 200px; margin: 0 auto;">
                                 </div>
                             </div>
                         </div>
@@ -299,5 +307,38 @@
         document.getElementById("direccion_envio").value    = "LOS ALISOS 615"
         document.getElementById("celular").value            = "951564780"
         document.getElementById("observaciones").value      = "CARMELO LA PLAZA"
+    }
+
+    function traer_datos(){
+        let id_c = document.getElementById("id_c").value;
+        if(id_c.trim() === "") return;
+
+        fetch('<?php echo base_url('carrito/actualizar_datos_cliente/'); ?>' + encodeURIComponent(id_c), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': '<?php echo $this->security->get_csrf_hash(); ?>'
+            },
+            body: new URLSearchParams({
+                nombre_cliente: '',
+                celular_cliente: ''
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                document.getElementById("nombres").value = data.nombre_cliente || '';
+                document.getElementById("celular").value = data.celular_cliente || '';
+                document.getElementById("img_pago").style.display = data.imagenes ? 'block' : 'none';
+                document.getElementById("img_pago").src = data.imagenes ? '<?php echo base_url('uploads/'); ?>' + data.imagenes : '';
+                console.log(data.nombre_cliente, data.celular_cliente);
+            } else {
+                alert('Error al obtener datos del cliente: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al obtener los datos del cliente.');
+        });
     }
 </script>
