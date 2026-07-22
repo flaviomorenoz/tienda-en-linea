@@ -78,4 +78,47 @@ function acceso_denegado($msg=""){
         exit($msg);
     }
 }
+
+function menu_principal($tienda_nombre=""){
+    ?>
+<div class="admin-sidebar text-white d-flex flex-column py-4 px-3">
+    <div class="text-center mb-4">
+        <i class="bi bi-bag-heart-fill fs-2 d-block mb-1"></i>
+        <span class="fw-bold small"><?php echo $tienda_nombre ?></span>
+        <div class="text-white-50 x-small">Admin Panel</div>
+    </div>
+    <nav class="flex-grow-1">
+        <a href="<?php echo base_url('admin/pedidos'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
+            <i class="bi bi-list-ul"></i> Pedidos
+        </a>
+        <a href="<?php echo base_url('admin/chats'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
+            <i class="bi bi-chat-dots-fill"></i> Chats
+        </a>
+        <a href="<?php echo base_url('admin/chats/historial'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
+            <i class="bi bi-clock-history"></i> Historial
+        </a>
+        <a href="<?php echo base_url('admin/chats_ia'); ?>" class="d-flex align-items-center gap-2 text-white text-decoration-none py-2 px-3 rounded mb-1 bg-white bg-opacity-10">
+            <i class="bi bi-robot"></i> Chats IA
+        </a>
+        <a href="<?php echo base_url('admin/whatsapp'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
+            <i class="bi bi-whatsapp"></i> WhatsApp
+        </a>
+        <a href="<?php echo base_url('tia_conversa'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
+            <i class="bi bi-chat-square-heart-fill"></i> Conversaciones IA
+        </a>
+        <a href="<?php echo base_url(); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1" target="_blank">
+            <i class="bi bi-shop"></i> Ver tienda
+        </a>
+    </nav>
+    <div class="border-top border-secondary pt-3 mt-3">
+        <div class="text-white-50 small mb-2">
+            <i class="bi bi-person-circle me-1"></i><?php echo htmlspecialchars($admin_nombre ?? 'Admin'); ?>
+        </div>
+        <a href="<?php echo base_url('admin/logout'); ?>" class="btn btn-outline-light btn-sm w-100">
+            <i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión
+        </a>
+    </div>
+</div>
+    <?php
+}
 ?>

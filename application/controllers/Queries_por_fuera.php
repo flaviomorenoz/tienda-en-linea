@@ -10,7 +10,7 @@ class Queries_por_fuera extends CI_Controller
         $this->load->model('queries_por_fuera_model');
     }
 
-    function actualizar_estados(){
+    function actualizar_estados(){ // del Courier Shalom API
         $pedidos = $this->queries_por_fuera_model->get_pedidos_con_codigo();
 
         foreach ($pedidos as $pedido){
@@ -88,5 +88,32 @@ class Queries_por_fuera extends CI_Controller
         } else {
             return $respuesta;
         }
+    }
+
+    function actualizar_estado_conversaciones_ia(){
+        // Barriendo las ultimas 20 conversaciones que se quedaron solo con la IA
+        // (estado = 'ia') y sin actividad en los ultimos 30 minutos: se cierran.
+        $cSql = "SELECT id FROM chat_conversaciones
+                 WHERE estado = 'ia'
+                   AND cerrado_en IS NULL
+                   AND ultima_actividad < NOW() - INTERVAL '30 minutes'
+                 ORDER BY id DESC
+                 LIMIT 20";
+        $query = $this->db->query($cSql);
+
+        foreach ($query->result() as $row) {
+            $id_conversacion = $row->id;
+
+            // "AND estado = 'ia'" de nuevo aca por seguridad: evita cerrar una
+            // conversacion que justo paso a en_espera/vendedor entre el select y el update.
+            $cSql = "UPDATE chat_conversaciones
+                     SET estado = 'cerrada', cerrado_en = NOW()
+                     WHERE id = ? AND estado = 'ia'";
+            $this->db->query($cSql, array($id_conversacion));
+
+            traza("Conversacion ID: " . $id_conversacion . " cerrada automaticamente por inactividad (IA, +30 min sin mensajes).");
+        }
+
+        traza("PROCESO DE ACTUALIZACION DE ESTADOS DE CONVERSACIONES IA.");
     }
 }

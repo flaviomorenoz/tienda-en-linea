@@ -19,12 +19,25 @@ $route['carrito/vaciar'] = 'carrito/vaciar';
 $route['carrito/actualizar_datos_cliente/(:num)'] = 'carrito/actualizar_datos_cliente/$1';
 
 // Asistente IA / Chat con vendedora
+/*
 $route['chat/preguntar'] = 'chat/preguntar';
 $route['chat/solicitar_vendedora'] = 'chat/solicitar_vendedora';
 $route['chat/enviar'] = 'chat/enviar';
 $route['chat/estado'] = 'chat/estado';
 $route['chat/subir_imagen'] = 'chat/subir_imagen';
 $route['chat/imagen/(:any)'] = 'chat/imagen/$1';
+*/
+
+// Asistente IA por WhatsApp (módulo independiente)
+$route['whatsapp/webhook'] = 'whatsapp/webhook';
+$route['admin/whatsapp'] = 'whatsapp/historial';
+$route['admin/whatsapp/json'] = 'whatsapp/historial_json';
+$route['admin/whatsapp/mensajes/(:any)'] = 'whatsapp/mensajes/$1';
+
+// Panel admin: conversaciones que se quedaron solo con la IA
+//$route['admin/chats_ia'] = 'chat/chats_ia';
+//$route['admin/chats_ia/json'] = 'chat/chats_ia_json';
+//$route['admin/chats_ia/mensajes/(:num)'] = 'chat/chats_ia_mensajes/$1';
 
 // Pago y checkout
 $route['checkout'] = 'pago/checkout';
@@ -44,6 +57,7 @@ $route['admin/pedidos_json']       = 'admin/pedidos_json';
 $route['admin/detalle/(:num)']     = 'admin/detalle_json/$1';
 
 // Panel de chats (vendedoras)
+/*
 $route['admin/chats'] = 'vendedora/panel';
 $route['admin/chats/en_espera'] = 'vendedora/en_espera_json';
 $route['admin/chats/mis_conversaciones'] = 'vendedora/mis_conversaciones_json';
@@ -55,3 +69,4 @@ $route['admin/chats/disponibilidad'] = 'vendedora/disponibilidad';
 $route['admin/chats/historial'] = 'vendedora/historial';
 $route['admin/chats/historial_json'] = 'vendedora/historial_json';
 $route['admin/chats/actualizar_cliente/(:num)'] = 'vendedora/actualizar_cliente/$1';
+*/

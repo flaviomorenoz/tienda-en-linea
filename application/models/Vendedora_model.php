@@ -46,9 +46,20 @@ class Vendedora_model extends CI_Model {
         $this->db->select('cc.*, (SELECT COUNT(*) FROM chat_mensajes m WHERE m.id_conversacion = cc.id) AS total_mensajes');
         $this->db->from('chat_conversaciones cc');
         $this->db->where('cc.id_vendedor', $id_vendedora);
-        $this->db->where('cc.estado', 'cerrada');
-        $this->db->where('cc.cerrado_en >=', $desde);
+        //$this->db->where('cc.estado', 'cerrada');
+        //$this->db->where('cc.cerrado_en >=', $desde);
         $this->db->order_by('cc.cerrado_en', 'DESC');
+        
+        //traza($this->db->get_compiled_select());
+        $this->db->reset_query();
+
+        $this->db->select('cc.*, (SELECT COUNT(*) FROM chat_mensajes m WHERE m.id_conversacion = cc.id) AS total_mensajes');
+        $this->db->from('chat_conversaciones cc');
+        $this->db->where('cc.id_vendedor', $id_vendedora);
+        //$this->db->where('cc.estado', 'cerrada');
+        //$this->db->where('cc.cerrado_en >=', $desde);
+        $this->db->order_by('cc.cerrado_en', 'DESC');
+
         return $this->db->get()->result();
     }
 

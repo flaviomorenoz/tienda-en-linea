@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial de chats - Admin</title>
+    <title>WhatsApp - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,11 +19,8 @@
 
         .chats-mensajes { flex-grow: 1; overflow-y: auto; padding: 1rem; max-height: 55vh; }
         .msg { max-width: 70%; padding: .5rem .8rem; border-radius: 12px; margin-bottom: .6rem; font-size: .9rem; white-space: pre-wrap; word-break: break-word; }
-        .msg-cliente { background: #e9ecef; margin-right: auto; }
-        .msg-vendedor { background: #2d3436; color: #fff; margin-left: auto; }
-        .msg-ia { background: #eef6ff; margin-right: auto; border: 1px dashed #90caf9; }
-        .msg-sistema { background: transparent; color: #adb5bd; font-size: .78rem; text-align: center; margin: .5rem auto; max-width: 100%; }
-        .msg-img { display: block; max-width: 100%; border-radius: 8px; cursor: zoom-in; margin-bottom: .3rem; }
+        .msg-user { background: #e9ecef; margin-right: auto; }
+        .msg-assistant { background: #25d366; color: #fff; margin-left: auto; }
     </style>
 </head>
 <body>
@@ -42,13 +39,13 @@
         <a href="<?php echo base_url('admin/chats'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
             <i class="bi bi-chat-dots-fill"></i> Chats
         </a>
-        <a href="<?php echo base_url('admin/chats/historial'); ?>" class="d-flex align-items-center gap-2 text-white text-decoration-none py-2 px-3 rounded mb-1 bg-white bg-opacity-10">
+        <a href="<?php echo base_url('admin/chats/historial'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
             <i class="bi bi-clock-history"></i> Historial
         </a>
         <a href="<?php echo base_url('admin/chats_ia'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
             <i class="bi bi-robot"></i> Chats IA
         </a>
-        <a href="<?php echo base_url('admin/whatsapp'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
+        <a href="<?php echo base_url('admin/whatsapp'); ?>" class="d-flex align-items-center gap-2 text-white text-decoration-none py-2 px-3 rounded mb-1 bg-white bg-opacity-10">
             <i class="bi bi-whatsapp"></i> WhatsApp
         </a>
         <a href="<?php echo base_url(); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1" target="_blank">
@@ -57,7 +54,7 @@
     </nav>
     <div class="border-top border-secondary pt-3 mt-3">
         <div class="text-white-50 small mb-2">
-            <i class="bi bi-person-circle me-1"></i><?php echo htmlspecialchars($admin_nombre ?? 'Vendedora'); ?>
+            <i class="bi bi-person-circle me-1"></i><?php echo htmlspecialchars($admin_nombre ?? 'Admin'); ?>
         </div>
         <a href="<?php echo base_url('admin/logout'); ?>" class="btn btn-outline-light btn-sm w-100">
             <i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión
@@ -69,23 +66,19 @@
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="fw-bold mb-0">Historial de mis chats</h4>
-            <p class="text-muted small mb-0">Conversaciones cerradas del último mes</p>
+            <h4 class="fw-bold mb-0">Asistente IA por WhatsApp</h4>
+            <p class="text-muted small mb-0">Conversaciones del último mes (solo lectura)</p>
         </div>
     </div>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
-            <table id="tabla-historial" class="table table-hover align-middle w-100">
+            <table id="tabla-whatsapp" class="table table-hover align-middle w-100">
                 <thead class="table-light">
                     <tr>
-                        <th>Id</th>
-                        <th>Cliente</th>
-                        <th>Celular</th>
-                        <th>Motivo</th>
-                        <th>Iniciado</th>
-
-                        <th>Cerrado</th>
+                        <th>Teléfono</th>
+                        <th>Primer mensaje</th>
+                        <th>Último mensaje</th>
                         <th class="text-center">Mensajes</th>
                         <th class="text-center">Acción</th>
                     </tr>
@@ -121,46 +114,14 @@
     </div>
 </div>
 
-<!-- Modal editar datos del cliente -->
-<div class="modal fade" id="modalEditarCliente" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h6 class="modal-title fw-bold" id="modalEditarClienteLabel">Datos del cliente</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="form-editar-cliente">
-                <div class="modal-body">
-                    <div id="editar-cliente-error" class="alert alert-danger py-2 small d-none"></div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Nombre</label>
-                        <input type="text" id="input-nombre-cliente" class="form-control" maxlength="200" placeholder="Nombre del cliente">
-                    </div>
-                    <div class="mb-1">
-                        <label class="form-label fw-semibold">Celular</label>
-                        <input type="text" id="input-celular-cliente" class="form-control" maxlength="20" placeholder="Ej: 987654321">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-dark btn-sm">
-                        <i class="bi bi-save me-1"></i>Guardar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-const ajaxUrl        = <?php echo json_encode(base_url('admin/chats/historial_json')); ?>;
-const mensajesUrl    = <?php echo json_encode(base_url('admin/chats/mensajes/')); ?>;
-const actualizarUrl  = <?php echo json_encode(base_url('admin/chats/actualizar_cliente/')); ?>;
+const ajaxUrl     = <?php echo json_encode(base_url('admin/whatsapp/json')); ?>;
+const mensajesUrl = <?php echo json_encode(base_url('admin/whatsapp/mensajes/')); ?>;
 
 function escHtml(str) {
     if (str === null || str === undefined) return '';
@@ -178,20 +139,17 @@ function fmtFecha(str) {
     return d.toLocaleString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-const table = $('#tabla-historial').DataTable({
+const table = $('#tabla-whatsapp').DataTable({
     ajax: { url: ajaxUrl, type: 'GET', dataSrc: 'data' },
     processing: true,
     columns: [
-        { data: 'id', className: 'text-center' },
-        { data: 'nombre_cliente', render: function(d) { return escHtml(d || 'Cliente sin nombre'); } },
-        { data: 'celular_cliente', render: function(d, type, row) { return escHtml(row.celular_cliente || '—'); } },
-        { data: 'motivo', render: function(d, type, row) { return escHtml(row.motivo || '—'); } },
+        { data: 'telefono' },
         {
-            data: 'iniciado_en', className: 'small text-muted',
+            data: 'primer_mensaje', className: 'small text-muted',
             render: function(d, type) { return type === 'display' ? fmtFecha(d) : d; }
         },
         {
-            data: 'cerrado_en', className: 'small text-muted',
+            data: 'ultimo_mensaje', className: 'small text-muted',
             render: function(d, type) { return type === 'display' ? fmtFecha(d) : d; }
         },
         { data: 'total_mensajes', className: 'text-center' },
@@ -202,11 +160,8 @@ const table = $('#tabla-historial').DataTable({
             className: 'text-center',
             render: function(d, type, row) {
                 if (type !== 'display') return '';
-                let cad = '<a href="#" onclick="ver_transcripcion(' + row.id + ');return false;" title="Ver conversación">' +
+                return '<a href="#" onclick="ver_transcripcion(\'' + row.telefono + '\');return false;" title="Ver conversación">' +
                        '<i class="bi bi-chat-square-text" style="font-size:18px"></i></a>';
-                cad = cad + '&nbsp;<a href="#" onclick="modificar_datos(' + row.id + ');return false;" title="Modificar datos" class="ms-2">' +
-                       '<i class="bi bi-pencil-square" style="font-size:18px"></i></a>';
-                return cad;
             }
         }
     ],
@@ -215,12 +170,12 @@ const table = $('#tabla-historial').DataTable({
         "<'row'<'col-12'tr>>" +
         "<'row mt-2'<'col-md-5 small text-muted'i><'col-md-7 d-flex justify-content-end'p>>",
     language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
-    order: [[4, 'desc']],
+    order: [[2, 'desc']],
     pageLength: 25
 });
 
-function ver_transcripcion(id_conversacion) {
-    document.getElementById('modalTranscripcionLabel').textContent = 'Conversación #' + id_conversacion;
+function ver_transcripcion(telefono) {
+    document.getElementById('modalTranscripcionLabel').textContent = 'Conversación · ' + telefono;
     document.getElementById('transcripcion-loading').classList.remove('d-none');
     document.getElementById('transcripcion-error').classList.add('d-none');
     document.getElementById('chats-mensajes').classList.add('d-none');
@@ -229,7 +184,7 @@ function ver_transcripcion(id_conversacion) {
     var modal = new bootstrap.Modal(document.getElementById('modalTranscripcion'));
     modal.show();
 
-    fetch(mensajesUrl + id_conversacion)
+    fetch(mensajesUrl + encodeURIComponent(telefono))
         .then(function(r) { return r.json(); })
         .then(function(data) {
             document.getElementById('transcripcion-loading').classList.add('d-none');
@@ -242,19 +197,8 @@ function ver_transcripcion(id_conversacion) {
             var cont = document.getElementById('chats-mensajes');
             data.mensajes.forEach(function(m) {
                 var div = document.createElement('div');
-                div.className = 'msg msg-' + m.emisor;
-                if (m.imagen) {
-                    var img = document.createElement('img');
-                    img.src = m.imagen;
-                    img.className = 'msg-img';
-                    img.alt = 'Imagen enviada por el cliente';
-                    div.appendChild(img);
-                }
-                if (m.texto) {
-                    var texto = document.createElement('div');
-                    texto.textContent = m.texto;
-                    div.appendChild(texto);
-                }
+                div.className = 'msg msg-' + m.rol;
+                div.textContent = m.texto;
                 cont.appendChild(div);
             });
             cont.classList.remove('d-none');
@@ -264,54 +208,6 @@ function ver_transcripcion(id_conversacion) {
             document.getElementById('transcripcion-error').classList.remove('d-none');
         });
 }
-
-let conversacionEditando = null;
-
-function modificar_datos(id_conversacion) {
-    const fila = table.rows().data().toArray().find(function(r) { return r.id === id_conversacion; });
-
-    conversacionEditando = id_conversacion;
-    document.getElementById('modalEditarClienteLabel').textContent = 'Datos del cliente #' + id_conversacion;
-    document.getElementById('input-nombre-cliente').value = (fila && fila.nombre_cliente) || '';
-    document.getElementById('input-celular-cliente').value = (fila && fila.celular_cliente) || '';
-    document.getElementById('editar-cliente-error').classList.add('d-none');
-
-    var modal = new bootstrap.Modal(document.getElementById('modalEditarCliente'));
-    modal.show();
-}
-
-document.getElementById('form-editar-cliente').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    if (!conversacionEditando) return;
-
-    const errorEl = document.getElementById('editar-cliente-error');
-    errorEl.classList.add('d-none');
-
-    const formData = new FormData();
-    formData.append('nombre_cliente', document.getElementById('input-nombre-cliente').value.trim());
-    formData.append('celular_cliente', document.getElementById('input-celular-cliente').value.trim());
-
-    fetch(actualizarUrl + conversacionEditando, {
-        method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        body: formData
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-        if (data && data.ok) {
-            bootstrap.Modal.getInstance(document.getElementById('modalEditarCliente')).hide();
-            table.ajax.reload(null, false);
-        } else {
-            errorEl.textContent = (data && data.error) || 'No se pudo guardar.';
-            errorEl.classList.remove('d-none');
-        }
-    })
-    .catch(function() {
-        errorEl.textContent = 'No se pudo guardar.';
-        errorEl.classList.remove('d-none');
-    });
-});
 </script>
 
 </body>

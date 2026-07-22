@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+date_default_timezone_set('America/Lima');
 
 //$config['base_url'] = 'http://localhost/tienda-en-linea/';
 $root=(isset($_SERVER["HTTPS"]) ? "https://" : "http://").$_SERVER["HTTP_HOST"];
@@ -61,6 +62,7 @@ $config['csrf_exclude_uris'] = array(
     'admin/chats/cerrar/\d+',
     'admin/chats/disponibilidad',
     'admin/chats/actualizar_cliente/\d+',
+    'whatsapp/webhook',
 );
 $config['compress_output'] = FALSE;
 $config['time_reference'] = 'local';

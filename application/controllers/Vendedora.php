@@ -7,10 +7,12 @@ class Vendedora extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
+        traza("Estoy en el metodo __construct con los parametros de entrada: sin parametros de entrada");
         $this->load->model('Vendedora_model');
     }
 
     public function panel() {
+        traza("Estoy en el metodo panel con los parametros de entrada: sin parametros de entrada");
         $this->_check_vendedora();
 
         $data = array(
@@ -24,6 +26,7 @@ class Vendedora extends CI_Controller {
     }
 
     public function en_espera_json() {
+        traza("Estoy en el metodo en_espera_json con los parametros de entrada: sin parametros de entrada");
         $this->_check_vendedora();
 
         $conversaciones = $this->Vendedora_model->en_espera();
@@ -44,6 +47,7 @@ class Vendedora extends CI_Controller {
     }
 
     public function historial() {
+        traza("Estoy en el metodo historial con los parametros de entrada: sin parametros de entrada");
         $this->_check_vendedora();
 
         $data = array(
@@ -57,6 +61,7 @@ class Vendedora extends CI_Controller {
     }
 
     public function historial_json() {
+        traza("Estoy en el metodo historial_json con los parametros de entrada: sin parametros de entrada");
         $this->_check_vendedora();
 
         $conversaciones = $this->Vendedora_model->historial($this->vendedora->id);
@@ -80,6 +85,7 @@ class Vendedora extends CI_Controller {
     }
 
     public function actualizar_cliente($id_conversacion) {
+        traza("Estoy en el metodo actualizar_cliente con los parametros de entrada: id_conversacion=$id_conversacion");
         $this->_check_vendedora();
 
         if ($this->input->method() !== 'post') {
@@ -116,6 +122,7 @@ class Vendedora extends CI_Controller {
     }
 
     public function mis_conversaciones_json() {
+        traza("Estoy en el metodo mis_conversaciones_json con los parametros de entrada: sin parametros de entrada");
         $this->_check_vendedora();
 
         $conversaciones = $this->Vendedora_model->asignadas($this->vendedora->id);
@@ -135,6 +142,7 @@ class Vendedora extends CI_Controller {
     }
 
     public function tomar($id_conversacion) {
+        traza("Estoy en el metodo tomar con los parametros de entrada: id_conversacion=$id_conversacion");
         $this->_check_vendedora();
 
         $ok = $this->Vendedora_model->tomar((int)$id_conversacion, $this->vendedora->id, $this->vendedora->nombre_visible);
@@ -143,6 +151,7 @@ class Vendedora extends CI_Controller {
     }
 
     public function mensajes($id_conversacion) {
+        traza("Estoy en el metodo mensajes con los parametros de entrada: id_conversacion=$id_conversacion");
         $this->_check_vendedora();
 
         $data = $this->Vendedora_model->mensajes_completos((int)$id_conversacion, $this->vendedora->id);
@@ -170,6 +179,7 @@ class Vendedora extends CI_Controller {
     }
 
     public function responder($id_conversacion) {
+        traza("Estoy en el metodo responder con los parametros de entrada: id_conversacion=$id_conversacion");
         $this->_check_vendedora();
 
         if ($this->input->method() !== 'post') {
@@ -190,6 +200,7 @@ class Vendedora extends CI_Controller {
     }
 
     public function cerrar($id_conversacion) {
+        traza("Estoy en el metodo cerrar con los parametros de entrada: id_conversacion=$id_conversacion");
         $this->_check_vendedora();
 
         $ok = $this->Vendedora_model->cerrar((int)$id_conversacion, $this->vendedora->id);
@@ -198,6 +209,7 @@ class Vendedora extends CI_Controller {
     }
 
     public function disponibilidad() {
+        traza("Estoy en el metodo disponibilidad con los parametros de entrada: sin parametros de entrada");
         $this->_check_vendedora();
 
         if ($this->input->method() !== 'post') {
@@ -218,12 +230,14 @@ class Vendedora extends CI_Controller {
     }
 
     private function _check_vendedora() {
+        traza("Estoy en el metodo _check_vendedora con los parametros de entrada: sin parametros de entrada");
         if (!$this->session->userdata('admin_logueado')) {
             redirect('admin');
             exit;
         }
 
         $admin_id = $this->session->userdata('admin_id');
+        traza("Valor del admin_id $admin_id");
         $this->vendedora = $admin_id ? $this->Vendedora_model->get_by_admin($admin_id) : null;
 
         if (!$this->vendedora) {
