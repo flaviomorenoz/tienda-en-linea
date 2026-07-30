@@ -24,4 +24,15 @@ class Tia_conversa_model extends CI_Model {
         $this->db->order_by('id', 'ASC');
         return $this->db->get('tia_mensajes')->result();
     }
+
+    public function cerrar_conversacion($id_conversacion) {
+        $this->db->where('id', $id_conversacion);
+        $this->db->where('estado', 'abierta');
+        $this->db->update('tia_conversaciones', array(
+            'estado'    => 'cerrada',
+            'fecha_fin' => date('Y-m-d H:i:s'),
+        ));
+
+        return $this->db->affected_rows() > 0;
+    }
 }

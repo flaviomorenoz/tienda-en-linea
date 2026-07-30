@@ -1,43 +1,27 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversaciones IA - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <style>
-        body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
-        .admin-sidebar { background: #2d3436; min-height: 100vh; width: 240px; position: fixed; left: 0; top: 0; z-index: 100; }
-        .main-content { margin-left: 240px; padding: 2rem; }
-        .badge-abierta { background: #198754; }
-        .badge-cerrada { background: #6c757d; }
-        @media (max-width: 768px) {
-            .admin-sidebar { display: none; }
-            .main-content { margin-left: 0; }
-        }
-
-        .chats-mensajes { flex-grow: 1; overflow-y: auto; padding: 1rem; max-height: 55vh; }
-        .msg { max-width: 70%; padding: .5rem .8rem; border-radius: 12px; margin-bottom: .6rem; font-size: .9rem; white-space: pre-wrap; word-break: break-word; }
-        .msg-user { background: #e9ecef; margin-right: auto; }
-        .msg-assistant { background: #25d366; color: #fff; margin-left: auto; }
-    </style>
-</head>
-<body>
-
-<!-- Sidebar -->
-<?=menu_principal($this->config->item('tienda_nombre'))?>
-
 <!-- Contenido principal -->
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h4 class="fw-bold mb-0">Conversaciones del Asistente IA</h4>
-            <p class="text-muted small mb-0">Historial de conversaciones por WhatsApp (solo lectura)</p>
+            <p class="text-muted small mb-0">Historial de conversaciones por WhatsApp</p>
         </div>
     </div>
+
+    <?php if ($this->session->flashdata('success')): ?>
+    <div class="alert alert-success alert-dismissible fade show py-2 small">
+        <i class="bi bi-check-circle me-1"></i>
+        <?php echo htmlspecialchars($this->session->flashdata('success'), ENT_QUOTES, 'UTF-8'); ?>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($this->session->flashdata('error')): ?>
+    <div class="alert alert-danger alert-dismissible fade show py-2 small">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        <?php echo htmlspecialchars($this->session->flashdata('error'), ENT_QUOTES, 'UTF-8'); ?>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+    </div>
+    <?php endif; ?>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
@@ -84,6 +68,12 @@
     </div>
 </div>
 
+<!-- Form oculto para cerrar una conversación -->
+<form action="" method="POST" id="form-cerrar" class="d-none">
+    <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>"
+           value="<?php echo $this->security->get_csrf_hash(); ?>">
+</form>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
@@ -92,6 +82,7 @@
 <script>
 const ajaxUrl     = <?php echo json_encode(base_url('tia_conversa/json')); ?>;
 const mensajesUrl = <?php echo json_encode(base_url('tia_conversa/mensajes/')); ?>;
+const cerrarUrl   = <?php echo json_encode(base_url('tia_conversa/cerrar/')); ?>;
 
 function escHtml(str) {
     if (str === null || str === undefined) return '';
@@ -138,8 +129,13 @@ const table = $('#tabla-tia-conversaciones').DataTable({
             className: 'text-center',
             render: function(d, type, row) {
                 if (type !== 'display') return '';
-                return '<a href="#" onclick="ver_conversacion(' + row.id + ', \'' + escHtml(row.contacto) + '\');return false;" title="Ver conversación">' +
-                       '<i class="bi bi-chat-square-text" style="font-size:18px"></i></a>';
+                var html = '<a href="#" class="me-3" onclick="ver_conversacion(' + row.id + ', \'' + escHtml(row.contacto) + '\');return false;" title="Ver conversación">' +
+                           '<i class="bi bi-chat-square-text" style="font-size:18px"></i></a>';
+                if (row.estado === 'abierta') {
+                    html += '<a href="#" onclick="cerrar_conversacion(' + row.id + ');return false;" title="Marcar como cerrada">' +
+                            '<i class="bi bi-x-circle text-danger" style="font-size:18px"></i></a>';
+                }
+                return html;
             }
         }
     ],
@@ -151,6 +147,14 @@ const table = $('#tabla-tia-conversaciones').DataTable({
     order: [[3, 'desc']],
     pageLength: 25
 });
+
+function cerrar_conversacion(id) {
+    if (!confirm('¿Marcar la conversación #' + id + ' como cerrada?')) return;
+
+    var form = document.getElementById('form-cerrar');
+    form.action = cerrarUrl + id;
+    form.submit();
+}
 
 function ver_conversacion(id, contacto) {
     document.getElementById('modalConversacionLabel').textContent = 'Conversación #' + id + ' · ' + contacto;

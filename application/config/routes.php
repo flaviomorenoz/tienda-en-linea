@@ -26,13 +26,13 @@ $route['chat/enviar'] = 'chat/enviar';
 $route['chat/estado'] = 'chat/estado';
 $route['chat/subir_imagen'] = 'chat/subir_imagen';
 $route['chat/imagen/(:any)'] = 'chat/imagen/$1';
-*/
 
 // Asistente IA por WhatsApp (módulo independiente)
 $route['whatsapp/webhook'] = 'whatsapp/webhook';
 $route['admin/whatsapp'] = 'whatsapp/historial';
 $route['admin/whatsapp/json'] = 'whatsapp/historial_json';
 $route['admin/whatsapp/mensajes/(:any)'] = 'whatsapp/mensajes/$1';
+*/
 
 // Panel admin: conversaciones que se quedaron solo con la IA
 //$route['admin/chats_ia'] = 'chat/chats_ia';

@@ -91,20 +91,11 @@ function menu_principal($tienda_nombre=""){
         <a href="<?php echo base_url('admin/pedidos'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
             <i class="bi bi-list-ul"></i> Pedidos
         </a>
-        <a href="<?php echo base_url('admin/chats'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
-            <i class="bi bi-chat-dots-fill"></i> Chats
-        </a>
-        <a href="<?php echo base_url('admin/chats/historial'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
-            <i class="bi bi-clock-history"></i> Historial
-        </a>
-        <a href="<?php echo base_url('admin/chats_ia'); ?>" class="d-flex align-items-center gap-2 text-white text-decoration-none py-2 px-3 rounded mb-1 bg-white bg-opacity-10">
-            <i class="bi bi-robot"></i> Chats IA
-        </a>
-        <a href="<?php echo base_url('admin/whatsapp'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
-            <i class="bi bi-whatsapp"></i> WhatsApp
-        </a>
         <a href="<?php echo base_url('tia_conversa'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
             <i class="bi bi-chat-square-heart-fill"></i> Conversaciones IA
+        </a>
+        <a href="<?php echo base_url('admin/wts'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
+            <i class="bi bi-whatsapp"></i> WhatsApp
         </a>
         <a href="<?php echo base_url(); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1" target="_blank">
             <i class="bi bi-shop"></i> Ver tienda

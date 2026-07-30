@@ -21,9 +21,9 @@ class Tia_conversa extends CI_Controller {
             'carrito_count' => 0,
         );
 
-        $this->load->view('layouts/header', $data);
+        $this->load->view('layouts/header1', $data);
         $this->load->view('admin/tia_conversa/index', $data);
-        $this->load->view('layouts/footer');
+        $this->load->view('layouts/footer1');
     }
 
     public function json() {
@@ -46,6 +46,20 @@ class Tia_conversa extends CI_Controller {
         $this->output
              ->set_content_type('application/json')
              ->set_output(json_encode(array('data' => $rows)));
+    }
+
+    public function cerrar($id_conversacion) {
+        $this->_check_admin();
+
+        if ($this->input->method() !== 'post') {
+            redirect('tia_conversa');
+            return;
+        }
+
+        $this->Tia_conversa_model->cerrar_conversacion((int)$id_conversacion);
+
+        $this->session->set_flashdata('success', 'Conversación #' . (int)$id_conversacion . ' cerrada correctamente.');
+        redirect('tia_conversa');
     }
 
     public function mensajes($id_conversacion) {
