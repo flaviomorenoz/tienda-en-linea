@@ -252,12 +252,14 @@ class Wts extends CI_Controller {
         $this->_check_admin();
 
         $data = array(
-            'titulo'        => 'WhatsApp - Admin',
+            'titulo'        => 'Conversaciones via WhatsApp',
             'admin_nombre'  => $this->session->userdata('admin_nombre'),
             'carrito_count' => 0,
         );
 
+        $this->load->view('layouts/header1', $data);
         $this->load->view('admin/wts_historial', $data);
+        $this->load->view('layouts/footer1', $data);
     }
 
     public function historial_json() {
@@ -265,6 +267,14 @@ class Wts extends CI_Controller {
 
         $conversaciones = $this->wts_model->conversaciones_recientes();
 
+        //$result = $conversaciones->result_array();
+
+        //$ar_campos = array("id","fecha", "message_sid", "nombre", "origen", "destino", "tipo", "mensaje", "rol");
+        $ar_campos = array("id", "fecha", "telefono_origen", "nombre", "cant", "opciones");
+
+        echo $this->fm->json_datatable($ar_campos, $conversaciones);
+
+        /*
         $rows = array();
         foreach ($conversaciones as $c) {
             $rows[] = array(
@@ -275,9 +285,19 @@ class Wts extends CI_Controller {
             );
         }
 
+        $rows = array();
+        foreach($conversaciones as $c){
+            $rows[] = array(
+                'id'    => $c->id,
+                'fecha' => $c->fecha,
+            );
+        }
+
         $this->output
              ->set_content_type('application/json')
              ->set_output(json_encode(array('data' => $rows)));
+        */
+
     }
 
     public function mensajes($telefono) {
@@ -298,6 +318,86 @@ class Wts extends CI_Controller {
         $this->output
              ->set_content_type('application/json')
              ->set_output(json_encode(array('ok' => true, 'mensajes' => $rows)));
+    }
+
+    /**
+     * Devuelve la conversación completa (estilo chat) a partir del id
+     * de un mensaje. Cada burbuja se pinta según su tipo: RECIBIDO o
+     * ENVIADO.
+     */
+    public function conversacion($id) {
+        $this->_check_admin();
+
+        $mensajes = $this->wts_model->conversacion_por_id($id);
+
+        $rows = array();
+        foreach ($mensajes as $m) {
+            $rows[] = array(
+                'id'      => (int)$m->id,
+                'fecha'   => $m->fecha,
+                'origen'  => $m->origen,
+                'destino' => $m->destino,
+                'tipo'    => $m->tipo,
+                'mensaje' => $m->mensaje,
+            );
+        }
+
+        $this->output
+             ->set_content_type('application/json')
+             ->set_output(json_encode(array('ok' => true, 'mensajes' => $rows)));
+    }
+
+    /**
+     * Reenvía (proxy) el envío de un mensaje al servicio Twilio vía
+     * ngrok. Se hace desde el servidor para evitar el bloqueo de CORS
+     * del navegador. No usa cURL: emplea streams HTTP nativos de PHP.
+     */
+    public function enviar_mensaje() {
+        $this->_check_admin();
+
+        $destino = $this->input->get('destino');
+        $msg     = $this->input->get('msg');
+
+        if (empty($destino) || empty($msg)) {
+            $this->output
+                 ->set_content_type('application/json')
+                 ->set_output(json_encode(array('ok' => false, 'error' => 'Faltan parámetros: destino y msg.')));
+            return;
+        }
+
+        $url = base_url("") . "../../varios/twilios/twilio_enviar_mensajes.php"
+            . '?destino=' . rawurlencode($destino)
+            . '&msg=' . rawurlencode($msg);
+        //die($url);
+
+        $contexto = stream_context_create(array('http' => array(
+            'method'     => 'GET',
+            'timeout'    => 30,
+            'ignore_errors' => true,
+        )));
+
+        $respuesta = @file_get_contents($url, false, $contexto);
+
+        if ($respuesta === false) {
+            $this->output
+                 ->set_content_type('application/json')
+                 ->set_output(json_encode(array('ok' => false, 'error' => 'No se pudo conectar con el servicio de mensajería.')));
+            return;
+        }
+
+        // Si el servicio devuelve JSON lo pasamos tal cual; si es texto
+        // plano, lo envolvemos en un JSON estándar.
+        $json = json_decode($respuesta, true);
+        if ($json !== null) {
+            $this->output
+                 ->set_content_type('application/json')
+                 ->set_output(json_encode($json));
+            return;
+        }
+
+        $this->output
+             ->set_content_type('application/json')
+             ->set_output(json_encode(array('ok' => true, 'respuesta' => $respuesta)));
     }
 
     private function _check_admin() {

@@ -82,10 +82,13 @@ if ( ! function_exists('base_url'))
 	 * @param	string	$protocol
 	 * @return	string
 	 */
-	function base_url($uri = '', $protocol = NULL)
-	{
+	function base_url($uri = '', $protocol = NULL){
 		return get_instance()->config->base_url($uri, $protocol);
 	}
+	/*function base_url($ruta="", $protocol = NULL){
+    	//return "https://detective-cornfield-coliseum.ngrok-free.dev/tienda-en-linea/admin";
+    	return "http://localhost/tienda-en-linea/admin";
+	}*/
 }
 
 // ------------------------------------------------------------------------

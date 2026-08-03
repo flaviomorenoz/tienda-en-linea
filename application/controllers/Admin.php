@@ -10,6 +10,7 @@ class Admin extends CI_Controller {
     }
 
     public function login() {
+        //die(base_url());
         if ($this->session->userdata('admin_logueado')) {
             redirect('admin/pedidos');
             return;

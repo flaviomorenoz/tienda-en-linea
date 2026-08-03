@@ -94,7 +94,7 @@ function menu_principal($tienda_nombre=""){
         <a href="<?php echo base_url('tia_conversa'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
             <i class="bi bi-chat-square-heart-fill"></i> Conversaciones IA
         </a>
-        <a href="<?php echo base_url('admin/wts'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
+        <a href="<?php echo base_url('wts/historial'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
             <i class="bi bi-whatsapp"></i> WhatsApp
         </a>
         <a href="<?php echo base_url(); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1" target="_blank">
