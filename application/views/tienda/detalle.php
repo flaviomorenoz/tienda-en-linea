@@ -1,5 +1,29 @@
 <div class="container">
 
+    <style>
+        .product-detail-thumbs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .product-detail-thumbs img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: border-color 0.2s, opacity 0.2s;
+            opacity: 0.7;
+        }
+        .product-detail-thumbs img.active,
+        .product-detail-thumbs img:hover {
+            border-color: #343a40;
+            opacity: 1;
+        }
+    </style>
+
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
@@ -16,12 +40,31 @@
     <div class="row g-4">
         <!-- Imagen del producto -->
         <div class="col-md-6">
+            <?php
+                $det_img_principal = base_url('assets/img/productos/' . $imagenes[0]);
+                $det_img_default   = base_url('assets/img/productos/default1.jpg');
+                $det_img_id        = 'detalle-img-principal';
+            ?>
             <div class="product-detail-img-wrapper rounded-4 overflow-hidden shadow-sm">
-                <img src="<?php echo base_url('assets/img/productos/' . $producto->imagen_url); ?>"
+                <img src="<?php echo $det_img_principal; ?>"
+                     id="<?php echo $det_img_id; ?>"
                      alt="<?php echo htmlspecialchars($producto->nombre, ENT_QUOTES, 'UTF-8'); ?>"
                      class="product-detail-img"
-                     onerror="this.onerror=null;this.src='<?php echo base_url('assets/img/productos/default1.jpg'); ?>'">
+                     onerror="this.onerror=null;this.src='<?php echo $det_img_default; ?>'">
             </div>
+
+            <?php if (count($imagenes) > 1): ?>
+            <div class="product-detail-thumbs">
+                <?php foreach ($imagenes as $i => $img_nombre): ?>
+                <?php $det_img_src = base_url('assets/img/productos/' . $img_nombre); ?>
+                <img src="<?php echo $det_img_src; ?>"
+                     class="<?php echo $i === 0 ? 'active' : ''; ?>"
+                     alt="Foto <?php echo $i + 1; ?> de <?php echo htmlspecialchars($producto->nombre, ENT_QUOTES, 'UTF-8'); ?>"
+                     onerror="this.style.display='none'"
+                     onclick="swapDetalleImg(this, '<?php echo $det_img_src; ?>')">
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
         </div>
 
         <!-- Información del producto -->
@@ -167,6 +210,14 @@
 </div>
 
 <script>
+function swapDetalleImg(thumb, src) {
+    document.getElementById('detalle-img-principal').src = src;
+    thumb.closest('.product-detail-thumbs').querySelectorAll('img').forEach(function(t) {
+        t.classList.remove('active');
+    });
+    thumb.classList.add('active');
+}
+
 function cambiarCantidad(delta) {
     const input = document.getElementById('cantidad');
     const val = parseInt(input.value) + delta;

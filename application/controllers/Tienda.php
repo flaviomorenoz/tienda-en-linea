@@ -57,10 +57,19 @@ class Tienda extends CI_Controller {
 
         $tallas      = $this->Producto_model->get_tallas($id);
         $relacionados = $this->Producto_model->get_relacionados($id, $producto->categoria);
+        $imagenes    = array_values(array_filter(array(
+            $producto->imagen_url,
+            isset($producto->imagen2) ? $producto->imagen2 : '',
+            isset($producto->imagen3) ? $producto->imagen3 : '',
+        ), function($img) { return !empty($img); }));
+        if (empty($imagenes)) {
+            $imagenes = array($producto->imagen_url);
+        }
 
         $data = array(
             'titulo'        => $producto->nombre . ' - ' . $this->config->item('tienda_nombre'),
             'producto'      => $producto,
+            'imagenes'      => $imagenes,
             'tallas'        => $tallas,
             'relacionados'  => $relacionados,
             'carrito_count' => $this->_carrito_count(),
@@ -73,12 +82,13 @@ class Tienda extends CI_Controller {
 
     private function _adjuntar_imagenes(&$productos) {
         if (empty($productos)) return;
-        $ids      = array_map(function($p) { return $p->id; }, $productos);
-        $imagenes = $this->Producto_model->get_imagenes_bulk($ids);
         foreach ($productos as $p) {
-            $p->imagenes = !empty($imagenes[(int)$p->id])
-                ? $imagenes[(int)$p->id]
-                : [$p->imagen_url];
+            $imgs = array_values(array_filter(array(
+                isset($p->imagen_url) ? $p->imagen_url : '',
+                isset($p->imagen2) ? $p->imagen2 : '',
+                isset($p->imagen3) ? $p->imagen3 : '',
+            ), function($img) { return !empty($img); }));
+            $p->imagenes = !empty($imgs) ? $imgs : array($p->imagen_url);
         }
     }
 

@@ -1,63 +1,63 @@
 <style>
-        /*body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }*/
-        .admin-sidebar { background: #2d3436; min-height: 100vh; width: 240px; position: fixed; left: 0; top: 0; z-index: 100; }
-        .container { margin-left: 240px; padding: 2rem; }
-        @media (max-width: 768px) {
-            .admin-sidebar { display: none; }
-            .main-content { margin-left: 0; }
-        }
+    /*body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }*/
+    .admin-sidebar { background: #2d3436; min-height: 100vh; width: 240px; position: fixed; left: 0; top: 0; z-index: 100; }
+    .container { margin-left: 240px; padding: 2rem; }
+    @media (max-width: 768px) {
+        .admin-sidebar { display: none; }
+        .main-content { margin-left: 0; }
+    }
 
-        /* ===== Chat estilo WhatsApp ===== */
-        .chats-mensajes {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            max-height: 60vh;
-            background: #e5ddd5;
-            background-image: linear-gradient(rgba(255,255,255,.2) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .chat-fila {
-            display: flex;
-            margin-bottom: .6rem;
-        }
-        .chat-fila.recibido { justify-content: flex-start; }
-        .chat-fila.enviado   { justify-content: flex-end; }
-        .burbuja {
-            position: relative;
-            max-width: 75%;
-            padding: .5rem .8rem 1.4rem;
-            border-radius: 12px;
-            font-size: .9rem;
-            white-space: pre-wrap;
-            word-break: break-word;
-            box-shadow: 0 1px 1px rgba(0,0,0,.13);
-            line-height: 1.4;
-        }
-        .burbuja.recibido {
-            background: #ffffff;
-            color: #111;
-            border-top-left-radius: 2px;
-        }
-        .burbuja.enviado {
-            background: #dcf8c6;
-            color: #111;
-            border-top-right-radius: 2px;
-        }
-        .burbuja .hora {
-            position: absolute;
-            bottom: .25rem;
-            right: .6rem;
-            font-size: .68rem;
-            color: #999;
-            display: flex;
-            align-items: center;
-            gap: .25rem;
-        }
-        .burbuja.enviado .hora { color: #6b8f5e; }
-        .burbuja .hora .bi-check2-all { color: #53bdeb; font-size: .8rem; }
-    </style>
+    /* ===== Chat estilo WhatsApp ===== */
+    .chats-mensajes {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        max-height: 60vh;
+        background: #e5ddd5;
+        background-image: linear-gradient(rgba(255,255,255,.2) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+    .chat-fila {
+        display: flex;
+        margin-bottom: .6rem;
+    }
+    .chat-fila.recibido { justify-content: flex-start; }
+    .chat-fila.enviado   { justify-content: flex-end; }
+    .burbuja {
+        position: relative;
+        max-width: 75%;
+        padding: .5rem .8rem 1.4rem;
+        border-radius: 12px;
+        font-size: .9rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+        box-shadow: 0 1px 1px rgba(0,0,0,.13);
+        line-height: 1.4;
+    }
+    .burbuja.recibido {
+        background: #ffffff;
+        color: #111;
+        border-top-left-radius: 2px;
+    }
+    .burbuja.enviado {
+        background: #dcf8c6;
+        color: #111;
+        border-top-right-radius: 2px;
+    }
+    .burbuja .hora {
+        position: absolute;
+        bottom: .25rem;
+        right: .6rem;
+        font-size: .68rem;
+        color: #999;
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+    }
+    .burbuja.enviado .hora { color: #6b8f5e; }
+    .burbuja .hora .bi-check2-all { color: #53bdeb; font-size: .8rem; }
+</style>
 
 <!-- Contenido principal -->
 <!--<div class="main-content" style="padding-top:1px!important">-->
@@ -290,10 +290,12 @@
         var destino = telDestinoEnvio.replace(/^\+/, '');
 
         // URL local del controlador (proxy) — evita el bloqueo de CORS
+        console.log("Flavito")
         var url = <?php echo json_encode(base_url('wts/enviar_mensaje')); ?>
                 + '?destino=' + encodeURIComponent(destino)
                 + '&msg=' + encodeURIComponent(msg);
 
+        console.log(url);
         $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Enviando...');
 
         fetch(url)
