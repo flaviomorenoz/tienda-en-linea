@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 1260">
+  <rect x="0" y="0" width="1260" height="1260" rx="185" ry="185" fill="#EC0C79"/>
+  <line x1="835" y1="437" x2="1260" y2="437" stroke="#ffffff" stroke-width="10"/>
+  <line x1="0" y1="691" x2="192" y2="691" stroke="#ffffff" stroke-width="10"/>
+  <text x="192" y="595" font-family="Georgia, 'Times New Roman', serif" font-size="335" fill="#ffffff">Bella</text>
+  <text x="408" y="845" font-family="Georgia, 'Times New Roman', serif" font-size="335" fill="#ffffff">Rosse</text>
+</svg>
