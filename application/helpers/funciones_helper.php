@@ -17,6 +17,38 @@ function traza($msg, $nombre_file="traza.txt"){
     fclose($gestor);
 }
 
+/**
+ * Devuelve la URL completa de la imagen de un producto.
+ * Normaliza el valor guardado en BD (p.imagen / imagen2 / imagen3) para que:
+ *  - 'short01.png'                    -> base_url('assets/img/productos/short01.png')
+ *  - 'assets/img/productos/short01.png' -> base_url('assets/img/productos/short01.png')  (NO duplica la ruta)
+ *  - 'http://...' o '/...'            -> se usa tal cual (URL externa/absoluta)
+ * Además escribe en traza.txt la entrada, la salida y si el archivo existe en disco,
+ * para diagnosticar el problema en producción.
+ */
+function ruta_imagen_producto($img) {
+    if (empty($img)) {
+        $url = base_url('assets/img/default.png');
+        traza("ruta_imagen_producto: entrada vacia -> '$url'");
+        return $url;
+    }
+
+    // URL con protocolo, data URI o ruta absoluta que inicia con '/'
+    if (preg_match('#^(https?://|data:|/)#i', $img)) {
+        traza("ruta_imagen_producto: entrada='$img' -> URL externa/absoluta, se usa tal cual");
+        return $img;
+    }
+
+    // Si el valor ya trae la carpeta 'assets/', no la duplicamos.
+    $ruta_rel = (strpos($img, 'assets/') === 0) ? $img : 'assets/img/productos/' . $img;
+    $ruta_fs  = FCPATH . $ruta_rel;
+    $url      = base_url($ruta_rel);
+
+    traza("ruta_imagen_producto: entrada='$img' ruta_rel='$ruta_rel' url='$url' existe=" . (file_exists($ruta_fs) ? 'SI' : 'NO'));
+
+    return $url;
+}
+
 function celda($dato="", $centrar=0, $estilo="", $cAtributo=""){
     if($dato=='0'){
         $dato = "<span style=\"color:#cccccc;\">0</span>";

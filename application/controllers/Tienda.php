@@ -9,9 +9,11 @@ class Tienda extends CI_Controller {
     }
 
     public function index() {
+        traza("Tienda.index: base_url='" . base_url() . "' FCPATH='" . FCPATH . "'");
         $categoria  = $this->input->get('categoria');
         $categorias = $this->Producto_model->get_categorias();
         $productos  = $this->Producto_model->get_todos($categoria ?: NULL);
+        traza("Tienda.index: cantidad productos=" . count($productos));
         $this->_adjuntar_imagenes($productos);
 
         $data = array(
@@ -28,6 +30,7 @@ class Tienda extends CI_Controller {
     }
 
     public function categoria($cat) {
+        traza("Tienda.categoria: base_url='" . base_url() . "' FCPATH='" . FCPATH . "' cat='$cat'");
         $cat        = rawurldecode($cat);
         $categorias = $this->Producto_model->get_categorias();
         $productos  = $this->Producto_model->get_todos($cat);
@@ -89,6 +92,7 @@ class Tienda extends CI_Controller {
                 isset($p->imagen3) ? $p->imagen3 : '',
             ), function($img) { return !empty($img); }));
             $p->imagenes = !empty($imgs) ? $imgs : array($p->imagen_url);
+            traza("_adjuntar_imagenes id={$p->id} imagenes=" . implode(' | ', $p->imagenes));
         }
     }
 

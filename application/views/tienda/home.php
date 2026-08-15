@@ -176,9 +176,13 @@
             <div class="card product-card h-100 border-0 shadow-sm">
                 <!-- Imagen principal -->
                 <?php
-                    $img_principal = base_url('assets/img/productos/' . $p->imagenes[0]);
+                    $trz_img2 = isset($p->imagen2) ? $p->imagen2 : '';
+                    $trz_img3 = isset($p->imagen3) ? $p->imagen3 : '';
+                    traza("home.php producto id=" . $p->id . " nombre='" . $p->nombre . "' imagen_url='" . $p->imagen_url . "' imagen2='" . $trz_img2 . "' imagen3='" . $trz_img3 . "' img(0)='" . $p->imagenes[0] . "'");
+                    $img_principal = ruta_imagen_producto($p->imagenes[0]);
                     $img_default   = base_url('assets/img/default.png');
                     $img_id        = 'prod-img-' . $p->id;
+                    traza("home.php producto id={$p->id} img_principal='$img_principal'");
                 ?>
                 <a href="<?php echo base_url('tienda/producto/' . $p->id); ?>" class="text-decoration-none">
                     <div class="product-img-wrapper">
@@ -198,7 +202,7 @@
                 <?php if (count($p->imagenes) > 1): ?>
                 <div class="product-thumbs">
                     <?php foreach ($p->imagenes as $i => $img_nombre): ?>
-                    <?php $img_src = base_url('assets/img/productos/' . $img_nombre); ?>
+                    <?php $img_src = ruta_imagen_producto($img_nombre); ?>
                     <img src="<?php echo $img_src; ?>"
                          class="<?php echo $i === 0 ? 'active' : ''; ?>"
                          alt="Foto <?php echo $i + 1; ?>"
