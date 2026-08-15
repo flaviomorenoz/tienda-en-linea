@@ -190,6 +190,7 @@
                              id="<?php echo $img_id; ?>"
                              alt="<?php echo htmlspecialchars($p->nombre, ENT_QUOTES, 'UTF-8'); ?>"
                              class="product-img"
+                             onerror="this.onerror=null;this.src='<?php echo $img_default; ?>'">
 
                         <?php if (!$p->tiene_precio): ?>
                         <span class="badge bg-secondary product-badge">Consultar</span>
