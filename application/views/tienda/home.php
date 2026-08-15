@@ -190,8 +190,8 @@
                              id="<?php echo $img_id; ?>"
                              alt="<?php echo htmlspecialchars($p->nombre, ENT_QUOTES, 'UTF-8'); ?>"
                              class="product-img"
-                             onerror="this.onerror=null;this.src='<?php echo $img_default; ?>'">
-                             data-combre="<?php echo htmlspecialchars($img_principal, ENT_QUOTES, 'UTF-8'); ?>"
+                             onerror="this.onerror=null;this.src='<?php echo $img_default; ?>'"
+                             data-combre="<?php echo htmlspecialchars($p->imagenes[0], ENT_QUOTES, 'UTF-8'); ?>">
                         <?php if (!$p->tiene_precio): ?>
                         <span class="badge bg-secondary product-badge">Consultar</span>
                         <?php endif; ?>
