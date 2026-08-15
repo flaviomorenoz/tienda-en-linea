@@ -27,10 +27,13 @@ function traza($msg, $nombre_file="traza.txt"){
  * para diagnosticar el problema en producción.
  */
 function ruta_imagen_producto($img) {
+    $url = base_url('../erp-en-linea/assets/img/productos/');
+    $url_default = base_url('../tienda-en-linea/assets/img/default.png');
     if (empty($img)) {
-        $url = base_url('assets/img/default.png');
         traza("ruta_imagen_producto: entrada vacia -> '$url'");
-        return $url;
+        return $url_default;
+    }else{
+        $url = $url . $img;
     }
 
     // URL con protocolo, data URI o ruta absoluta que inicia con '/'
@@ -40,12 +43,13 @@ function ruta_imagen_producto($img) {
     }
 
     // Si el valor ya trae la carpeta 'assets/', no la duplicamos.
+    /*
     $ruta_rel = (strpos($img, 'assets/') === 0) ? $img : 'assets/img/productos/' . $img;
     $ruta_fs  = FCPATH . $ruta_rel;
     $url      = base_url($ruta_rel);
 
     traza("ruta_imagen_producto: entrada='$img' ruta_rel='$ruta_rel' url='$url' existe=" . (file_exists($ruta_fs) ? 'SI' : 'NO'));
-
+    */
     return $url;
 }
 
