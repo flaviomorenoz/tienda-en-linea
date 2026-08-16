@@ -306,6 +306,7 @@
             + '&destino=' + encodeURIComponent(destino)
             + '&msg=' + encodeURIComponent(msg);
 
+        console.log("base_url: " + "<?= base_url("") ?>");
         console.log(url);
         $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Enviando...');
 
