@@ -5,6 +5,7 @@ class Wts_model extends CI_Model {
 
     public function __construct() {
         parent::__construct();
+        $this->nro_propio = '+15554881827'; // Número propio de WhatsApp
     }
 
     public function mensaje_existe($wa_message_id) {
@@ -52,7 +53,7 @@ class Wts_model extends CI_Model {
             order by a.id desc";
              
         // Query mejorado que muestra una linea por conversacion al mismo numero en el dia:
-        $cSql = "select z.id, z.fecha, z.telefono_origen, wa.nombre, z.cant, 'x' opciones
+        $cSql = "select z.id, z.fecha, z.telefono_origen, wa.nombre, z.cant, 'x' opciones, '{$this->nro_propio}' as nro_propio
             from (
                 select min(a.id) id, to_char(a.fecha, 'YYYY-MM-DD') fecha, a.telefono_origen, count(1) cant
                 from wts_mensajes a

@@ -270,7 +270,7 @@ class Wts extends CI_Controller {
         //$result = $conversaciones->result_array();
 
         //$ar_campos = array("id","fecha", "message_sid", "nombre", "origen", "destino", "tipo", "mensaje", "rol");
-        $ar_campos = array("id", "fecha", "telefono_origen", "nombre", "cant", "opciones");
+        $ar_campos = array("id", "fecha", "telefono_origen", "nombre", "cant", "opciones", "nro_propio");
 
         echo $this->fm->json_datatable($ar_campos, $conversaciones);
 

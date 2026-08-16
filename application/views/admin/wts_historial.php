@@ -145,6 +145,10 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
+                    <label class="form-label">Número origen</label>
+                    <input type="text" id="enviar-origen" class="form-control" readonly>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Número destino</label>
                     <input type="text" id="enviar-destino" class="form-control" readonly>
                 </div>
@@ -185,7 +189,7 @@
                     render: function(data, type, row){
                         var telefono = row[2] || '';
                         let cad = "<a href='#' title='Ver' onclick='detalle(" + row[0] + ")'><span class='bi bi-eye' style=\"font-size:16px\"></span></a>&nbsp;"
-                        cad += "<a href='#' title='Enviar' onclick='abrirEnviar(" + row[0] + ", \"" + telefono + "\")'><span class='bi bi-send' style=\"font-size:16px\"></span></a>&nbsp;"
+                        cad += "<a href='#' title='Enviar' onclick=\"abrirEnviar(" + row[0] + ",'"  + row[6] + "', '" + telefono + "')\"><span class='bi bi-send' style=\"font-size:16px\"></span></a>&nbsp;"
                         return cad
                     },
                     "targets":  [5]
@@ -255,8 +259,9 @@
     }
 
     var telDestinoEnvio = '';
+    var telOrigenEnvio = '';
 
-    function abrirEnviar(id, telefono) {
+    function abrirEnviar(id, origen, telefono) {
         // Limpiar campos del modal
         $('#enviar-mensaje').val('');
         $('#enviar-resultado').empty();
@@ -265,9 +270,13 @@
         // Quitar prefijo "whatsapp:" y espacios
         var numero = String(telefono || '').trim();
         numero = numero.replace(/^whatsapp:/i, '');
-
         telDestinoEnvio = numero;
         $('#enviar-destino').val(numero);
+
+        var numeroD = String(origen || '').trim();
+        numeroD = numeroD.replace(/^whatsapp:/i, '');
+        telOrigenEnvio = numeroD;
+        $('#enviar-origen').val(numeroD);
 
         var modalEl = document.getElementById('modalEnviar');
         var modal   = bootstrap.Modal.getOrCreateInstance(modalEl);
@@ -288,12 +297,14 @@
 
         // Se le extrae el signo "+" al inicio del número
         var destino = telDestinoEnvio.replace(/^\+/, '');
+        var origen = telOrigenEnvio.replace(/^\+/, '');
 
         // URL local del controlador (proxy) — evita el bloqueo de CORS
-        console.log("Flavito")
+        //console.log("Flavito")
         var url = <?php echo json_encode(base_url('wts/enviar_mensaje')); ?>
-                + '?destino=' + encodeURIComponent(destino)
-                + '&msg=' + encodeURIComponent(msg);
+            + '?origen=' + encodeURIComponent(origen)
+            + '?destino=' + encodeURIComponent(destino)
+            + '&msg=' + encodeURIComponent(msg);
 
         console.log(url);
         $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Enviando...');
