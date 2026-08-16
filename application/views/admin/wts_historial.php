@@ -303,7 +303,7 @@
         //console.log("Flavito")
         var url = <?php echo json_encode(base_url('wts/enviar_mensaje')); ?>
             + '?origen=' + encodeURIComponent(origen)
-            + '?destino=' + encodeURIComponent(destino)
+            + '&destino=' + encodeURIComponent(destino)
             + '&msg=' + encodeURIComponent(msg);
 
         console.log(url);
