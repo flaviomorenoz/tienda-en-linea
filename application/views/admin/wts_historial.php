@@ -301,7 +301,7 @@
 
         // URL local del controlador (proxy) — evita el bloqueo de CORS
         //console.log("Flavito")
-        var url = <?php echo json_encode(base_url('wts/enviar_mensaje')); ?>
+        var url = <?php echo json_encode(base_url('../varios/twilios/twilio_enviar_mensajes')); ?>
             + '?origen=' + encodeURIComponent(origen)
             + '&destino=' + encodeURIComponent(destino)
             + '&msg=' + encodeURIComponent(msg);
