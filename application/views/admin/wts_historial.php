@@ -1,12 +1,4 @@
 <style>
-    /*body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }*/
-    .admin-sidebar { background: #2d3436; min-height: 100vh; width: 240px; position: fixed; left: 0; top: 0; z-index: 100; }
-    .container { margin-left: 240px; padding: 2rem; }
-    @media (max-width: 768px) {
-        .admin-sidebar { display: none; }
-        .main-content { margin-left: 0; }
-    }
-
     /* ===== Chat estilo WhatsApp ===== */
     .chats-mensajes {
         flex-grow: 1;
@@ -60,47 +52,21 @@
 </style>
 
 <!-- Contenido principal -->
-<!--<div class="main-content" style="padding-top:1px!important">-->
-
-    <!--
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <table id="tabla-whatsapp" class="table table-hover align-middle w-100">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Id</th>
-                            <th>Fecha</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-    -->
-<div class="container">
-    <div class="row">
-        <div class="col-sm-10 col-lg-8">
-            <table id="example" class="display" style="width:98%; font-size: 14px!important; margin-bottom: 20px;" data-page-length='22'>
-                <thead>
+<div class="main-content">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <table id="tabla-whatsapp" class="table table-hover align-middle w-100">
+                <thead class="table-light">
                     <tr>
-                        <th>Id</th>
+                        <th class="text-center">Id</th>
                         <th>Fecha</th>
                         <th>Origen</th>
                         <th>Nombre</th>
-                        <th>Nro. Msjes</th>
-                        <th>Opciones</th>
+                        <th class="text-center">Nro. Msjes</th>
+                        <th class="text-center">Opciones</th>
                     </tr>
                 </thead>
-                <tfoot>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </tfoot>
+                <tbody></tbody>
             </table>
         </div>
     </div>
@@ -168,33 +134,117 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
 <script>
     const conversacionUrl = <?php echo json_encode(base_url('wts/conversacion/')); ?>;
 
+    function escHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&' + 'amp;')
+            .replace(/</g, '&' + 'lt;')
+            .replace(/>/g, '&' + 'gt;')
+            .replace(/"/g, '&' + 'quot;');
+    }
+
+    function fmtFechaCorta(str) {
+        if (!str) return '&mdash;';
+        var p = String(str).split('-');
+        if (p.length === 3) return p[2] + '/' + p[1] + '/' + p[0];
+        return str;
+    }
+
     $(document).ready(function() {
-        $('#example').DataTable({
-            "order": [[0, "desc"]],
-            dom: 'Bfrtip',
-            buttons: [
-                'copy', 'csv', 'excel', 'pdf', 'print'
+        $('#tabla-whatsapp').DataTable({
+            ajax: { url: '<?= base_url("wts/historial_json") ?>', type: 'GET', dataSrc: 'data' },
+            processing: true,
+            columns: [
+                { data: 0, className: 'text-center' },
+                { data: 1, className: 'small text-muted' },
+                { data: 2 },
+                { data: 3 },
+                { data: 4, className: 'text-center' },
+                { data: 5, className: 'text-center', orderable: false, searchable: false }
             ],
-            "ajax": "<?= base_url("wts/historial_json") ?>",
-            "columnDefs": [
-                { visible: true, "targets": [2]},
-                { 
-                    render: function(data, type, row){
-                        var telefono = row[2] || '';
-                        let cad = "<a href='#' title='Ver' onclick='detalle(" + row[0] + ")'><span class='bi bi-eye' style=\"font-size:16px\"></span></a>&nbsp;"
-                        cad += "<a href='#' title='Enviar' onclick=\"abrirEnviar(" + row[0] + ",'"  + row[6] + "', '" + telefono + "')\"><span class='bi bi-send' style=\"font-size:16px\"></span></a>&nbsp;"
-                        return cad
-                    },
-                    "targets":  [5]
+            columnDefs: [
+                {
+                    targets: 0,
+                    render: function(d, type) {
+                        return type === 'display' ? '<strong>#' + d + '</strong>' : d;
+                    }
+                },
+                {
+                    targets: 1,
+                    render: function(d, type) {
+                        return type === 'display' ? fmtFechaCorta(d) : d;
+                    }
+                },
+                {
+                    targets: 2,
+                    render: function(d, type) {
+                        var t = String(d || '').replace(/^whatsapp:/i, '');
+                        return type === 'display' ? escHtml(t) : t;
+                    }
+                },
+                {
+                    targets: 3,
+                    render: function(d, type) {
+                        return type === 'display' ? escHtml(d) : d;
+                    }
+                },
+                {
+                    targets: 5,
+                    render: function(d, type, row) {
+                        if (type !== 'display') return '';
+                        var telefono  = String(row[2] || '').replace(/^whatsapp:/i, '');
+                        var nroPropio = String(row[6] || '').replace(/^whatsapp:/i, '');
+
+                        return '<a href="#" title="Ver" onclick="detalle(' + row[0] + ');return false;">' +
+                               '<i class="bi bi-eye me-3" style="font-size:18px"></i></a>' +
+                               '<a href="#" title="Enviar" onclick="abrirEnviar(' + row[0] + ',\'' + escHtml(nroPropio) + '\',\'' + escHtml(telefono) + '\');return false;">' +
+                               '<i class="bi bi-send" style="font-size:18px"></i></a>';
+                    }
                 }
-            ]
+            ],
+            dom:
+                "<'row mb-3'<'col-md-6'B><'col-md-6 d-flex justify-content-end align-items-center'f>>" +
+                "<'row'<'col-12'tr>>" +
+                "<'row mt-2'<'col-md-5 small text-muted'i><'col-md-7 d-flex justify-content-end'p>>",
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: '<i class="bi bi-clipboard me-1"></i>Copiar',
+                    className: 'btn btn-outline-secondary btn-sm',
+                    exportOptions: { columns: [0,1,2,3,4] }
+                },
+                {
+                    extend: 'excel',
+                    text: '<i class="bi bi-file-earmark-excel me-1"></i>Excel',
+                    className: 'btn btn-success btn-sm',
+                    exportOptions: { columns: [0,1,2,3,4] }
+                },
+                {
+                    extend: 'pdf',
+                    text: '<i class="bi bi-file-earmark-pdf me-1"></i>PDF',
+                    className: 'btn btn-danger btn-sm',
+                    exportOptions: { columns: [0,1,2,3,4] }
+                },
+                {
+                    extend: 'csv',
+                    text: '<i class="bi bi-filetype-csv me-1"></i>CSV',
+                    className: 'btn btn-secondary btn-sm',
+                    exportOptions: { columns: [0,1,2,3,4] }
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="bi bi-printer me-1"></i>Imprimir',
+                    className: 'btn btn-info btn-sm text-white',
+                    exportOptions: { columns: [0,1,2,3,4] }
+                }
+            ],
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
+            order: [[0, 'desc']],
+            pageLength: 22
         });
     });
 
@@ -300,14 +350,11 @@
         var origen = telOrigenEnvio.replace(/^\+/, '');
 
         // URL local del controlador (proxy) — evita el bloqueo de CORS
-        //console.log("Flavito")
         var url = <?php echo json_encode(base_url('../varios/twilios/twilio_enviar_mensajes.php')); ?>
             + '?origen=' + encodeURIComponent(origen)
             + '&destino=' + encodeURIComponent(destino)
             + '&msg=' + encodeURIComponent(msg);
 
-        console.log("base_url: " + "<?= base_url("") ?>");
-        console.log(url);
         $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Enviando...');
 
         fetch(url)
@@ -327,22 +374,6 @@
                 $btn.prop('disabled', false).html('<i class="bi bi-send me-1"></i> Enviar');
                 $res.html('<div class="alert alert-danger py-2 mb-0"><i class="bi bi-x-circle me-1"></i> No se pudo enviar el mensaje. Verifica la conexión con el servicio.</div>');
             });
-    }
-
-    function escHtml(str) {
-        if (str === null || str === undefined) return '';
-        return String(str)
-            .replace(/&/g, '&')
-            .replace(/</g, '<')
-            .replace(/>/g, '>')
-            .replace(/"/g, '"');
-    }
-
-    function fmtFecha(str) {
-        if (!str) return '—';
-        var d = new Date(str.replace(' ', 'T'));
-        if (isNaN(d.getTime())) return str;
-        return d.toLocaleString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
     function fmtFechaHora(str) {
