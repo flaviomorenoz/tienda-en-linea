@@ -3,7 +3,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 date_default_timezone_set('America/Lima');
 
 //$config['base_url'] = 'http://localhost/tienda-en-linea/';
-$root=(isset($_SERVER["HTTPS"]) ? "https://" : "http://").$_SERVER["HTTP_HOST"];
+$is_https = (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off")
+    || (isset($_SERVER["HTTP_X_FORWARDED_PROTO"]) && $_SERVER["HTTP_X_FORWARDED_PROTO"] === "https")
+    || (isset($_SERVER["HTTP_X_FORWARDED_SSL"]) && $_SERVER["HTTP_X_FORWARDED_SSL"] === "on")
+    || (isset($_SERVER["HTTP_X_FORWARDED_PORT"]) && $_SERVER["HTTP_X_FORWARDED_PORT"] === "443");
+
+$root=($is_https ? "https://" : "http://").$_SERVER["HTTP_HOST"];
 $root.= str_replace(basename($_SERVER["SCRIPT_NAME"]), "", $_SERVER["SCRIPT_NAME"]);
 $config["base_url"] = $root; 
 
