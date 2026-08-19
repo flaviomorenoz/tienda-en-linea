@@ -1,148 +1,29 @@
 <style>
-    :root {
-        --c1: #ff6b6b;
-        --c2: #6c5ce7;
-        --c3: #00cec9;
-        --c4: #55efc4;
-        --c5: #fdcb6e;
-    }
-
-    .hero {
-        position: relative;
-        overflow: hidden;
-
-        /*height: 230px;*/
-        border-radius: 20px;
-        padding: 40px;
-
-        color: white;
-        /*background: #111;*/
-    }
-
-    .hero::before {
-        content: "";
-
-        position: absolute;
-        inset: -50%;
-
-        background:
-            radial-gradient(circle, var(--c1) 0%, transparent 50%),
-            radial-gradient(circle, var(--c2) 0%, transparent 50%),
-            radial-gradient(circle, var(--c3) 0%, transparent 50%),
-            radial-gradient(circle, var(--c4) 0%, transparent 50%),
-            radial-gradient(circle, var(--c5) 0%, transparent 50%);
-
-        background-size: 50% 50%;
-
-        filter: blur(80px);
-
-        animation: aurora 20s linear infinite;
-    }
-
-    .hero > * {
-        position: relative;
-        z-index: 1;
-    }
-
-    @keyframes aurora {
-        0% {
-            transform: rotate(0deg) scale(1);
-        }
-        50% {
-            transform: rotate(180deg) scale(1.2);
-        }
-        100% {
-            transform: rotate(360deg) scale(1);
-        }
-    }
-
-    /* Ocultar imágenes en móviles */
-    .imagen-movil-oculta {
-        display: none;
-    }
-
-    /* Mostrar solo en desktop */
-    @media (min-width: 768px) {
-        .imagen-movil-oculta {
-            display: inline-block; /* o inline-block según tu layout */
-        }
-    }
-
-    /* Fila de logos del hero: se achican en lugar de pasar a otra fila */
-    .hero-logos {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 10px;
-        overflow: hidden;
-        width: 100%;
-    }
-    .hero-logos img {
-        height: auto;
-        max-height: 100px;
-        max-width: 100px;
-        min-width: 24px;
-        flex: 1 1 70px;
-        object-fit: contain;
-    }
-
-    /* Si quieres mostrar solo una imagen en móvil */
-    @media (max-width: 767px) {
-        .imagen-movil-visible {
-            display: inline-block;
-        }
-        .imagen-movil-oculta {
-            display: none;
-        }
-    }
-
-    /* Miniaturas de producto */
-    .product-thumbs {
-        display: flex;
-        gap: 5px;
-        justify-content: center;
-        padding: 6px 8px 2px;
-    }
-    .product-thumbs img {
-        width: 48px;
-        height: 48px;
-        object-fit: cover;
-        border-radius: 5px;
-        cursor: pointer;
-        border: 2px solid transparent;
-        transition: border-color 0.2s, opacity 0.2s;
-        opacity: 0.65;
-    }
-    .product-thumbs img.active,
-    .product-thumbs img:hover {
-        border-color: #343a40;
-        opacity: 1;
-    }
 </style>
 <div class="container">
 
     <!-- Hero banner -->
-    <div class="hero hero-banner rounded-4 mb-4 text-white d-flex align-items-center">
+    <div class="tol-hero rounded-4 mb-4 text-white d-flex align-items-center" style="border-width:1px;border-right: 1px solid var(--color-tol-tit);
+    border-bottom: 1px solid var(--color-tol-tit);">
         <div>
-            <h1 class="display-5 fw-bold mb-2"><?php echo $this->config->item('tienda_nombre'); ?></h1>
+            <h1 class="tol-tit"><?php echo $this->config->item('tienda_nombre'); ?></h1>
             <!--<p class="lead mb-3"><?php echo $this->config->item('tienda_slogan'); ?></p>-->
-            <a href="#productos" class="btn btn-light btn-lg fw-semibold">
+            <a href="#productos" class="btn btn-light btn-lg fw-semibold tol-tit2">
                 <i class="bi bi-grid-3x3-gap me-2"></i>Ropa y accesorios para todos
             </a>
         </div>
         <div class="flex-grow-1 imagen-movil-oculta hero-logos" style="padding-left: 55px;">
-            <?php for ($i = 0; $i < 6; $i++): 
+            <?php for ($i = 0; $i < 5; $i++): 
                 //$color = ['#ff6b6b', '#6c5ce7', '#00cec9', '#55efc4', '#fdcb6e', '#ff6b6b'];
-                $color = ['#3a0b0b', '#5c1818', '#801c1c', '#a83535', '#da4f4f', '#ff6b6b'];
+                $color = ['#ff6b6b', '#da4f4f', '#a83535', '#801c1c','#5c1818' ];
             ?>
             <!--<img src="<?php echo base_url('assets/img/logox.png'); ?>" alt="Hero Image">-->
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 1260">
-                <rect x="0" y="0" width="1260" height="1260" rx="185" ry="185" fill="<?php echo $color[$i]; ?>"/>
-                <line x1="835" y1="437" x2="1260" y2="437" stroke="#ffffff" stroke-width="10"/>
-                <line x1="0" y1="691" x2="192" y2="691" stroke="#ffffff" stroke-width="10"/>
-                <text x="192" y="595" font-family="Georgia, 'Times New Roman', serif" font-size="300" fill="#ffffff">Bella</text>
-                <text x="408" y="845" font-family="Georgia, 'Times New Roman', serif" font-size="300" fill="#ffffff">Rosse</text>
+                <rect x="0" y="0" width="1060" height="1060" rx="165" ry="165" fill="<?php echo $color[$i]; ?>"/>
+                <line x1="835" y1="437" x2="1060" y2="437" stroke="#ffffff" stroke-width="6"/>
+                <line x1="0" y1="691" x2="162" y2="691" stroke="#ffffff" stroke-width="6"/>
+                <text x="192" y="495" font-family="Georgia, 'Times New Roman', serif" font-size="250" fill="#e9bcbc">Bella</text>
+                <text x="408" y="745" font-family="Georgia, 'Times New Roman', serif" font-size="250" fill="#e4cdcd">Rosse</text>
             </svg>
             <?php endfor; ?>
         </div>

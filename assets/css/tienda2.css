@@ -11,8 +11,9 @@
     --whatsapp:    #25D366;
     --light-bg:    #f8f9fa;
     --card-radius: 12px;
-    --font:        'Poppins', sans-serif;
-    --fondo:    rgb(255,27,138);
+    --font:        'Fraunces', serif;
+    --fondo:    rgb(255, 255, 255);
+    --color: white;
 }
 
 /* Base */
@@ -21,9 +22,14 @@ body {
     color: #2d3436;
     background-color: var(--fondo);
     /*background-image: url('../img/logox2.jpeg');*/
+    background-size: 234px 110px;
+    background-image: url('../../assets/img/papel-tapiz.png');
     background-repeat: repeat;
-    background-size: 534px 533px;
     background-attachment: fixed;
+}
+
+.color-fuente-bella {
+    color: var(--color);
 }
 
 /* ===================================================
@@ -31,7 +37,7 @@ body {
    =================================================== */
 main > .container,
 main > .container-fluid {
-    background:  rgba(232,226,177,1);/*rgba(255, 255, 255, 0.95);*/
+    background: #f4efe9;
     border-radius: 16px;
     padding: 1.5rem;
     box-shadow: 0 4px 24px rgba(0,0,0,0.08);
@@ -79,7 +85,7 @@ main > .container-fluid {
 .hero-banner {
     /*background: linear-gradient(135deg, var(--primary) 0%, #636e72 100%);*/
     /*min-height: 220px;*/
-    background-color: white;
+    background-color: rgb(212, 190, 178);
     border-style:solid;
     border-color: var(--primary);
 }
@@ -424,9 +430,7 @@ main > .container-fluid {
         width: calc(100vw - 2rem);
     }
 }
-    body{
-        font-family: 'Fraunces', serif;
-    }
+
     .tol-tit{
         color:var(--color-tol-tit)
     }
@@ -441,6 +445,12 @@ main > .container-fluid {
         --c5: #fdcb6e;
         --color-tol-tit: RGB(250,1,131);
         --color-tol-fondo: RGB(255, 255, 255);
+    }
+
+    .tol-hero{
+        border-radius: 20px;
+        background-color:rgb(237,224,217);
+        padding: 30px;
     }
 
     .hero {
@@ -480,7 +490,7 @@ main > .container-fluid {
     .hero > * {
         position: relative;
         z-index: 1;
-        background-color: var(--color-tol-fondo)!important;
+        background-color: rgb(237,224,217)!important;
     }
     .hero-banner{
         /*background-color: var(--color-tol-fondo)!important;*/

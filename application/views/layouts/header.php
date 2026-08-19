@@ -34,8 +34,11 @@
     </style>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- CSS Custom -->
-    <link href="<?php echo base_url('assets/css/tienda.css?v=3'); ?>" rel="stylesheet">
+    <link href="<?php echo base_url('assets/css/tienda3.css?v=3'); ?>" rel="stylesheet">
 </head>
 <body>
 

@@ -49,6 +49,10 @@
     }
     .burbuja.enviado .hora { color: #6b8f5e; }
     .burbuja .hora .bi-check2-all { color: #53bdeb; font-size: .8rem; }
+    #tabla-whatsapp {
+        --bs-body-font-size: 0.9rem;
+        font-size: 0.9rem;
+    }
 </style>
 
 <!-- Contenido principal -->
@@ -62,8 +66,11 @@
                         <th>Fecha</th>
                         <th>Origen</th>
                         <th>Nombre</th>
-                        <th class="text-center">Nro. Msjes</th>
+                        <th class="text-center">Msjes</th>
+                        <th class="">Ultimo Msje</th>
+                        <th class="text-center">Estado</th>
                         <th class="text-center">Opciones</th>
+                        <!--<th class="">Nro.Propio</th>-->
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -164,7 +171,9 @@
                 { data: 2 },
                 { data: 3 },
                 { data: 4, className: 'text-center' },
-                { data: 5, className: 'text-center', orderable: false, searchable: false }
+                { data: 5},
+                { data: 6},
+                { data: 7}
             ],
             columnDefs: [
                 {
@@ -172,32 +181,48 @@
                     render: function(d, type) {
                         return type === 'display' ? '<strong>#' + d + '</strong>' : d;
                     }
-                },
-                {
+                },{
                     targets: 1,
                     render: function(d, type) {
                         return type === 'display' ? fmtFechaCorta(d) : d;
                     }
-                },
-                {
+                },{
                     targets: 2,
                     render: function(d, type) {
                         var t = String(d || '').replace(/^whatsapp:/i, '');
                         return type === 'display' ? escHtml(t) : t;
                     }
-                },
-                {
+                },{
                     targets: 3,
                     render: function(d, type) {
                         return type === 'display' ? escHtml(d) : d;
                     }
-                },
-                {
+                },{
+                    targets: 4,
+                    render: function(d, type) {
+                        return type === 'display' ? escHtml(d) : d;
+                    }
+                },{
                     targets: 5,
+                    render: function(d, type) {
+                        return type === 'display' ? escHtml(d) : d;
+                    }
+                },{
+                    targets: 6,
+                    render: function(d, type) {
+                        //return type === 'display' ? escHtml(d) : d;
+                        if(d.trim() == 'ENVIADO'){
+                            return "<div style=\"background-color:lightgreen;text-align:center;border-radius:7px;\">" + d + "</div>"
+                        }else{
+                            return "<div style=\"background-color:rgb(255,110,110);text-align:center;border-radius:7px;\">" + d + "</div>"
+                        }
+                    }
+                },{
+                    targets: 7,
                     render: function(d, type, row) {
                         if (type !== 'display') return '';
                         var telefono  = String(row[2] || '').replace(/^whatsapp:/i, '');
-                        var nroPropio = String(row[6] || '').replace(/^whatsapp:/i, '');
+                        var nroPropio = String(row[8] || '').replace(/^whatsapp:/i, '');
 
                         return '<a href="#" title="Ver" onclick="detalle(' + row[0] + ');return false;">' +
                                '<i class="bi bi-eye me-3" style="font-size:18px"></i></a>' +

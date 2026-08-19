@@ -53,16 +53,37 @@ class Wts_model extends CI_Model {
             order by a.id desc";
              
         // Query mejorado que muestra una linea por conversacion al mismo numero en el dia:
-        $cSql = "select z.id, z.fecha, z.telefono_origen, wa.nombre, z.cant, 'x' opciones, '{$this->nro_propio}' as nro_propio
-            from (
-                select min(a.id) id, to_char(a.fecha, 'YYYY-MM-DD') fecha, a.telefono_origen, count(1) cant
-                from wts_mensajes a
-                where a.tipo='RECIBIDO'
-                group by to_char(a.fecha, 'YYYY-MM-DD'), a.telefono_origen
-            ) z
-            left join wts_mensajes wa on z.id = wa.id
-            order by z.id desc";
+        $cSql = "select z.id, z.fecha, z.telefono_origen, wa.nombre, z.cant, 
+        case when z.id >= z.id_max then convert_from(convert_to(wa.mensaje, 'UTF8'),'UTF8') else convert_from(convert_to(wb.mensaje, 'UTF8'),'UTF8') end mensaje, 'x' opciones, '{$this->nro_propio}' as nro_propio
+        ,case when z.id >= z.id_max then 'Enviado' else 'Recibido' end estado
+        from (
+            select min(a.id) id, max(a.id) id_max, to_char(a.fecha, 'YYYY-MM-DD') fecha, a.telefono_origen, count(1) cant
+            from wts_mensajes a
+            where a.tipo='RECIBIDO'
+            group by to_char(a.fecha, 'YYYY-MM-DD'), a.telefono_origen
+        ) z
+        left join wts_mensajes wa on z.id = wa.id
+        left join wts_mensajes wb on z.id_max = wb.id
+        order by z.id desc";
 
+        $cSql = "select z.id, z.fecha, 
+            case when wb.tipo = 'ENVIADO' then wb.telefono_destino else wb.telefono_origen end telefono_origen, 
+            wb.nombre, 
+            z.cant, 
+            convert_from(convert_to(wb.mensaje, 'UTF8'),'UTF8') mensaje,
+            'x' opciones,
+            '{$this->nro_propio}' as nro_propio,
+            wb.tipo estado
+        from (
+            select min(a.id) id, max(a.id) id_max, to_char(a.fecha, 'YYYY-MM-DD') fecha, count(1) cant
+            from wts_mensajes a
+            group by to_char(a.fecha, 'YYYY-MM-DD')
+        ) z
+        left join wts_mensajes wb on z.id_max = wb.id
+        where (case when wb.tipo = 'ENVIADO' then wb.telefono_destino else wb.telefono_origen end) != 'whatsapp:{$this->nro_propio}'
+        order by z.id desc";
+
+        //die($cSql);
         $result = $this->db->query($cSql)->result_array();
         return $result;
     }

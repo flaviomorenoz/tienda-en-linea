@@ -9,18 +9,18 @@
                     <i class="bi bi-bag-heart-fill me-2"></i>
                     <?php echo $this->config->item('tienda_nombre'); ?>
                 </h5>
-                <p class="text-white-50 small"><?php echo $this->config->item('tienda_slogan'); ?></p>
+                <p class="small color-fuente-bella"><?php echo $this->config->item('tienda_slogan'); ?></p>
             </div>
             <div class="col-md-4">
                 <h6 class="fw-semibold mb-3">Contacto</h6>
                 <p class="text-white-50 small mb-1">
                     <i class="bi bi-whatsapp me-2 text-success"></i>
                     <a href="https://wa.me/<?php echo $this->config->item('whatsapp_numero'); ?>"
-                       class="text-white-50 text-decoration-none" target="_blank">
+                       class="color-fuente-bella" target="_blank">
                         +<?php echo $this->config->item('whatsapp_numero'); ?>
                     </a>
                 </p>
-                <p class="text-white-50 small">
+                <p class="color-fuente-bella small">
                     <i class="bi bi-envelope me-2"></i>
                     <?php echo $this->config->item('tienda_email'); ?>
                 </p>
