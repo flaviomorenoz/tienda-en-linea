@@ -22,8 +22,8 @@
                 <rect x="0" y="0" width="1060" height="1060" rx="165" ry="165" fill="<?php echo $color[$i]; ?>"/>
                 <line x1="835" y1="437" x2="1060" y2="437" stroke="#ffffff" stroke-width="6"/>
                 <line x1="0" y1="691" x2="162" y2="691" stroke="#ffffff" stroke-width="6"/>
-                <text x="192" y="495" font-family="Georgia, 'Times New Roman', serif" font-size="250" fill="#e9bcbc">Bella</text>
-                <text x="408" y="745" font-family="Georgia, 'Times New Roman', serif" font-size="250" fill="#e4cdcd">Rosse</text>
+                <text x="192" y="495" font-family="Georgia, 'Times New Roman', serif" font-size="250" fill="#f09696">Bella</text>
+                <text x="408" y="745" font-family="Georgia, 'Times New Roman', serif" font-size="250" fill="#f09696">Rosse</text>
             </svg>
             <?php endfor; ?>
         </div>
