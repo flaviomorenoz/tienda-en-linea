@@ -1,36 +1,15 @@
 <style>
 </style>
-<div class="container">
+<div class="container" style="padding-top:0px!important;">
 
-    <!-- Hero banner -->
-    <div class="tol-hero rounded-4 mb-4 text-white d-flex align-items-center" style="border-width:1px;border-right: 1px solid var(--color-tol-tit);
-    border-bottom: 1px solid var(--color-tol-tit);">
-        <div>
-            <h1 class="tol-tit"><?php echo $this->config->item('tienda_nombre'); ?></h1>
-            <!--<p class="lead mb-3"><?php echo $this->config->item('tienda_slogan'); ?></p>-->
-            <a href="#productos" class="btn btn-light btn-lg fw-semibold tol-tit2">
-                <i class="bi bi-grid-3x3-gap me-2"></i>Ropa y accesorios para todos
-            </a>
-        </div>
-        <div class="flex-grow-1 imagen-movil-oculta hero-logos" style="padding-left: 55px;">
-            <?php for ($i = 0; $i < 5; $i++): 
-                //$color = ['#ff6b6b', '#6c5ce7', '#00cec9', '#55efc4', '#fdcb6e', '#ff6b6b'];
-                $color = ['#ff6b6b', '#da4f4f', '#a83535', '#801c1c','#5c1818' ];
-            ?>
-            <!--<img src="<?php echo base_url('assets/img/logox.png'); ?>" alt="Hero Image">-->
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 1260">
-                <rect x="0" y="0" width="1060" height="1060" rx="165" ry="165" fill="<?php echo $color[$i]; ?>"/>
-                <line x1="835" y1="437" x2="1060" y2="437" stroke="#ffffff" stroke-width="6"/>
-                <line x1="0" y1="691" x2="162" y2="691" stroke="#ffffff" stroke-width="6"/>
-                <text x="192" y="495" font-family="Georgia, 'Times New Roman', serif" font-size="250" fill="#f09696">Bella</text>
-                <text x="408" y="745" font-family="Georgia, 'Times New Roman', serif" font-size="250" fill="#f09696">Rosse</text>
-            </svg>
-            <?php endfor; ?>
-        </div>
+    <!-- Encabezado de sección (estilo Aruma) -->
+    <div class="aruma-section-header" id="productos">
+        <h2 class="aruma-section-title">Nuestros productos</h2>
+        <a href="<?php echo base_url(); ?>" class="aruma-section-link">Ver todos</a>
     </div>
 
     <!-- Filtros de categoría -->
-    <div class="d-flex flex-wrap gap-2 mb-4" id="productos">
+    <div class="d-flex flex-wrap gap-2 mb-4">
         <a href="<?php echo base_url(); ?>"
            class="btn <?php echo (!isset($categoria_activa) || !$categoria_activa) ? 'btn-dark' : 'btn-outline-secondary'; ?> btn-sm rounded-pill">
             <i class="bi bi-grid me-1"></i>Todos

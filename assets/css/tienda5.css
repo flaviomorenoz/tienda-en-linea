@@ -1,0 +1,675 @@
+/* ===================================================
+   TIENDA VIRTUAL - Estilos Personalizados
+   TEMA 5: Estilo Aruma (https://www.aruma.pe/)
+   Colores: Magenta #FA0082 / Texto #3A3735 / Negro #1D1D1B
+   =================================================== */
+
+/* Variables */
+:root {
+    --primary:       #FA0082;
+    --primary-dark:  #AC0078;
+    --whatsapp:      #25D366;
+    --light-bg:      #f7f6f4;
+    --card-radius:   0px;
+    --font:          'Poppins', sans-serif;
+    --fondo:         #ffffff;
+    --color:         #3A3735;
+    --texto:         #3A3735;
+    --texto-muted:   #8a8580;
+    --negro:         #1D1D1B;
+    --borde:         #e8e6e3;
+    --card-bg:       #ffffff;
+    --color-tol-tit:   #3A3735;
+    --color-tol-fondo: #ffffff;
+}
+
+/* Base */
+body {
+    font-family: var(--font);
+    color: var(--texto);
+    background-color: var(--fondo);
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+}
+
+.color-fuente-bella {
+    color: #ffffff;
+}
+
+/* ===================================================
+   MAIN CONTENT
+   =================================================== */
+main > .container,
+main > .container-fluid {
+    background: #ffffff;
+    border-radius: 0;
+    padding: 1.5rem;
+    min-height: 60vh;
+}
+
+/* ===================================================
+   NAVBAR (estilo Aruma: blanco, letras carbón)
+   =================================================== */
+#navbar-tienda {
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border-bottom: 1px solid var(--borde);
+    padding: 0.75rem 0;
+}
+
+#navbar-tienda .navbar-brand {
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+    color: var(--primary) !important;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+#navbar-tienda .navbar-brand i {
+    color: var(--primary);
+}
+
+#navbar-tienda .nav-link {
+    color: var(--texto) !important;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.85rem;
+    border-radius: 0;
+    transition: color 0.2s;
+}
+
+#navbar-tienda .nav-link:hover,
+#navbar-tienda .nav-link.active {
+    color: var(--primary) !important;
+    background: transparent;
+}
+
+.btn-carrito {
+    border: 1px solid var(--negro);
+    color: var(--negro) !important;
+    border-radius: 0;
+    padding: 0.4rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.btn-carrito:hover {
+    background: var(--negro);
+    border-color: var(--negro);
+    color: #fff !important;
+}
+
+/* ===================================================
+   HERO BANNER (estilo Aruma shopByCategory)
+   =================================================== */
+.tol-hero {
+    border-radius: 0;
+    background: var(--light-bg);
+    border: 1px solid var(--borde);
+    padding: 2.5rem 2rem;
+    margin-bottom: 2.5rem !important;
+    position: relative;
+}
+
+.tol-tit {
+    color: var(--color-tol-tit);
+    font-weight: 700;
+    font-size: 2.2rem;
+    letter-spacing: 0.01em;
+    text-shadow: none;
+}
+
+.tol-tit2 {
+    color: var(--primary);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--primary);
+    border-radius: 0;
+    padding: 0.25rem 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.tol-tit2:hover {
+    color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    background: transparent;
+}
+
+/* SVGs decorativos del hero → carbón/neutro Aruma */
+.hero-logos svg rect {
+    fill: #ffffff !important;
+    stroke: var(--borde);
+    stroke-width: 1;
+}
+
+.hero-logos svg line {
+    stroke: var(--primary) !important;
+}
+
+.hero-logos svg text {
+    fill: #1D1D1B !important;
+    font-weight: 600;
+}
+
+.hero > * {
+    position: relative;
+    z-index: 1;
+    background-color: transparent !important;
+}
+
+.hero-banner {
+    border-style: none;
+    border-color: transparent;
+}
+
+/* ===================================================
+   ENCABEZADO DE SECCIÓN (tipo Aruma)
+   =================================================== */
+.aruma-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--borde);
+}
+
+.aruma-section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--negro);
+    letter-spacing: 0.02em;
+    margin: 0;
+}
+
+.aruma-section-link {
+    color: var(--primary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    transition: color 0.2s;
+}
+
+.aruma-section-link:hover {
+    color: var(--primary-dark);
+}
+
+/* ===================================================
+   FILTROS DE CATEGORÍA (píldoras Aruma)
+   =================================================== */
+.btn-dark {
+    background: var(--negro);
+    border-color: var(--negro);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    border-radius: 999px;
+    padding: 0.4rem 1.2rem;
+}
+
+.btn-dark:hover,
+.btn-dark:focus,
+.btn-dark:active {
+    background: #000000;
+    border-color: #000000;
+    color: #fff;
+}
+
+.btn-outline-secondary {
+    color: var(--texto);
+    border-color: var(--borde);
+    background: transparent;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    border-radius: 999px;
+    padding: 0.4rem 1.2rem;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+    background: var(--negro);
+    border-color: var(--negro);
+    color: #fff;
+}
+
+/* ===================================================
+   TARJETAS DE PRODUCTO (look limpio Aruma)
+   =================================================== */
+.card {
+    background: var(--card-bg);
+    border: none;
+}
+
+.product-card {
+    border-radius: var(--card-radius) !important;
+    border: 1px solid var(--borde) !important;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+    border-color: rgba(250,0,130,0.3) !important;
+}
+
+.product-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    background: var(--light-bg);
+}
+
+.product-img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-img {
+    transform: scale(1.04);
+}
+
+.product-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: auto;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: var(--primary) !important;
+    border-radius: 0;
+    padding: 0.35rem 0.7rem;
+}
+
+/* Textos de la tarjeta */
+.product-card .text-muted {
+    color: var(--texto-muted) !important;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.product-card .card-title a.text-dark {
+    color: var(--texto) !important;
+}
+
+.product-name-link {
+    color: var(--texto) !important;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.product-name-link:hover {
+    color: var(--primary) !important;
+}
+
+.texto-descrip pre {
+    color: var(--texto-muted);
+    font-family: var(--font);
+    font-size: 0.72rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0.25rem 0 0;
+}
+
+/* Precio */
+.precio {
+    color: var(--negro);
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.precio::before {
+    content: '';
+}
+
+/* Botón Ver y agregar (btn-dark en tarjeta) */
+.product-card .btn-dark {
+    background: var(--negro);
+    border-color: var(--negro);
+    border-radius: 0;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+}
+
+.product-card .btn-dark:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+/* ===================================================
+   MINIATURAS DE PRODUCTO
+   =================================================== */
+.product-thumbs {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    padding: 6px 8px 2px;
+    background: #ffffff;
+}
+
+.product-thumbs img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 0;
+    cursor: pointer;
+    border: 1px solid var(--borde);
+    transition: border-color 0.2s, opacity 0.2s;
+    opacity: 0.65;
+}
+
+.product-thumbs img.active,
+.product-thumbs img:hover {
+    border-color: var(--primary);
+    opacity: 1;
+}
+
+/* ===================================================
+   BOTONES CUSTOM
+   =================================================== */
+.btn-consultar {
+    background-color: var(--whatsapp);
+    border-color: var(--whatsapp);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.btn-consultar:hover {
+    background-color: #1da851;
+    border-color: #1da851;
+    color: #fff;
+}
+
+/* ===================================================
+   ESTADO VACÍO
+   =================================================== */
+.text-center .bi-box-seam {
+    color: var(--texto-muted) !important;
+}
+
+.text-center .text-muted {
+    color: var(--texto-muted) !important;
+}
+
+/* ===================================================
+   FOOTER (Aruma: oscuro con columnas)
+   =================================================== */
+.footer-tienda {
+    background: var(--negro);
+    border-top: 3px solid var(--primary);
+    color: #d9d5d0;
+}
+
+.footer-tienda h5,
+.footer-tienda h6 {
+    color: #ffffff;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.footer-tienda .color-fuente-bella {
+    color: #b5b0ab;
+}
+
+.footer-tienda a.color-fuente-bella {
+    color: #d9d5d0;
+}
+
+.footer-tienda a.color-fuente-bella:hover {
+    color: var(--primary);
+}
+
+.footer-cat-link {
+    color: #b5b0ab !important;
+}
+
+.footer-cat-link:hover {
+    color: var(--primary) !important;
+}
+
+/* ===================================================
+   RESPONSIVE / MOBILE
+   =================================================== */
+.imagen-movil-oculta {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .imagen-movil-oculta {
+        display: inline-block;
+    }
+}
+
+.hero-logos {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.hero-logos img {
+    height: auto;
+    max-height: 100px;
+    max-width: 100px;
+    min-width: 24px;
+    flex: 1 1 70px;
+    object-fit: contain;
+}
+
+@media (max-width: 767px) {
+    .imagen-movil-visible {
+        display: inline-block;
+    }
+    .imagen-movil-oculta {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .tol-hero {
+        min-height: 160px;
+        padding: 2rem 1.5rem !important;
+    }
+    .tol-hero h1 { font-size: 1.6rem; }
+    .product-img { aspect-ratio: 1 / 1; }
+    .checkout-steps { display: none !important; }
+}
+
+/* ===================================================
+   ASISTENTE IA (chat flotante) - Aruma
+   =================================================== */
+#chat-ia-widget {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 1050;
+}
+
+.chat-ia-toggle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 1.4rem;
+    box-shadow: 0 6px 18px rgba(250,0,130,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.chat-ia-toggle:hover {
+    transform: scale(1.06);
+}
+
+.chat-ia-panel {
+    width: 320px;
+    max-width: calc(100vw - 2rem);
+    height: 440px;
+    max-height: calc(100vh - 2rem);
+    background: #ffffff;
+    border-radius: 0;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-ia-header {
+    background: var(--negro);
+    color: #ffffff;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.chat-ia-mensajes {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.9rem;
+    background: var(--light-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chat-ia-msg {
+    max-width: 85%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0;
+    font-size: 0.875rem;
+    line-height: 1.35;
+}
+
+.chat-ia-msg-user {
+    align-self: flex-end;
+    background: var(--primary);
+    color: #fff;
+}
+
+.chat-ia-msg-bot {
+    align-self: flex-start;
+    background: #ffffff;
+    color: var(--texto);
+    border: 1px solid var(--borde);
+}
+
+.chat-ia-msg-vendedor {
+    align-self: flex-start;
+    background: var(--primary);
+    color: #fff;
+}
+
+.chat-ia-msg-sistema {
+    align-self: center;
+    background: transparent;
+    color: var(--texto-muted);
+    font-size: 0.78rem;
+    text-align: center;
+    max-width: 100%;
+}
+
+.chat-ia-img {
+    display: block;
+    max-width: 100%;
+    border-radius: 0;
+    cursor: zoom-in;
+}
+
+.chat-ia-escribiendo {
+    padding: 0 0.9rem 0.4rem;
+    font-size: 0.75rem;
+    color: var(--texto-muted);
+    font-style: italic;
+}
+
+.chat-ia-estado {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.78rem;
+    color: var(--texto);
+    background: var(--light-bg);
+    text-align: center;
+    border-top: 1px solid var(--borde);
+}
+
+.chat-ia-transferir {
+    margin: 0 0.65rem 0.5rem;
+    border: 1px solid var(--primary);
+    background: #ffffff;
+    color: var(--primary);
+    border-radius: 0;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.chat-ia-transferir:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+.chat-ia-form {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.65rem;
+    border-top: 1px solid var(--borde);
+    background: #ffffff;
+}
+
+.chat-ia-form .btn {
+    background: var(--negro);
+    color: #fff;
+    flex-shrink: 0;
+    border-color: var(--negro);
+    border-radius: 0;
+}
+
+@media (max-width: 400px) {
+    .chat-ia-panel {
+        width: calc(100vw - 2rem);
+    }
+}

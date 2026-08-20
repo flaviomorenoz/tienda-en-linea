@@ -61,6 +61,7 @@ class Ajustes_model extends CI_Model {
             'tienda2.css' => 'Estilo 2 (tienda2.css) Chocolate',
             'tienda3.css' => 'Estilo 3 (tienda3.css) Blanco-rosas',
             'tienda4.css' => 'Estilo 4 (tienda4.css) Electrico',
+            'tienda5.css' => 'Estilo 5 (tienda5.css) Aruma',
         );
     }
 

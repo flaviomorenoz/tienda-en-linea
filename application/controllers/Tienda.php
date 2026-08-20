@@ -24,9 +24,9 @@ class Tienda extends CI_Controller {
             'carrito_count'    => $this->_carrito_count(),
         );
 
-        $this->load->view('layouts/header', $data);
+        $this->load->view('layouts/header2', $data);
         $this->load->view('tienda/home', $data);
-        $this->load->view('layouts/footer');
+        $this->load->view('layouts/footer2');
     }
 
     public function categoria($cat) {
