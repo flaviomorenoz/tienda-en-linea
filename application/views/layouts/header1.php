@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversaciones IA - Admin</title>
+    <title><?= isset($titulo) ? htmlspecialchars($titulo, ENT_QUOTES, 'UTF-8') : 'Admin' ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -43,13 +43,15 @@
 <body>
 
 <!-- Sidebar -->
-<?=menu_principal($this->config->item('tienda_nombre'))?>
+<?=menu_principal($this->config->item('tienda_nombre'), $admin_nombre ?? NULL)?>
 
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h4 class="fw-bold mb-0"><?= $titulo ?></h4>
-            <p class="text-muted small mb-0">Conversaciones de los últimos 2 meses</p>
+            <?php if (isset($subtitulo)): ?>
+            <p class="text-muted small mb-0"><?= $subtitulo ?></p>
+            <?php endif; ?>
         </div>
     </div>
 </div>

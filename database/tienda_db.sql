@@ -68,6 +68,13 @@ CREATE TABLE IF NOT EXISTS admins (
     created_at      TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS config_ajustes (
+    id          SERIAL PRIMARY KEY,
+    clave       VARCHAR(100) UNIQUE NOT NULL,
+    valor       VARCHAR(255),
+    updated_at  TIMESTAMP DEFAULT NOW()
+);
+
 -- =============================================================
 -- INDICES
 -- =============================================================

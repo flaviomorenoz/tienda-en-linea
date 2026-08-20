@@ -38,7 +38,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- CSS Custom -->
-    <link href="<?php echo base_url('assets/css/tienda3.css?v=3'); ?>" rel="stylesheet">
+    <?php
+    $CI =& get_instance();
+    if (!isset($CI->Ajustes_model)) { $CI->load->model('Ajustes_model'); }
+    $tema_css = $CI->Ajustes_model->get_tema_activo();
+    ?>
+    <link href="<?php echo base_url('assets/css/' . $tema_css . '?v=3'); ?>" rel="stylesheet">
 </head>
 <body>
 

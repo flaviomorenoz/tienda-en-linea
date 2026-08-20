@@ -115,7 +115,7 @@ function acceso_denegado($msg=""){
     }
 }
 
-function menu_principal($tienda_nombre=""){
+function menu_principal($tienda_nombre="", $admin_nombre=NULL){
     ?>
 <div class="admin-sidebar text-white d-flex flex-column py-4 px-3">
     <div class="text-center mb-4">
@@ -132,6 +132,9 @@ function menu_principal($tienda_nombre=""){
         </a>
         <a href="<?php echo base_url('wts/historial'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
             <i class="bi bi-whatsapp"></i> WhatsApp
+        </a>
+        <a href="<?php echo base_url('ajustes'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
+            <i class="bi bi-palette"></i> Ajustes
         </a>
         <a href="<?php echo base_url(); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1" target="_blank">
             <i class="bi bi-shop"></i> Ver tienda

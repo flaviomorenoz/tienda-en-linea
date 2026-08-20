@@ -45,6 +45,10 @@ $route['pago/procesar'] = 'pago/procesar';
 $route['pedido/gracias/(:num)'] = 'pago/gracias/$1';
 $route['pedido/cancelado'] = 'pago/cancelado';
 
+// Ajustes (configuración)
+$route['ajustes'] = 'ajustes/index';
+$route['ajustes/guardar_tema'] = 'ajustes/guardar_tema';
+
 // Panel admin
 $route['admin'] = 'admin/login';
 $route['admin/login'] = 'admin/login';
