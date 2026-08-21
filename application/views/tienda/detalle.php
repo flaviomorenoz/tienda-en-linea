@@ -39,7 +39,7 @@
 
     <div class="row g-4">
         <!-- Imagen del producto -->
-        <div class="col-md-6 text-center">
+        <div class="col-md-6">
             <?php
                 $det_img_principal = base_url('../erp-en-linea/assets/img/productos/' . $imagenes[0]);
                 $det_img_default   = base_url('../erp-en-linea/assets/img/productos/default1.jpg');
