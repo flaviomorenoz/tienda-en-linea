@@ -1,3 +1,22 @@
+<style>
+    .defensa-01{
+        border-style:solid;
+        border-width:2px;
+        border-color:red;
+        border-radius:6px;
+        padding:4px;
+    }
+    .estilo-yape{
+        font-weight:bold;
+    }
+    .estilo-courier{
+        font-weight:bold;
+        font-size:16px;
+        display: grid;
+        place-items: center;
+        height:90px;
+    }
+</style>
 <div class="container">
     <h2 class="fw-bold mb-4"><i class="bi bi-cart3 me-2"></i>Mi Carrito</h2>
 
@@ -40,7 +59,7 @@
                                     <?php foreach ($carrito as $key => $item): ?>
                                     <tr>
                                         <td>
-                                            <img src="<?php echo base_url($item['imagen']); ?>"
+                                            <img src="<?php echo base_url("../erp-en-linea/".$item['imagen']); ?>"
                                                  alt="<?php echo htmlspecialchars($item['nombre'], ENT_QUOTES, 'UTF-8'); ?>"
                                                  class="rounded" width="60" height="70"
                                                  style="object-fit:cover;"
@@ -96,7 +115,7 @@
                         <i class="bi bi-arrow-left me-1"></i>Seguir comprando
                     </a>
                     <div class="d-flex gap-2">
-                        <button type="button" onclick="rellenar()">rellenar</button>
+                        <!--<button type="button" onclick="rellenar()">rellenar</button>-->
                         <a href="#" onclick="ver_modal_paguito()" class="btn btn-primary btn-sm">
                             <i class="bi bi-arrow-repeat me-1"></i>Pago verificado
                         </a>
@@ -140,16 +159,34 @@
                         </div>
                         <div class="d-grid mt-4">
                             <a href="<?php echo base_url('checkout'); ?>" class="btn btn-dark btn-lg">
-                                <i class="bi bi-lock-fill me-2"></i>Pago con tarjeta
+                                <i class="bi bi-lock-fill me-2"></i>Total del Pedido
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="row" style="margin-left:1px!important;">
+            <!-- Mensaje de yape -->
+            <div class="col-sm-6 col-lg-3" style="padding:4px;margin-top:4px!important;">
+                <div class="row defensa-01">
+                    <div class="col-sm-6 col-lg-6">
+                        <img src="<?= base_url("assets/img/yape.jpeg") ?>" style="height:74px;">
+                    </div>
+                    <div class="col-sm-6 col-lg-6 estilo-yape" style="padding:16px">
+                        991-629-237<br>Rosita Cha*
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 estilo-courier" style="padding:16px;margin-top:4px!important;">
+                Envíos por Shalom, Olva Courier, Marvisur
+            </div>
+        </div>
     </form>
 
-    <div id="form-pagos" class="row g-4" style="display:none">
+    <div id="form-pagos" class="row defensa-01" style="display:none">
         <div class="col-sm-12">    
             <form action="<?php echo base_url('pago/procesar'); ?>" method="POST" name="form-checkout" id="form-checkout" enctype="multipart/form-data" novalidate>
                 <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>"

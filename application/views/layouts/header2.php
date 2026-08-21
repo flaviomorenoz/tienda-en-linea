@@ -150,6 +150,11 @@
         font-family:verdana;
         font-size:12px;
     }
+    @media (max-width: 768px) {
+        .div-ocultar {
+            display: none;
+        }
+}
 </style>
 <!-- NAVBAR -->
 <div class="container" style="display:block!important">
@@ -204,11 +209,11 @@
                 </button>
             </form>
         </div>
-        <div class="col-sm-1 banner2">
+        <div class="col-sm-1 banner2 div-ocultar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="#000000" stroke-linejoin="round" stroke-width="2" d="M12 11a5 5 0 100-10 5 5 0 000 10zM1 22.91C1.21 17.92 6.029 14 12 14s10.79 4.01 11 9H1v-.09z"></path></svg>
             <span class="tol-301">Hola, inicia sesion</span>
         </div>
-        <div class="col-sm-1 banner2" style="padding-left:0px!important;padding-right:0px!important;">
+        <div class="col-sm-1 banner2 div-ocultar" style="padding-left:0px!important;padding-right:0px!important;">
             <!--<img src="assets/img/tiendita.png" style="height:40px">-->
             <svg xmlns="http://www.w3.org/2000/svg"
                  viewBox="0 0 64 64"
@@ -231,7 +236,7 @@
             </svg>
             <span class="tol-301">Encuentra tu tienda</span>
         </div>
-        <div class="col-sm-1 banner2">
+        <div class="col-sm-1 banner2 div-ocultar">
             <span class="tol-300">Puntos<br> Bonus</span>
         </div>
         <div class="col-sm-1 banner2">
@@ -250,7 +255,7 @@
 
 
 <!-- Mensajes flash -->
-<div class="container mt-3">
+<div class="container mt-3 div-ocultar">
     <?php if ($this->session->flashdata('success')): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>
