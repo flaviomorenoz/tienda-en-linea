@@ -36,8 +36,8 @@
         <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>"
                value="<?php echo $this->security->get_csrf_hash(); ?>">
 
+        <!-- Tabla de productos -->
         <div class="row g-4">
-            <!-- Tabla de productos -->
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-0">
@@ -59,11 +59,11 @@
                                     <?php foreach ($carrito as $key => $item): ?>
                                     <tr>
                                         <td>
-                                            <img src="<?php echo base_url("../erp-en-linea/".$item['imagen']); ?>"
+                                            <img src="<?php echo base_url("../erp-en-linea/assets/img/productos/".$item['imagen']); ?>"
                                                  alt="<?php echo htmlspecialchars($item['nombre'], ENT_QUOTES, 'UTF-8'); ?>"
                                                  class="rounded" width="60" height="70"
                                                  style="object-fit:cover;"
-                                                 onerror="this.onerror=null;this.src='<?php echo base_url('assets/img/default.png'); ?>'">
+                                            >
                                         </td>
                                         <td>
                                             <span class="fw-semibold"><?php echo htmlspecialchars($item['nombre'], ENT_QUOTES, 'UTF-8'); ?></span>
@@ -167,6 +167,7 @@
             </div>
         </div>
 
+        <!-- CUADRO DEL YAPE ------------------>
         <div class="row" style="margin-left:1px!important;">
             <!-- Mensaje de yape -->
             <div class="col-sm-6 col-lg-3" style="padding:4px;margin-top:4px!important;">
