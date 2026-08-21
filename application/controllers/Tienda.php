@@ -12,6 +12,7 @@ class Tienda extends CI_Controller {
         traza("Tienda.index: base_url='" . base_url() . "' FCPATH='" . FCPATH . "'");
         $categoria  = $this->input->get('categoria');
         $categorias = $this->Producto_model->get_categorias();
+        $secciones  = $this->Producto_model->get_secciones();
         $productos  = $this->Producto_model->get_todos($categoria ?: NULL);
         traza("Tienda.index: cantidad productos=" . count($productos));
         $this->_adjuntar_imagenes($productos);
@@ -19,6 +20,7 @@ class Tienda extends CI_Controller {
         $data = array(
             'titulo'           => $this->config->item('tienda_nombre'),
             'productos'        => $productos,
+            'secciones'        => $secciones,
             'categorias'       => $categorias,
             'categoria_activa' => $categoria,
             'carrito_count'    => $this->_carrito_count(),
