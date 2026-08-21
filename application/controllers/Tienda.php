@@ -6,6 +6,7 @@ class Tienda extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Producto_model');
+        $this->load->model('ajustes_model');
     }
 
     public function index() {
@@ -27,6 +28,7 @@ class Tienda extends CI_Controller {
             'categoria_activa' => $categoria,
             'termino_busqueda' => $termino,
             'carrito_count'    => $this->_carrito_count(),
+            'texto_banner'     => $this->ajustes_model->get_config('texto_banner'),
         );
 
         $this->load->view('layouts/header2', $data);
@@ -81,6 +83,7 @@ class Tienda extends CI_Controller {
             'tallas'        => $tallas,
             'relacionados'  => $relacionados,
             'carrito_count' => $this->_carrito_count(),
+            'descripcion'   => $this->db->query("select trim(descripcion) descripcion from tec_products where id = ?",$id)->row()->descripcion
         );
 
         $this->load->view('layouts/header', $data);

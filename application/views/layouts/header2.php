@@ -155,7 +155,7 @@
 <div class="container" style="display:block!important">
     <div class="row">
         <div class="col-sm-12 banner0">
-            <span>Compra y obten descuentos hasta 6 cuotas sin interes!</span>
+            <span><?= isset($texto_banner) ? $texto_banner : "" ?></span>
         </div>
     </div>
 

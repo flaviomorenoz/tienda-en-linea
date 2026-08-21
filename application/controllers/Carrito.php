@@ -6,7 +6,7 @@ class Carrito extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Producto_model');
-        $this->load->model('Chat_model');
+        //$this->load->model('Chat_model');
     }
 
     public function ver() {
@@ -28,6 +28,7 @@ class Carrito extends CI_Controller {
     }
 
     public function agregar() {
+        traza("Carrito->agregar");
         if ($this->input->method() !== 'post') {
             redirect('tienda');
             return;
@@ -54,6 +55,7 @@ class Carrito extends CI_Controller {
 
         if (isset($carrito[$key])) {
             $carrito[$key]['cantidad'] += $cantidad;
+            traza("Carrito->agregar: producto ya en carrito, nueva cantidad=" . $carrito[$key]['cantidad']);
         } else {
             $carrito[$key] = array(
                 'id'        => $id_producto,
@@ -65,6 +67,8 @@ class Carrito extends CI_Controller {
                 'categoria' => $producto->categoria,
                 'unidad'    => $unidad
             );
+            traza("Carrito->agregar: producto agregado al carrito, cantidad=" . $cantidad);
+            traza(print_r($carrito, true));
         }
 
         $this->session->set_userdata('carrito', $carrito);
@@ -131,7 +135,7 @@ class Carrito extends CI_Controller {
             show_404();
             return;
         }*/
-
+        /*
         $conversacion = $this->Chat_model->obtener_por_id((int)$id_conversacion);
         if (!$conversacion) {
             echo json_encode(array('ok' => false, 'error' => 'Conversación no encontrada.'));
@@ -144,6 +148,8 @@ class Carrito extends CI_Controller {
             'celular_cliente' => $conversacion->celular_cliente,
             'imagenes'        => $conversacion->imagenes,
         ));
+        */
+        $hola = "Hola";
     }
 
     public function vaciar() {

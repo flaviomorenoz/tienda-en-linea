@@ -39,14 +39,14 @@
 
     <div class="row g-4">
         <!-- Imagen del producto -->
-        <div class="col-md-6">
+        <div class="col-md-6 text-center">
             <?php
-                $det_img_principal = base_url('assets/img/productos/' . $imagenes[0]);
-                $det_img_default   = base_url('assets/img/productos/default1.jpg');
+                $det_img_principal = base_url('../erp-en-linea/assets/img/productos/' . $imagenes[0]);
+                $det_img_default   = base_url('../erp-en-linea/assets/img/productos/default1.jpg');
                 $det_img_id        = 'detalle-img-principal';
             ?>
             <div class="product-detail-img-wrapper rounded-4 overflow-hidden shadow-sm">
-                <img src="<?php echo $det_img_principal; ?>"
+                <img src="<?php echo $det_img_principal; ?>" style="height:356px!important;"
                      id="<?php echo $det_img_id; ?>"
                      alt="<?php echo htmlspecialchars($producto->nombre, ENT_QUOTES, 'UTF-8'); ?>"
                      class="product-detail-img"
@@ -56,7 +56,7 @@
             <?php if (count($imagenes) > 1): ?>
             <div class="product-detail-thumbs">
                 <?php foreach ($imagenes as $i => $img_nombre): ?>
-                <?php $det_img_src = base_url('assets/img/productos/' . $img_nombre); ?>
+                <?php $det_img_src = base_url('../erp-en-linea/assets/img/productos/' . $img_nombre); ?>
                 <img src="<?php echo $det_img_src; ?>"
                      class="<?php echo $i === 0 ? 'active' : ''; ?>"
                      alt="Foto <?php echo $i + 1; ?> de <?php echo htmlspecialchars($producto->nombre, ENT_QUOTES, 'UTF-8'); ?>"
@@ -174,6 +174,12 @@
         </div>
     </div>
 
+    <div class="row g-4">
+        <div class="col_md-6">
+            <span><?= isset($descripcion) ? $descripcion : "" ?></span>
+        </div>
+    </div>
+
     <!-- Productos relacionados -->
     <?php if (!empty($relacionados)): ?>
     <hr class="my-5">
@@ -184,7 +190,7 @@
             <div class="card product-card h-100 border-0 shadow-sm">
                 <a href="<?php echo base_url('tienda/producto/' . $r->id); ?>">
                     <div class="product-img-wrapper">
-                        <img src="<?php echo base_url('assets/img/productos/' . $r->imagen_url); ?>"
+                        <img src="<?php echo base_url('../erp-en-linea/assets/img/productos/' . $r->imagen_url); ?>"
                              alt="<?php echo htmlspecialchars($r->nombre, ENT_QUOTES, 'UTF-8'); ?>"
                              class="product-img"
                              onerror="this.onerror=null;this.src='<?php echo base_url('assets/img/productos/default1.jpg'); ?>'">

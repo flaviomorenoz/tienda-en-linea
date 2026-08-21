@@ -5,7 +5,7 @@ class Ajustes extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('Ajustes_model');
+        $this->load->model('ajustes_model');
     }
 
     public function index() {
@@ -18,8 +18,9 @@ class Ajustes extends CI_Controller {
         $data = array(
             'titulo'          => 'Ajustes - Admin',
             'admin_nombre'    => $this->session->userdata('admin_nombre'),
-            'tema_activo'     => $this->Ajustes_model->get_tema_activo(),
-            'temas_disponibles' => $this->Ajustes_model->temas_disponibles(),
+            'tema_activo'     => $this->ajustes_model->get_tema_activo(),
+            'temas_disponibles' => $this->ajustes_model->temas_disponibles(),
+            'texto_banner' => $this->ajustes_model->get_banner1()
         );
 
         $this->load->view('layouts/header1', $data);
@@ -40,7 +41,8 @@ class Ajustes extends CI_Controller {
         }
 
         $tema = $this->input->post('tema_css', TRUE);
-        $temas = $this->Ajustes_model->temas_disponibles();
+        $temas = $this->ajustes_model->temas_disponibles();
+        $texto_banner = $this->input->post('texto_banner', true);
 
         if (!array_key_exists($tema, $temas)) {
             $this->session->set_flashdata('error', 'El tema seleccionado no es válido.');
@@ -48,7 +50,8 @@ class Ajustes extends CI_Controller {
             return;
         }
 
-        $ok = $this->Ajustes_model->set_config('tema_css', $tema);
+        $ok = $this->ajustes_model->set_config('tema_css', $tema);
+        $ok = $this->ajustes_model->set_config('texto_banner', $texto_banner);
 
         if ($ok) {
             $this->session->set_flashdata('success', 'Tema de estilo actualizado correctamente.');

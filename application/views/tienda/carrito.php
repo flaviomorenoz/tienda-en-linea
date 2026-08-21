@@ -151,7 +151,7 @@
 
     <div id="form-pagos" class="row g-4" style="display:none">
         <div class="col-sm-12">    
-            <form action="<?php echo base_url('pago/procesar'); ?>" method="POST" name="form-checkout" id="form-checkout" novalidate>
+            <form action="<?php echo base_url('pago/procesar'); ?>" method="POST" name="form-checkout" id="form-checkout" enctype="multipart/form-data" novalidate>
                 <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>"
                     value="<?php echo $this->security->get_csrf_hash(); ?>">
 
@@ -194,6 +194,10 @@
                                             placeholder="987654321" maxlength="20"
                                             value="<?php echo set_value('celular'); ?>" required>
                                         <div class="invalid-feedback"><?php echo form_error('celular'); ?></div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label">Comprobante</label>
+                                        <input type="file" name="archivo" id="archivo">
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label">Referencia / Observaciones</label>

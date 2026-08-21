@@ -8,6 +8,17 @@ class Pedido_model extends CI_Model {
     }
 
     public function crear($datos) {
+
+        // Agregar el archivo fisico a una carpeta (a erp-en-linea)
+        
+        
+        /*
+        $ar_rpta = $this->save_file($datos["archivo"]);
+        $file_name = "";
+        if($ar_rpta["success"] == 'ok'){
+            $file_name = $ar_rpta["file_name"];
+        }*/
+
         $insert = array(
             'total'           => $datos['total'],
             'estado_pago'     => 'Pendiente',
@@ -17,8 +28,10 @@ class Pedido_model extends CI_Model {
             'dni'             => $datos['dni'],
             'nombres'         => $datos['nombres'],
             'observaciones'   => isset($datos['observaciones']) ? $datos['observaciones'] : '',
+            'archivo'         => $datos["archivo"]
         );
         $this->db->insert('pedidos_web', $insert);
+        
         return $this->db->insert_id();
     }
 

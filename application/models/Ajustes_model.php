@@ -80,4 +80,9 @@ class Ajustes_model extends CI_Model {
 
         return $tema;
     }
+
+    public function get_banner1(){
+        $cSql = "select trim(valor) valor from config_ajustes where clave='texto_banner'";
+        return $this->db->query($cSql)->row()->valor;
+    }
 }

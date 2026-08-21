@@ -29,14 +29,14 @@
                 <i class="bi bi-palette me-2 text-primary"></i>Apariencia de la tienda
             </h5>
         </div>
-        <div class="card-body">
+        <?php echo form_open('ajustes/guardar_tema'); ?>
 
-            <p class="text-muted small mb-4">
-                Seleccione el estilo de tema que desea aplicar al catálogo en línea.
-                El cambio se guarda y se aplica en toda la tienda.
-            </p>
+            <div class="card-body">
 
-            <?php echo form_open('ajustes/guardar_tema'); ?>
+                <p class="text-muted small mb-4">
+                    Seleccione el estilo de tema que desea aplicar al catálogo en línea.
+                    El cambio se guarda y se aplica en toda la tienda.
+                </p>
 
                 <div class="mb-3">
                     <label for="tema_css" class="form-label fw-semibold">Tema de estilo</label>
@@ -52,18 +52,29 @@
                     </div>
                 </div>
 
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-palette me-2 text-primary"></i>Texto del 1er. banner:
+                    </h5>
+                </div>
+
+                <div class="card-header bg-white">
+                    <input type="text" name="texto_banner" id="texto_banner" value="<?= $texto_banner ?>" class="form-control">
+                </div>
+
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-lg me-1"></i>Guardar tema
+                        <i class="bi bi-check-lg me-1"></i>Guardar Cambios
                     </button>
                     <a href="<?php echo base_url(); ?>" class="btn btn-outline-secondary" target="_blank">
                         <i class="bi bi-eye me-1"></i>Ver tienda
                     </a>
                 </div>
 
-            <?php echo form_close(); ?>
+            </div>
 
-        </div>
+        <?php echo form_close(); ?>
+
     </div>
 
 </div>
