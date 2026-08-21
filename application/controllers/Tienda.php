@@ -11,10 +11,12 @@ class Tienda extends CI_Controller {
     public function index() {
         traza("Tienda.index: base_url='" . base_url() . "' FCPATH='" . FCPATH . "'");
         $categoria  = $this->input->get('categoria');
+        $termino    = $this->input->get('q', TRUE);
+        $termino    = $termino !== NULL ? trim($termino) : '';
         $categorias = $this->Producto_model->get_categorias();
         $secciones  = $this->Producto_model->get_secciones();
-        $productos  = $this->Producto_model->get_todos($categoria ?: NULL);
-        traza("Tienda.index: cantidad productos=" . count($productos));
+        $productos  = $this->Producto_model->get_todos($categoria ?: NULL, $termino);
+        traza("Tienda.index: cantidad productos=" . count($productos) . " termino='$termino'");
         $this->_adjuntar_imagenes($productos);
 
         $data = array(
@@ -23,6 +25,7 @@ class Tienda extends CI_Controller {
             'secciones'        => $secciones,
             'categorias'       => $categorias,
             'categoria_activa' => $categoria,
+            'termino_busqueda' => $termino,
             'carrito_count'    => $this->_carrito_count(),
         );
 

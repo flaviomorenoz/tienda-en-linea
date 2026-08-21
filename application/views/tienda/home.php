@@ -33,12 +33,28 @@
          *   todos los productos en un solo bloque sin título.
          */
         $hay_secciones = isset($secciones) && !empty($secciones);
+        $busqueda = trim(isset($termino_busqueda) ? $termino_busqueda : '');
 
         if ($hay_secciones):
-            foreach ($secciones as $sec):
-                $prod_sec = array_values(array_filter($productos, function($p) use ($sec) {
-                    return isset($p->id_seccion) && (int)$p->id_seccion === (int)$sec->id;
-                }));
+            // Cuando hay búsqueda activa, se muestran TODOS los resultados en un
+            // solo bloque con un encabezado propio, sin agrupar por sección.
+            $secciones_render = $secciones;
+            if ($busqueda !== '') {
+                $secciones_render = array((object)array(
+                    'id'              => -1,
+                    'descrip_seccion' => 'Resultados para "' . $busqueda . '"',
+                    'orden'           => 0,
+                ));
+            }
+
+            foreach ($secciones_render as $sec):
+                if ($busqueda !== '') {
+                    $prod_sec = $productos;
+                } else {
+                    $prod_sec = array_values(array_filter($productos, function($p) use ($sec) {
+                        return isset($p->id_seccion) && (int)$p->id_seccion === (int)$sec->id;
+                    }));
+                }
 
                 if (empty($prod_sec)) continue;
         ?>

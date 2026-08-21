@@ -167,11 +167,14 @@
             </a>
         </div>
         <div class="col-sm-6 banner2" id="busqueda">
-            <div class="buscador">
-                <input 
-                    type="text" 
-                    class="buscador-input" 
+            <form action="<?php echo base_url(); ?>" method="get" class="buscador" role="search">
+                <input
+                    type="text"
+                    name="q"
+                    class="buscador-input"
                     placeholder="Buscar producto"
+                    value="<?php echo isset($termino_busqueda) ? htmlspecialchars($termino_busqueda, ENT_QUOTES, 'UTF-8') : ''; ?>"
+                    autocomplete="off"
                 >
 
                 <button type="button" class="buscador-icono" aria-label="Buscar por imagen">
@@ -199,7 +202,7 @@
                         <path d="M16 16l5 5"/>
                     </svg>
                 </button>
-            </div>
+            </form>
         </div>
         <div class="col-sm-1 banner2">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="#000000" stroke-linejoin="round" stroke-width="2" d="M12 11a5 5 0 100-10 5 5 0 000 10zM1 22.91C1.21 17.92 6.029 14 12 14s10.79 4.01 11 9H1v-.09z"></path></svg>
