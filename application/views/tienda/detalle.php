@@ -22,6 +22,17 @@
             border-color: #343a40;
             opacity: 1;
         }
+        .texto-descripb{
+            color: rgb(80,80,80);
+            font-family: var(--font);
+            font-size: 1.4rem!important;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0.25rem 0 0;
+        }
     </style>
 
     <!-- Breadcrumb -->
@@ -52,7 +63,9 @@
                      class="product-detail-img"
                      onerror="this.onerror=null;this.src='<?php echo $det_img_default; ?>'">
             </div>
-
+            <div class="product-detail-thumbs">
+                <span class="texto-descripb"><?= isset($descripcion) ? $descripcion : "" ?></span>
+            </div>
             <?php if (count($imagenes) > 1): ?>
             <div class="product-detail-thumbs">
                 <?php foreach ($imagenes as $i => $img_nombre): ?>
@@ -65,6 +78,7 @@
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>
+            
         </div>
 
         <!-- Información del producto -->
@@ -81,7 +95,7 @@
             </div>
             <?php endif; ?>
 
-            <p class="text-muted mb-4"><?php echo nl2br(htmlspecialchars($producto->descripcion, ENT_QUOTES, 'UTF-8')); ?></p>
+            <!--<p class="text-muted mb-4"><?php echo nl2br(htmlspecialchars($producto->descripcion, ENT_QUOTES, 'UTF-8')); ?></p>-->
 
             <?php if ($producto->tiene_precio): ?>
             <!-- Formulario agregar al carrito -->
@@ -171,12 +185,13 @@
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>
+            
         </div>
     </div>
 
     <div class="row g-4">
         <div class="col_md-6">
-            <span><?= isset($descripcion) ? $descripcion : "" ?></span>
+            
         </div>
     </div>
 
