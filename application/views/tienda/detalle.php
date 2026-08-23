@@ -86,7 +86,7 @@
             <?php if ($producto->tiene_precio): ?>
             <!-- Formulario agregar al carrito -->
             <form action="<?php echo base_url('carrito/agregar'); ?>" method="POST" id="form-agregar">
-                <?php echo $this->security->get_csrf_token_name(); ?>
+                
                 <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>"
                        value="<?php echo $this->security->get_csrf_hash(); ?>">
                 <input type="hidden" name="id_producto" value="<?php echo $producto->id; ?>">
