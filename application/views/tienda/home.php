@@ -75,11 +75,11 @@
                     <?php
                         $trz_img2 = isset($p->imagen2) ? $p->imagen2 : '';
                         $trz_img3 = isset($p->imagen3) ? $p->imagen3 : '';
-                        traza("home.php producto id=" . $p->id . " nombre='" . $p->nombre . "' imagen_url='" . $p->imagen_url . "' imagen2='" . $trz_img2 . "' imagen3='" . $trz_img3 . "' img(0)='" . $p->imagenes[0] . "'");
+                        //traza("home.php producto id=" . $p->id . " nombre='" . $p->nombre . "' imagen_url='" . $p->imagen_url . "' imagen2='" . $trz_img2 . "' imagen3='" . $trz_img3 . "' img(0)='" . $p->imagenes[0] . "'");
                         $img_principal = ruta_imagen_producto($p->imagenes[0]);
                         $img_default   = base_url('assets/img/default.png');
                         $img_id        = 'prod-img-' . $p->id;
-                        traza("home.php producto id={$p->id} img_principal='$img_principal'");
+                        //traza("home.php producto id={$p->id} img_principal='$img_principal'");
                     ?>
                     <a href="<?php echo base_url('tienda/producto/' . $p->id); ?>" class="text-decoration-none">
                         <div class="product-img-wrapper">
@@ -118,7 +118,7 @@
                             <a href="<?php echo base_url('tienda/producto/' . $p->id); ?>" class="text-dark text-decoration-none product-name-link">
                                 <?php echo htmlspecialchars($p->nombre, ENT_QUOTES, 'UTF-8'); ?>
                             </a><br>
-                            <span class="texto-descrip"><pre><?php echo $p->descripcion; ?></pre></span>
+                            <span class="texto-descrip div-ocultar"><pre><?php echo $p->descripcion; ?></pre></span>
                         </h6>
 
                         <div class="mt-auto">
@@ -159,11 +159,11 @@
                     <?php
                         $trz_img2 = isset($p->imagen2) ? $p->imagen2 : '';
                         $trz_img3 = isset($p->imagen3) ? $p->imagen3 : '';
-                        traza("home.php producto id=" . $p->id . " nombre='" . $p->nombre . "' imagen_url='" . $p->imagen_url . "' imagen2='" . $trz_img2 . "' imagen3='" . $trz_img3 . "' img(0)='" . $p->imagenes[0] . "'");
+                        //traza("home.php producto id=" . $p->id . " nombre='" . $p->nombre . "' imagen_url='" . $p->imagen_url . "' imagen2='" . $trz_img2 . "' imagen3='" . $trz_img3 . "' img(0)='" . $p->imagenes[0] . "'");
                         $img_principal = ruta_imagen_producto($p->imagenes[0]);
                         $img_default   = base_url('assets/img/default.png');
                         $img_id        = 'prod-img-' . $p->id;
-                        traza("home.php producto id={$p->id} img_principal='$img_principal'");
+                        //traza("home.php producto id={$p->id} img_principal='$img_principal'");
                     ?>
                     <a href="<?php echo base_url('tienda/producto/' . $p->id); ?>" class="text-decoration-none">
                         <div class="product-img-wrapper">
@@ -202,7 +202,7 @@
                             <a href="<?php echo base_url('tienda/producto/' . $p->id); ?>" class="text-dark text-decoration-none product-name-link">
                                 <?php echo htmlspecialchars($p->nombre, ENT_QUOTES, 'UTF-8'); ?>
                             </a><br>
-                            <span class="texto-descrip"><pre><?php echo $p->descripcion; ?></pre></span>
+                            <div class="texto-descrip div-ocultar"><pre>okokok<?php echo $p->descripcion; ?></pre></div>
                         </h6>
 
                         <div class="mt-auto">
