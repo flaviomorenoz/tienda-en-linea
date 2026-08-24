@@ -206,7 +206,7 @@
             <div class="card product-card h-100 border-0 shadow-sm">
                 <a href="<?php echo base_url('tienda/producto/' . $r->id); ?>">
                     <div class="product-img-wrapper">
-                        <img src="<?php echo base_url('../erp-en-linea/assets/img/productos/' . $r->imagen_url); ?>"
+                        <img src="<?php ruta_imagen_producto($r->imagen_url); ?>"
                              alt="<?php echo htmlspecialchars($r->nombre, ENT_QUOTES, 'UTF-8'); ?>"
                              class="product-img"
                              onerror="this.onerror=null;this.src='<?php echo base_url('assets/img/productos/default1.jpg'); ?>'">
