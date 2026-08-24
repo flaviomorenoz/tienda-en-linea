@@ -209,7 +209,8 @@
                         <img src="<?php ruta_imagen_producto($r->imagen_url); ?>"
                              alt="<?php echo htmlspecialchars($r->nombre, ENT_QUOTES, 'UTF-8'); ?>"
                              class="product-img"
-                             onerror="this.onerror=null;this.src='<?php echo base_url('assets/img/productos/default1.jpg'); ?>'">
+                             onerror="this.onerror=null;this.src='<?php echo base_url('assets/img/productos/default1.jpg'); ?>'"
+                             data-combre="<?php echo htmlspecialchars($r->imagen_url, ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                 </a>
                 <div class="card-body p-3">
