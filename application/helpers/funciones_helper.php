@@ -27,6 +27,7 @@ function traza($msg, $nombre_file="traza.txt"){
  * para diagnosticar el problema en producción.
  */
 function ruta_imagen_producto($img) {
+    /*
     $url = base_url('../erp-en-linea/assets/img/productos/');
     $url_default = base_url('../tienda-en-linea/assets/img/default.png');
     if (empty($img)) {
@@ -41,15 +42,9 @@ function ruta_imagen_producto($img) {
         traza("ruta_imagen_producto: entrada='$img' -> URL externa/absoluta, se usa tal cual");
         return $img;
     }
-
-    // Si el valor ya trae la carpeta 'assets/', no la duplicamos.
-    /*
-    $ruta_rel = (strpos($img, 'assets/') === 0) ? $img : 'assets/img/productos/' . $img;
-    $ruta_fs  = FCPATH . $ruta_rel;
-    $url      = base_url($ruta_rel);
-
-    traza("ruta_imagen_producto: entrada='$img' ruta_rel='$ruta_rel' url='$url' existe=" . (file_exists($ruta_fs) ? 'SI' : 'NO'));
     */
+    $url = "https://cubifact.com/erp-en-linea/assets/img/productos/{$img}";
+    // Si el valor ya trae la carpeta 'assets/', no la duplicamos.
     return $url;
 }
 
