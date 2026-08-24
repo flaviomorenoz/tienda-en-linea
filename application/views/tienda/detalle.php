@@ -206,11 +206,14 @@
             <div class="card product-card h-100 border-0 shadow-sm">
                 <a href="<?php echo base_url('tienda/producto/' . $r->id); ?>">
                     <div class="product-img-wrapper">
-                        <img src="<?php ruta_imagen_producto($r->imagen_url); ?>"
+                        <?php
+                            $rutax = ruta_imagen_producto($r->imagen_url);
+                        ?>
+                        <img src="<?= $rutax ?>"
                              alt="<?php echo htmlspecialchars($r->nombre, ENT_QUOTES, 'UTF-8'); ?>"
                              class="product-img"
                              onerror="this.onerror=null;this.src='<?php echo base_url('assets/img/productos/default1.jpg'); ?>'"
-                             data-combre="<?php echo htmlspecialchars($r->imagen_url, ENT_QUOTES, 'UTF-8'); ?>">
+                             data-combre="<?php echo htmlspecialchars($rutax, ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                 </a>
                 <div class="card-body p-3">
