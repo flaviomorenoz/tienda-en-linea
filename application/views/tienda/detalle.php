@@ -69,7 +69,7 @@
             <?php if (count($imagenes) > 1): ?>
             <div class="product-detail-thumbs">
                 <?php foreach ($imagenes as $i => $img_nombre): ?>
-                <?php $det_img_src = base_url('../erp-en-linea/assets/img/productos/' . $img_nombre); ?>
+                <?php $det_img_src="<?= ruta_imagen_producto($img_nombre) ?>" ?>
                 <img src="<?php echo $det_img_src; ?>"
                      class="<?php echo $i === 0 ? 'active' : ''; ?>"
                      alt="Foto <?php echo $i + 1; ?> de <?php echo htmlspecialchars($producto->nombre, ENT_QUOTES, 'UTF-8'); ?>"
