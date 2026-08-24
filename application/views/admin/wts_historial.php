@@ -378,6 +378,7 @@
         var url = <?php echo json_encode(base_url('../varios/twilios/twilio_enviar_mensajes.php')); ?>
             + '?origen=' + encodeURIComponent(origen)
             + '&destino=' + encodeURIComponent(destino)
+            + '&rol=human' 
             + '&msg=' + encodeURIComponent(msg);
 
         $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Enviando...');
