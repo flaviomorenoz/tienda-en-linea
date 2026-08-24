@@ -48,6 +48,16 @@ function ruta_imagen_producto($img) {
     return $url;
 }
 
+/**
+ * Devuelve la URL completa del comprobante de pago (imagen subida por el cliente).
+ * El archivo se guarda en erp-en-linea/uploads/compruebas/ (ver Pago->procesar),
+ * por eso se apunta al mismo dominio que ruta_imagen_producto().
+ */
+function ruta_imagen_comprobante($archivo) {
+    $url = "https://cubifact.com/erp-en-linea/uploads/compruebas/{$archivo}";
+    return $url;
+}
+
 function celda($dato="", $centrar=0, $estilo="", $cAtributo=""){
     if($dato=='0'){
         $dato = "<span style=\"color:#cccccc;\">0</span>";

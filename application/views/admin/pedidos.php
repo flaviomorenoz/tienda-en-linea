@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Pedidos - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
+        body { font-family: 'Poppins', sans-serif; background: #f8f9fa;}
         .admin-sidebar { background: #2d3436; min-height: 100vh; width: 240px; position: fixed; left: 0; top: 0; z-index: 100; }
         .main-content { margin-left: 240px; padding: 2rem; }
         .badge-EN_ORIGEN   { background: #dc3545; }
@@ -26,8 +20,6 @@
             .main-content { margin-left: 0; }
         }
     </style>
-</head>
-<body>
 
 <!-- Sidebar -->
 <?=menu_principal($this->config->item('tienda_nombre'))?>
@@ -205,6 +197,34 @@
     </div>
 </div>
 
+<!-- Modal ver comprobante de pago (imagen) -->
+<div class="modal fade" id="modalImagen" tabindex="-1" aria-labelledby="modalImagenLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title fw-bold" id="modalImagenLabel">
+                    <i class="bi bi-image text-success me-1"></i>Comprobante de pago
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="imagen-comprobante"
+                     src=""
+                     alt="Comprobante de pago"
+                     class="img-fluid rounded shadow-sm d-inline-block"
+                     style="max-height:400px; width:auto; height:auto;"
+                     onerror="this.classList.add('d-none');document.getElementById('imagen-error').classList.remove('d-none');">
+                <div id="imagen-error" class="alert alert-warning d-none mt-2 mb-0">
+                    <i class="bi bi-exclamation-triangle me-1"></i>No se pudo cargar la imagen del comprobante.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
@@ -223,6 +243,7 @@ const ajaxUrl = <?php echo json_encode(base_url('admin/pedidos_json')); ?>;
 const codigosUrl = <?php echo json_encode(base_url('admin/codigos/')); ?>;
 const estadoUrl  = <?php echo json_encode(base_url('admin/estado/')); ?>;
 const detalleUrl = <?php echo json_encode(base_url('admin/detalle/')); ?>;
+const imagenUrl  = <?php echo json_encode(($_SERVER["RUTA_DOMINIO_ERP"] ?? '') . '/uploads/compruebas/'); ?>;
 
 function escHtml(str) {
     if (str === null || str === undefined) return '';
@@ -323,15 +344,19 @@ const table = $('#tabla-pedidos').DataTable({
             className: 'text-center',
             render: function(d, type, row) {
                 if (type !== 'display') return '';
-                let cad1 = '<a href="#" onclick="ver_detalle(' + row.id + ');return false;" title="Ver detalle"><i class="bi bi-eye" style="font-size:18px"></i></a>';
-                let cad2 = '<a href=\"#\" ' +
+                let cad0 = ""
+                if (row.archivo.length > 0){
+                    cad0 = '<a href="#" onclick="ver_imagen(\'' + row.archivo + '\');return false;" title="Ver imagen"><i class="bi bi-camera" style="font-size:18px;color:green"></i></a>';
+                }
+                let cad1 = ' <a href="#" onclick="ver_detalle(' + row.id + ');return false;" title="Ver detalle"><i class="bi bi-eye" style="font-size:18px"></i></a>';
+                let cad2 = ' <a href=\"#\" ' +
                        'data-bs-toggle="modal" data-bs-target="#modalCodigos" ' +
                        'data-id="' + row.id + '" ' +
                        'data-nro="' + escHtml(row.nro_orden || '') + '" ' +
                        'data-cod="' + escHtml(row.codigo_transaccion || '') + '">' +
                        '<i class="bi bi-pencil-square" style="font-size:18px!important"></i></a>';
                 
-                return cad1 + " " + cad2;
+                return cad0 + cad1 + cad2;
             }
         }
     ],
@@ -427,6 +452,25 @@ document.getElementById('modalEstado').addEventListener('show.bs.modal', functio
     document.getElementById('modal-cliente-info').textContent = 'Pedido #' + id + ' — ' + cliente;
 });
 
+function ver_imagen(nombre_imagen) {
+    
+    var img  = document.getElementById('imagen-comprobante');
+    var err  = document.getElementById('imagen-error');
+
+    // Reiniciar estados
+    err.classList.add('d-none');
+    img.classList.remove('d-none');
+    img.onerror = function() {
+        img.classList.add('d-none');
+        err.classList.remove('d-none');
+    };
+
+    img.src = imagenUrl + encodeURIComponent(nombre_imagen);
+
+    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalImagen'));
+    modal.show();
+}
+
 function ver_detalle(id_pedido) {
     document.getElementById('modalDetalleLabel').textContent = 'Detalle del Pedido #' + id_pedido;
     document.getElementById('detalle-loading').classList.remove('d-none');
@@ -473,6 +517,3 @@ function ver_detalle(id_pedido) {
         });
 }
 </script>
-
-</body>
-</html>
