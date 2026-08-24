@@ -134,6 +134,7 @@ class Admin extends CI_Controller {
                 'nro_orden'          => $p->nro_orden,
                 'codigo_transaccion' => $p->codigo_transaccion,
                 'estado_envio'       => $p->estado_envio,
+                'archivo'            => trim($p->archivo)
             );
         }
 
