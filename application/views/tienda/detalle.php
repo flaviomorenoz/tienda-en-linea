@@ -74,7 +74,8 @@
                      class="<?php echo $i === 0 ? 'active' : ''; ?>"
                      alt="Foto <?php echo $i + 1; ?> de <?php echo htmlspecialchars($producto->nombre, ENT_QUOTES, 'UTF-8'); ?>"
                      onerror="this.style.display='none'"
-                     onclick="swapDetalleImg(this, '<?php echo $det_img_src; ?>')">
+                     onclick="swapDetalleImg(this, '<?php echo $det_img_src; ?>')"
+                     data-combre="<?php echo htmlspecialchars($det_img_src, ENT_QUOTES, 'UTF-8'); ?>">
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>
