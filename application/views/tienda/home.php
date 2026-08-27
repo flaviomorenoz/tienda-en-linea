@@ -167,7 +167,8 @@ function swapProdImg(imgId, thumb, src) {
 function quitar_ocultacion(enlace){
     var span = enlace.closest('.card-body').querySelector('.texto-descrip');
     if (span) {
-        span.classList.remove('div-ocultar');
+        var oculto = span.classList.toggle('div-ocultar');
+        enlace.textContent = oculto ? 'Ver más...' : 'Ver menos...';
     }
     return false;
 }

@@ -816,10 +816,8 @@ main > .container-fluid {
 }
 
 /* ===================================================
-   Ocultar descripcion de productos en movil (Ver mas)
+   Descripcion de producto (interruptor Ver mas/Ver menos)
    =================================================== */
-@media (max-width: 768px) {
-    .div-ocultar {
-        display: none;
-    }
+.texto-descrip.div-ocultar {
+    display: none;
 }
