@@ -101,7 +101,7 @@
       <!-- Columna 1: Marca + "Disfruta! d f" -->
       <div class="col-md-3">
         <div class="brand-footer">Bella Rose</div>
-        <div class="brand-sub">Quienes somos</div>
+        <div class="brand-sub"><a href="<?php echo base_url('quienes-somos'); ?>">Quiénes somos</a></div>
         <div class="brand-sub">Tiendas Otros</div>
         <!-- líneas que aparecen en la imagen: "Disfruta!" y "d f" -->
         <div class="disfruta-line mt-2">Disfruta!</div>
@@ -146,7 +146,7 @@
       <div class="col-md-3">
         <h6>Otros</h6>
         <ul class="list-unstyled">
-          <li><a href="#">Sobre nosotros</a></li>
+          <li><a href="<?php echo base_url('quienes-somos'); ?>">Sobre nosotros</a></li>
           <li><a href="#">Blog</a></li>
           <li><a href="#">Contacto</a></li>
           <li><a href="#">Preguntas frecuentes</a></li>

@@ -15,25 +15,17 @@ class Tienda extends CI_Controller {
         $termino    = $this->input->get('q', TRUE);
         $termino    = $termino !== NULL ? trim($termino) : '';
         $categorias = $this->Producto_model->get_categorias();
-        $secciones  = $this->Producto_model->get_secciones();
         $productos  = $this->Producto_model->get_todos($categoria ?: NULL, $termino);
         traza("Tienda.index: cantidad productos=" . count($productos) . " termino='$termino'");
         $this->_adjuntar_imagenes($productos);
 
-        $data = array(
-            'titulo'           => $this->config->item('tienda_nombre'),
-            'productos'        => $productos,
-            'secciones'        => $secciones,
-            'categorias'       => $categorias,
-            'categoria_activa' => $categoria,
-            'termino_busqueda' => $termino,
-            'carrito_count'    => $this->_carrito_count(),
-            'texto_banner'     => $this->ajustes_model->get_config('texto_banner'),
+        $this->_render_catalogo(
+            $this->config->item('tienda_nombre'),
+            $productos,
+            $categorias,
+            $categoria,
+            $termino
         );
-
-        $this->load->view('layouts/header2', $data);
-        $this->load->view('tienda/home', $data);
-        $this->load->view('layouts/footer2');
     }
 
     public function categoria($cat) {
@@ -43,17 +35,41 @@ class Tienda extends CI_Controller {
         $productos  = $this->Producto_model->get_todos($cat);
         $this->_adjuntar_imagenes($productos);
 
+        // Vista de categoría: todos los productos de la categoría en un solo bloque,
+        // sin agrupar por sección (por eso se envían $secciones vacías).
+        $this->_render_catalogo(
+            $cat . ' - ' . $this->config->item('tienda_nombre'),
+            $productos,
+            $categorias,
+            $cat,
+            '',
+            array()
+        );
+    }
+
+    /**
+     * Prepara la data del catálogo y renderiza home.php con el layout de la tienda.
+     * Evita repetir la carga de vistas en index() y categoria().
+     */
+    private function _render_catalogo($titulo, $productos, $categorias, $categoria_activa, $termino_busqueda = '', $secciones = null) {
+        if ($secciones === null) {
+            $secciones = $this->Producto_model->get_secciones();
+        }
+
         $data = array(
-            'titulo'           => $cat . ' - ' . $this->config->item('tienda_nombre'),
+            'titulo'           => $titulo,
             'productos'        => $productos,
+            'secciones'        => $secciones,
             'categorias'       => $categorias,
-            'categoria_activa' => $cat,
+            'categoria_activa' => $categoria_activa,
+            'termino_busqueda' => $termino_busqueda,
             'carrito_count'    => $this->_carrito_count(),
+            'texto_banner'     => $this->ajustes_model->get_config('texto_banner'),
         );
 
-        $this->load->view('layouts/header', $data);
+        $this->load->view('layouts/header2', $data);
         $this->load->view('tienda/home', $data);
-        $this->load->view('layouts/footer');
+        $this->load->view('layouts/footer2');
     }
 
     public function detalle($id) {
@@ -89,6 +105,18 @@ class Tienda extends CI_Controller {
         $this->load->view('layouts/header', $data);
         $this->load->view('tienda/detalle', $data);
         $this->load->view('layouts/footer');
+    }
+
+    public function quienes_somos() {
+        $data = array(
+            'titulo'        => 'Quiénes somos - ' . $this->config->item('tienda_nombre'),
+            'carrito_count' => $this->_carrito_count(),
+            'texto_banner'  => $this->ajustes_model->get_config('texto_banner'),
+        );
+
+        $this->load->view('layouts/header2', $data);
+        $this->load->view('tienda/quienes_somos', $data);
+        $this->load->view('layouts/footer2');
     }
 
     private function _adjuntar_imagenes(&$productos) {

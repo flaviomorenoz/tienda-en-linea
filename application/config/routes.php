@@ -9,6 +9,7 @@ $route['translate_uri_dashes'] = FALSE;
 $route['tienda'] = 'tienda/index';
 $route['tienda/categoria/(:any)'] = 'tienda/categoria/$1';
 $route['tienda/producto/(:num)'] = 'tienda/detalle/$1';
+$route['quienes-somos'] = 'tienda/quienes_somos';
 
 // Carrito
 $route['carrito'] = 'carrito/ver';

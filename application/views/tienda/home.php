@@ -39,10 +39,18 @@
         $hay_secciones = isset($secciones) && !empty($secciones);
         $busqueda = trim(isset($termino_busqueda) ? $termino_busqueda : '');
 
-        //if ($hay_secciones):
-            // Cuando hay búsqueda activa, se muestran TODOS los resultados en un
-            // solo bloque con un encabezado propio, sin agrupar por sección.
-            $secciones_render = $secciones;
+            // Sin secciones (vista de categoría): todos los productos en un solo bloque sin título.
+            if (!$hay_secciones) {
+                $secciones_render = array((object)array(
+                    'id'              => null,
+                    'descrip_seccion' => '',
+                    'orden'           => 0,
+                ));
+            } else {
+                $secciones_render = $secciones;
+            }
+            // Cuando hay búsqueda activa se muestran TODOS los resultados en un
+            // solo bloque con encabezado propio, sin agrupar por sección.
             if ($busqueda !== '') {
                 $secciones_render = array((object)array(
                     'id'              => -1,
@@ -52,7 +60,7 @@
             }
 
             foreach ($secciones_render as $sec):
-                if ($busqueda !== '') {
+                if (!$hay_secciones || $busqueda !== '') {
                     $prod_sec = $productos;
                 } else {
                     $prod_sec = array_values(array_filter($productos, function($p) use ($sec) {
