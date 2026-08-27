@@ -43,7 +43,9 @@ function ruta_imagen_producto($img) {
         return $img;
     }
     */
-    $url = "https://cubifact.com/erp-en-linea/assets/img/productos/{$img}";
+    //$url = "https://cubifact.com/erp-en-linea/assets/img/productos/{$img}";
+    $url = $_SERVER["RUTA_DOMINIO_ERP"] . "/assets/img/productos/" . $img;
+
     // Si el valor ya trae la carpeta 'assets/', no la duplicamos.
     return $url;
 }
