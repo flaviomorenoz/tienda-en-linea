@@ -43,7 +43,7 @@
     if (!isset($CI->Ajustes_model)) { $CI->load->model('Ajustes_model'); }
     $tema_css = $CI->Ajustes_model->get_tema_activo();
     ?>
-    <link href="<?php echo base_url('assets/css/' . $tema_css . '?v=3'); ?>" rel="stylesheet">
+    <link href="<?php echo base_url('assets/css/' . $tema_css . '?v=4'); ?>" rel="stylesheet">
 </head>
 <body>
 <style>

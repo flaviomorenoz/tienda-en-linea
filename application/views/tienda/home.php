@@ -122,8 +122,8 @@
                             <a href="<?php echo base_url('tienda/producto/' . $p->id); ?>" class="text-dark text-decoration-none product-name-link">
                                 <?php echo htmlspecialchars($p->nombre, ENT_QUOTES, 'UTF-8'); ?>
                             </a><br>
-                            <div id="div-muesca" class="muesca"><a href="#" onclick="quitar_ocultacion()">Ver m&aacute;s...</a></div>
-                            <span id="div-descrip" class="texto-descrip div-ocultar"><pre><?php echo $p->descripcion; ?></pre></span>
+                            <div id="div-muesca" class="muesca"><a href="#" onclick="quitar_ocultacion(this); return false;">Ver m&aacute;s...</a></div>
+                            <span id="div-descrip_<?php echo $p->id; ?>" class="texto-descrip div-ocultar"><pre><?php echo $p->descripcion; ?></pre></span>
                         </h6>
 
                         <div class="mt-auto">
@@ -164,8 +164,11 @@ function swapProdImg(imgId, thumb, src) {
     });
     thumb.classList.add('active');
 }
-function quitar_ocultacion(){
-    document.getElementById("div-descrip").classList.remove("div-ocultar");
-    alert("Funciona!")
+function quitar_ocultacion(enlace){
+    var span = enlace.closest('.card-body').querySelector('.texto-descrip');
+    if (span) {
+        span.classList.remove('div-ocultar');
+    }
+    return false;
 }
 </script>

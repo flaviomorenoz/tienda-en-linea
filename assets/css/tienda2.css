@@ -570,3 +570,13 @@ main > .container-fluid {
         opacity: 1;
     }
 
+
+/* ===================================================
+   Ocultar descripcion de productos en movil (Ver mas)
+   =================================================== */
+@media (max-width: 768px) {
+    .div-ocultar {
+        display: none;
+    }
+}
+
