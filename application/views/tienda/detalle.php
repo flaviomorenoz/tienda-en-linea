@@ -128,17 +128,32 @@
 
                 <!-- Cantidad -->
                 <div class="mb-4">
+                    <?php
+                        // Modalidades de venta según la tabla tec_products:
+                        // solo se muestra la opción si su campo correspondiente es '1'.
+                        $x_unidad       = isset($producto->x_unidad)       ? trim($producto->x_unidad)       : '';
+                        $x_docena       = isset($producto->x_docena)       ? trim($producto->x_docena)       : '';
+                        $x_media_docena = isset($producto->x_media_docena) ? trim($producto->x_media_docena) : '';
+                        $hay_modalidad  = ($x_unidad === '1' || $x_docena === '1' || $x_media_docena === '1');
+                    ?>
+                    <?php if ($hay_modalidad): ?>
                     <div style="border-style:none; border-color:red;display:inline-block;">
                         <label class="form-label fw-semibold">Unidad</label>
                         <div class="input-group" style="max-width:160px;">
                             <select name="select_unidad" id="select_unidad">
+                                <?php if ($x_unidad === '1'): ?>
                                 <option value="UNIDAD">Unidad</option>
+                                <?php endif; ?>
+                                <?php if ($x_docena === '1'): ?>
                                 <option value="DOCENA">Docena</option>
+                                <?php endif; ?>
+                                <?php if ($x_media_docena === '1'): ?>
                                 <option value="MEDIA DOCENA">1/2 Docena</option>
+                                <?php endif; ?>
                             </select>
-                            
                         </div>
                     </div>
+                    <?php endif; ?>
                     <div style="border-style:none; border-color:red;display:inline-block;">
                         <label class="form-label fw-semibold">Cantidad</label>
                         <div class="input-group" style="max-width:160px;">

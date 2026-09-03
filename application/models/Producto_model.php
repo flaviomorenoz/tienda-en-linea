@@ -32,7 +32,7 @@ class Producto_model extends CI_Model {
     }
 
     public function get_por_id($id) {
-        $this->db->select('p.id, p.name AS nombre, p.descripcion, p.price AS precio, p.tiene_precio, p.imagen AS imagen_url, p.imagen2, p.imagen3, p.activo, c.name AS categoria');
+        $this->db->select('p.id, p.name AS nombre, p.descripcion, p.price AS precio, p.tiene_precio, p.imagen AS imagen_url, p.imagen2, p.imagen3, p.x_unidad, p.x_docena, p.x_media_docena, p.activo, c.name AS categoria');
         $this->db->from('tec_products p');
         $this->db->join('tec_categories c', 'c.id = p.category_id', 'left');
         $this->db->where('p.id', (int)$id);
