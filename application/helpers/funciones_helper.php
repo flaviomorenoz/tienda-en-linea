@@ -134,6 +134,9 @@ function menu_principal($tienda_nombre="", $admin_nombre=NULL){
         <a href="<?php echo base_url('admin/pedidos'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
             <i class="bi bi-list-ul"></i> Pedidos
         </a>
+        <a href="<?php echo base_url('admin/libro-reclamaciones'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
+            <i class="bi bi-journal-bookmark-fill"></i> Libro de Reclamaciones
+        </a>
         <a href="<?php echo base_url('tia_conversa'); ?>" class="d-flex align-items-center gap-2 text-white-50 text-decoration-none py-2 px-3 rounded mb-1">
             <i class="bi bi-chat-square-heart-fill"></i> Conversaciones IA
         </a>

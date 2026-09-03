@@ -108,6 +108,10 @@ class Tienda extends CI_Controller {
     }
 
     public function quienes_somos() {
+        // Vista estática: no mostrar mensajes flash (p. ej. mensajes del panel
+        // admin como "Hoja actualizada correctamente") en esta página.
+        $this->session->unset_userdata(array('success', 'error'));
+
         $data = array(
             'titulo'        => 'Quiénes somos - ' . $this->config->item('tienda_nombre'),
             'carrito_count' => $this->_carrito_count(),
@@ -116,6 +120,18 @@ class Tienda extends CI_Controller {
 
         $this->load->view('layouts/header2', $data);
         $this->load->view('tienda/quienes_somos', $data);
+        $this->load->view('layouts/footer2');
+    }
+
+    public function contacto() {
+        $data = array(
+            'titulo'        => 'Contacto - ' . $this->config->item('tienda_nombre'),
+            'carrito_count' => $this->_carrito_count(),
+            'texto_banner'  => $this->ajustes_model->get_config('texto_banner'),
+        );
+
+        $this->load->view('layouts/header2', $data);
+        $this->load->view('tienda/contacto', $data);
         $this->load->view('layouts/footer2');
     }
 

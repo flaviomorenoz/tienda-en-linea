@@ -10,6 +10,7 @@ $route['tienda'] = 'tienda/index';
 $route['tienda/categoria/(:any)'] = 'tienda/categoria/$1';
 $route['tienda/producto/(:num)'] = 'tienda/detalle/$1';
 $route['quienes-somos'] = 'tienda/quienes_somos';
+$route['contacto'] = 'tienda/contacto';
 
 // Carrito
 $route['carrito'] = 'carrito/ver';
@@ -18,6 +19,12 @@ $route['carrito/quitar/(:num)'] = 'carrito/quitar/$1';
 $route['carrito/actualizar'] = 'carrito/actualizar';
 $route['carrito/vaciar'] = 'carrito/vaciar';
 $route['carrito/actualizar_datos_cliente/(:num)'] = 'carrito/actualizar_datos_cliente/$1';
+
+// Libro de Reclamaciones (Ley N° 29571 - D.S. N° 011-2011-PCM - D.S. N° 004-2024-PCM)
+$route['libro-reclamaciones']               = 'libro_reclamaciones/index';
+$route['libro-reclamaciones/enviar']        = 'libro_reclamaciones/enviar';
+$route['libro-reclamaciones/verificar']     = 'libro_reclamaciones/verificar';
+$route['libro-reclamaciones/consultar']     = 'libro_reclamaciones/consultar';
 
 // Asistente IA / Chat con vendedora
 /*
@@ -50,7 +57,7 @@ $route['pedido/cancelado'] = 'pago/cancelado';
 $route['ajustes'] = 'ajustes/index';
 $route['ajustes/guardar_tema'] = 'ajustes/guardar_tema';
 
-// Panel admin
+// Admin
 $route['admin'] = 'admin/login';
 $route['admin/login'] = 'admin/login';
 $route['admin/login_post'] = 'admin/login_post';
@@ -60,6 +67,12 @@ $route['admin/estado/(:num)']   = 'admin/actualizar_estado/$1';
 $route['admin/codigos/(:num)']    = 'admin/guardar_codigos/$1';
 $route['admin/pedidos_json']       = 'admin/pedidos_json';
 $route['admin/detalle/(:num)']     = 'admin/detalle_json/$1';
+
+// Admin - Libro de Reclamaciones
+$route['admin/libro-reclamaciones']            = 'admin/reclamos';
+$route['admin/libro-reclamaciones/json']       = 'admin/reclamos_json';
+$route['admin/libro-reclamaciones/detalle/(:num)']    = 'admin/reclamo_detalle/$1';
+$route['admin/libro-reclamaciones/responder/(:num)']  = 'admin/reclamo_responder/$1';
 
 // Panel de chats (vendedoras)
 /*

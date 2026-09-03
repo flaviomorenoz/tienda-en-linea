@@ -344,8 +344,8 @@ main > .container-fluid {
    FILTROS DE CATEGORÍA (píldoras Aruma)
    =================================================== */
 .btn-dark {
-    background: var(--negro);
-    border-color: var(--negro);
+    background: var(--primary);
+    border-color: var(--fondo);
     color: #fff;
     font-size: 0.75rem;
     font-weight: 500;
@@ -357,7 +357,7 @@ main > .container-fluid {
 .btn-dark:hover,
 .btn-dark:focus,
 .btn-dark:active {
-    background: #000000;
+    background: #941a1a;
     border-color: #000000;
     color: #fff;
 }

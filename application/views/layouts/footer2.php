@@ -114,9 +114,8 @@
         <h6>Servicio al cliente</h6>
         <ul class="list-unstyled">
           <li><a href="#">Cómo comprar</a></li>
-          <li><a href="#">Cambios</a></li>
           <li><a href="#">Medio de Pago</a></li>
-          <li><a href="#">Libro de Reclamaciones</a></li>
+          <li><a href="<?php echo base_url('libro-reclamaciones'); ?>">Libro de Reclamaciones</a></li>
         </ul>
       </div>
 
@@ -135,7 +134,6 @@
       <div class="col-md-3">
         <h6>Tiendas</h6>
         <ul class="list-unstyled">
-          <li><a href="#">Bella Rose Madrid</a></li>
           <li><a href="#">Bella Rose Barcelona</a></li>
           <li><a href="#">Bella Rose Valencia</a></li>
           <li><a href="#">Outlet Online</a></li>
@@ -147,13 +145,11 @@
         <h6>Otros</h6>
         <ul class="list-unstyled">
           <li><a href="<?php echo base_url('quienes-somos'); ?>">Sobre nosotros</a></li>
-          <li><a href="#">Blog</a></li>
-          <li><a href="#">Contacto</a></li>
+          <li><a href="<?php echo base_url('contacto'); ?>">Contacto</a></li>
           <li><a href="#">Preguntas frecuentes</a></li>
         </ul>
         <!-- mostramos "Info lega..." tal cual aparece en la imagen (abreviado) -->
         <div class="mt-3">
-          <a href="#" class="legal-link"><i class="far fa-file-alt me-1"></i>Info lega...</a>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ class Admin extends CI_Controller {
         parent::__construct();
         $this->load->model('Pedido_model');
         $this->load->model('Vendedora_model');
+        $this->load->model('Reclamo_model');
         $this->load->library('form_validation');
     }
 
@@ -198,6 +199,139 @@ class Admin extends CI_Controller {
         }
 
         redirect('admin/pedidos');
+    }
+
+    /**
+     * Panel admin: listado del Libro de Reclamaciones.
+     */
+    public function reclamos() {
+        $this->_check_admin();
+
+        $data = array(
+            'titulo'        => 'Libro de Reclamaciones - Admin',
+            'admin_nombre'  => $this->session->userdata('admin_nombre'),
+            'carrito_count' => 0,
+        );
+
+        $this->load->view('layouts/header', $data);
+        $this->load->view('admin/libro_reclamaciones', $data);
+        $this->load->view('layouts/footer');
+    }
+
+    /**
+     * JSON para DataTables.
+     */
+    public function reclamos_json() {
+        $this->_check_admin();
+
+        $filtro   = $this->input->get('filtro', TRUE);
+        $reclamos = $this->Reclamo_model->get_todos($filtro ?: 'todos');
+
+        $rows = array();
+        foreach ($reclamos as $r) {
+            $rows[] = array(
+                'id'                 => (int)$r->id,
+                'codigo'             => $r->codigo,
+                'fecha'              => date('d/m/Y H:i', strtotime($r->created_at)),
+                'fecha_raw'          => $r->created_at,
+                'tipo'               => $r->tipo,
+                'nombres'            => $r->nombres,
+                'tipo_documento'     => $r->tipo_documento,
+                'numero_documento'   => $r->numero_documento,
+                'email'              => $r->email,
+                'telefono'           => $r->telefono,
+                'producto_servicio'  => $r->producto_servicio,
+                'numero_pedido'      => $r->numero_pedido,
+                'monto'              => $r->monto_reclamado !== NULL ? (float)$r->monto_reclamado : NULL,
+                'estado'             => $r->estado,
+            );
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(array('data' => $rows)));
+    }
+
+    /**
+     * JSON con el detalle completo de una hoja (modal de admin).
+     */
+    public function reclamo_detalle($id) {
+        $this->_check_admin();
+
+        $r = $this->Reclamo_model->get_por_id($id);
+        if (!$r) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(array('ok' => FALSE, 'error' => 'No se encontró la hoja.')));
+            return;
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(array(
+                'ok'                 => TRUE,
+                'id'                 => (int)$r->id,
+                'codigo'             => $r->codigo,
+                'tipo'               => $r->tipo,
+                'nombres'            => $r->nombres,
+                'tipo_documento'     => $r->tipo_documento,
+                'numero_documento'   => $r->numero_documento,
+                'domicilio'          => $r->domicilio,
+                'telefono'           => $r->telefono,
+                'email'              => $r->email,
+                'departamento'       => $r->departamento,
+                'provincia'          => $r->provincia,
+                'distrito'           => $r->distrito,
+                'producto_servicio'  => $r->producto_servicio,
+                'numero_pedido'      => $r->numero_pedido,
+                'monto'              => $r->monto_reclamado !== NULL ? (float)$r->monto_reclamado : NULL,
+                'detalle'            => $r->detalle,
+                'estado'             => $r->estado,
+                'respuesta'          => $r->respuesta,
+                'fecha'              => date('d/m/Y H:i', strtotime($r->created_at)),
+                'fecha_respuesta'    => $r->fecha_respuesta ? date('d/m/Y H:i', strtotime($r->fecha_respuesta)) : '',
+                'ip'                 => $r->ip,
+                'moneda'             => $this->config->item('moneda_simbolo'),
+            )));
+    }
+
+    /**
+     * POST: registrar respuesta del proveedor y estado de la hoja.
+     */
+    public function reclamo_responder($id) {
+        $this->_check_admin();
+
+        if ($this->input->method() !== 'post') {
+            redirect('admin/libro-reclamaciones');
+            return;
+        }
+
+        $id       = (int)$id;
+        $estado   = $this->input->post('estado', TRUE);
+        $respuesta = trim($this->input->post('respuesta', TRUE));
+
+        $estados_validos = array('RECIBIDO', 'EN_PROCESO', 'RESPONDIDO', 'ARCHIVADO');
+        if (!in_array($estado, $estados_validos)) {
+            $this->session->set_flashdata('error', 'Estado no válido.');
+            redirect('admin/libro-reclamaciones');
+            return;
+        }
+
+        if ($estado === 'RESPONDIDO' && $respuesta === '') {
+            $this->session->set_flashdata('error', 'Debe registrar la respuesta del proveedor para marcar la hoja como respondida.');
+            redirect('admin/libro-reclamaciones');
+            return;
+        }
+
+        $ok = $this->Reclamo_model->actualizar_respuesta($id, $estado, $respuesta);
+
+        if ($ok) {
+            $this->session->set_flashdata('success', 'Hoja actualizada correctamente.');
+        } else {
+            $this->session->set_flashdata('error', 'No se pudo actualizar la hoja.');
+        }
+
+        redirect('admin/libro-reclamaciones');
     }
 
     private function _check_admin() {

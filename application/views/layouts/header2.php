@@ -55,9 +55,9 @@
         padding:10px;
         text-align: center;
     }
-    .banner2{
-        height:75px;
-        padding:12px 8px;
+    .banner2a{
+        height:50px;
+        padding:10px 8px;
         border-style: none;
         border-color:gray;
         border-width:1px;
@@ -154,24 +154,39 @@
         .div-ocultar {
             display: none;
         }
-}
+    }
+    .texto-corto {
+        display: none;
+        font-size:14px;
+    }
+
+    @media (max-width: 768px) {
+        .texto-completo {
+            display: none;
+        }
+
+        .texto-corto {
+            display: inline;
+        }
+    }
 </style>
 <!-- NAVBAR -->
 <div class="container" style="display:block!important">
     <div class="row">
         <div class="col-sm-12 banner0">
-            <span><?= isset($texto_banner) ? $texto_banner : "" ?></span>
+            <span class="texto-completo"><?= isset($texto_banner) ? $texto_banner : "" ?></span>
+            <span class="texto-corto"><?= isset($texto_banner) ? $texto_banner : "" ?></span>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-sm-2 banner2">
+        <div class="col-12 col-sm-5 col-md-4 col-lg-4 banner2a">
             <a class="navbar-brand fw-bold tol-logo" href="<?php echo base_url(); ?>">
                 <i class="bi bi-bag-heart-fill me-2"></i>
                 <?php echo $this->config->item('tienda_nombre'); ?>
             </a>
         </div>
-        <div class="col-sm-6 banner2" id="busqueda">
+        <div class="col-8 col-sm-5 col-md-6 col-lg-4 banner2a" id="busqueda" style="padding-top:15px;">
             <form action="<?php echo base_url(); ?>" method="get" class="buscador" role="search">
                 <input
                     type="text"
@@ -209,11 +224,11 @@
                 </button>
             </form>
         </div>
-        <div class="col-sm-1 banner2 div-ocultar">
+        <div class="col-3 col-sm-1 banner2a div-ocultar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="#000000" stroke-linejoin="round" stroke-width="2" d="M12 11a5 5 0 100-10 5 5 0 000 10zM1 22.91C1.21 17.92 6.029 14 12 14s10.79 4.01 11 9H1v-.09z"></path></svg>
-            <span class="tol-301">Hola, inicia sesion</span>
+            <span class="tol-301">Inicia sesion</span>
         </div>
-        <div class="col-sm-1 banner2 div-ocultar" style="padding-left:0px!important;padding-right:0px!important;">
+        <div class="col-3 col-sm-1 banner2a div-ocultar" style="padding-left:0px!important;padding-right:0px!important;">
             <!--<img src="assets/img/tiendita.png" style="height:40px">-->
             <svg xmlns="http://www.w3.org/2000/svg"
                  viewBox="0 0 64 64"
@@ -236,11 +251,11 @@
             </svg>
             <span class="tol-301">Encuentra tu tienda</span>
         </div>
-        <div class="col-sm-1 banner2 div-ocultar">
+        <div class="col-3 col-sm-1 banner2a div-ocultar">
             <span class="tol-300">Puntos<br> Bonus</span>
         </div>
-        <div class="col-sm-1 banner2">
-            <a href="<?php echo base_url('carrito'); ?>" class="btn btn-outline-light btn-carrito position-relative">
+        <div class="col-4 col-sm-2 col-md-2 col-lg-1 banner2a">
+            <a href="<?php echo base_url('carrito'); ?>" class="btn btn-outline-light">
                 <img src="assets/img/carrito.svg" style="height:45px;">
                 <?php $count = isset($carrito_count) ? (int)$carrito_count : 0; ?>
                 <?php if ($count > 0): ?>
