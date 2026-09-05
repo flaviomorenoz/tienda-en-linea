@@ -482,8 +482,8 @@ main > .container-fluid {
 
 /* Botón Ver y agregar (btn-dark en tarjeta) */
 .product-card .btn-dark {
-    background: var(--negro);
-    border-color: var(--negro);
+    background: var(--primary);
+    border-color: var(--primary);
     border-radius: 0;
     color: #fff;
     font-size: 0.72rem;
@@ -494,8 +494,8 @@ main > .container-fluid {
 }
 
 .product-card .btn-dark:hover {
-    background: var(--primary);
-    border-color: var(--primary);
+    background: var(--negro);
+    border-color: var(--negro);
     color: #fff;
 }
 
