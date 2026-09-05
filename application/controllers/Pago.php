@@ -131,6 +131,31 @@ class Pago extends CI_Controller {
         if ($resultado['success']) {
             $this->Pedido_model->actualizar_pago($id_pedido, 'Pagado', $resultado['codigo']);
             $this->session->unset_userdata('carrito');
+
+            // ***** Enviar correo de confirmación ********************
+            $email = "flaviomorenoz@gmail.com";
+
+            if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+                $this->load->library('email');
+
+                $this->email->from('flaviomorenoz@hotmail.com');
+                $this->email->to($email);
+                $this->email->subject('Confirmación de pedido');
+                $this->email->message('Tiene un pedido confirmado con ID: ' . $id_pedido . '. Total: S/ ' . number_format($total, 2));
+
+                if (!$this->email->send()) {
+                    $this->session->set_flashdata(
+                        'error',
+                        'No se pudo enviar el correo de confirmación.'
+                    );
+                    traza("No se pudo enviar el correo de confirmación al cliente. ID Pedido: " . $id_pedido);
+                }else{
+                    traza("Correo de confirmación enviado al cliente. ID Pedido: " . $id_pedido);
+                }
+            }
+            // ***** Fin enviar correo de confirmación ********************
+
             redirect('pedido/gracias/' . $id_pedido);
         } else {
             $this->Pedido_model->actualizar_pago($id_pedido, 'Fallido', '');
