@@ -5,7 +5,8 @@ class Wts_model extends CI_Model {
 
     public function __construct() {
         parent::__construct();
-        $this->nro_propio = '+15554881827'; // Número propio de WhatsApp
+        //$this->nro_propio = '+15554881827'; // Número propio de WhatsApp
+        $this->nro_propio = '+51989856507'; // Número propio de WhatsApp
     }
 
     public function mensaje_existe($wa_message_id) {
@@ -67,20 +68,27 @@ class Wts_model extends CI_Model {
         order by z.id desc";
 
         $cSql = "select z.id, z.fecha, 
-            case when wb.tipo = 'ENVIADO' then wb.telefono_destino else wb.telefono_origen end telefono_origen, 
-            wb.nombre, 
+            z.telefono telefono_origen, 
+            wc.nombre, 
             z.cant, 
             convert_from(convert_to(wb.mensaje, 'UTF8'),'UTF8') mensaje,
             'x' opciones,
             '{$this->nro_propio}' as nro_propio,
-            wb.tipo estado
+            wb.tipo estado,
+            case when w.tel_d is null then '' else 'human' end rol
         from (
-            select min(a.id) id, max(a.id) id_max, to_char(a.fecha, 'YYYY-MM-DD') fecha, count(1) cant
+            select case when a.tipo='RECIBIDO' then a.telefono_origen else a.telefono_destino end telefono, min(a.id) id, max(a.id) id_max, to_char(a.fecha, 'YYYY-MM-DD') fecha, count(1) cant
             from wts_mensajes a
-            group by to_char(a.fecha, 'YYYY-MM-DD')
+            group by case when a.tipo='RECIBIDO' then a.telefono_origen else a.telefono_destino end, to_char(a.fecha, 'YYYY-MM-DD')
         ) z
-        left join wts_mensajes wb on z.id_max = wb.id
-        where (case when wb.tipo = 'ENVIADO' then wb.telefono_destino else wb.telefono_origen end) != 'whatsapp:{$this->nro_propio}'
+        inner join wts_mensajes wb on z.id_max = wb.id
+        left join wts_clientes wc on z.telefono = wc.telefono
+        left join (
+			select telefono_destino tel_d
+			from wts_mensajes 
+			where rol='human' and to_char(fecha, 'YYYY-MM-DD') = current_date::character(10)
+			group by telefono_destino
+		) w on z.telefono = w.tel_d
         order by z.id desc";
 
         //die($cSql);

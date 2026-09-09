@@ -16,6 +16,7 @@ class Wts extends CI_Controller {
         parent::__construct();
         $this->load->model('Asistente_model');
         $this->load->model('wts_model');
+        $this->nro_propio = "51989856507"; // Número propio de WhatsApp
     }
 
     /**
@@ -268,36 +269,67 @@ class Wts extends CI_Controller {
         $conversaciones = $this->wts_model->conversaciones_recientes();
 
         //$result = $conversaciones->result_array();
-
         //$ar_campos = array("id","fecha", "message_sid", "nombre", "origen", "destino", "tipo", "mensaje", "rol");
-        $ar_campos = array("id", "fecha", "telefono_origen", "nombre", "cant", "mensaje", "estado", "opciones", "nro_propio"); // 
+        $ar_campos = array("id", "fecha", "telefono_origen", "nombre", "cant", "mensaje", "estado", "rol","opciones", "nro_propio"); // 
 
-        echo $this->fm->json_datatable($ar_campos, $conversaciones);
-
-        /*
-        $rows = array();
-        foreach ($conversaciones as $c) {
-            $rows[] = array(
-                'telefono'        => $c->telefono,
-                'total_mensajes'  => (int)$c->total_mensajes,
-                'primer_mensaje'  => $c->primer_mensaje,
-                'ultimo_mensaje'  => $c->ultimo_mensaje,
-            );
+        for($i=0; $i<count($conversaciones); $i++){
+            $texto = substr($conversaciones[$i]["mensaje"], 0, 200); // Limitar a 200 caracteres
+            $conversaciones[$i]["mensaje"] = $this->sanitizarTexto($texto);
         }
+        
+        $data =$this->fm->json_datatable($ar_campos, $conversaciones);
+        
+        echo $data;
+    }
 
-        $rows = array();
-        foreach($conversaciones as $c){
-            $rows[] = array(
-                'id'    => $c->id,
-                'fecha' => $c->fecha,
-            );
+    function procesarJSONDataTable($jsonString) {
+        // Decodificar el JSON a array
+        $datos = json_decode($jsonString, true);
+        
+        // Verificar si es un JSON válido
+        if ($datos === null) {
+            return $jsonString; // Si no es válido, devolver el original
         }
+        
+        // Procesar los datos si existe la clave 'data'
+        if (isset($datos['data']) && is_array($datos['data'])) {
+            foreach ($datos['data'] as $indiceFila => &$fila) {
+                if (is_array($fila)) {
+                    foreach ($fila as $indiceCelda => &$celda) {
+                        if (is_string($celda)) {
+                            $celda = $this->sanitizarTexto($celda);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Devolver el array procesado (o puedes devolver el JSON directamente)
+        return $datos;
+    }
 
-        $this->output
-             ->set_content_type('application/json')
-             ->set_output(json_encode(array('data' => $rows)));
-        */
-
+    function sanitizarTexto($texto) {
+        if ($texto === null || $texto === '') {
+            return '';
+        }
+        
+        // Convertir a string por si acaso
+        $texto = (string) $texto;
+        
+        // 1. Escapar caracteres especiales HTML
+        $texto = htmlspecialchars($texto, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        
+        // 2. Opcional: Eliminar emojis y caracteres especiales
+        // (Los emojis suelen causar problemas en DataTables)
+        $texto = preg_replace('/[\x{1F600}-\x{1F64F}]/u', '', $texto); // Emojis
+        $texto = preg_replace('/[\x{1F300}-\x{1F5FF}]/u', '', $texto); // Símbolos
+        $texto = preg_replace('/[\x{1F680}-\x{1F6FF}]/u', '', $texto); // Transporte
+        $texto = preg_replace('/[\x{2600}-\x{26FF}]/u', '', $texto);   // Misceláneos
+        
+        // 3. Opcional: Limpiar caracteres de control
+        $texto = preg_replace('/[\x00-\x1F\x7F]/u', '', $texto);
+        
+        return $texto;
     }
 
     public function mensajes($telefono) {
@@ -352,7 +384,7 @@ class Wts extends CI_Controller {
      * ngrok. Se hace desde el servidor para evitar el bloqueo de CORS
      * del navegador. No usa cURL: emplea streams HTTP nativos de PHP.
      */
-    public function enviar_mensaje() {
+    public function enviar_mensaje() { // Por Twilio
         $this->_check_admin();
 
         $destino = $this->input->get('destino');
@@ -406,4 +438,78 @@ class Wts extends CI_Controller {
             exit;
         }
     }
+
+    function wts_enviar_texto_brigde(){
+        // Reproduce ChatPropio._a_jid(): si ya trae @ (jid completo) se usa tal cual;
+        // si es numero/clave, se normaliza a digitos + @s.whatsapp.net
+        //string $numero, string $texto
+        $numero = $_REQUEST["numero"];
+        $texto = $_REQUEST["texto"];
+        //die("numero: $numero, texto: $texto");
+        
+        $to = trim($numero);
+        if (strpos($to, '@') === false) {
+            $to = preg_replace('/\D/', '', $to) . '@s.whatsapp.net';
+        }
+
+        // texto decodificado
+        $texto = urldecode($texto);
+        
+        $ch = curl_init('http://127.0.0.1:8457/send');  // = WTS_BRIDGE_URL
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 25,               // mismo timeout que _bridge_json
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS     => json_encode(['to' => $to, 'text' => $texto]),
+        ]);
+
+        $resp   = curl_exec($ch);
+        $errno  = curl_errno($ch);
+        $error  = curl_error($ch);
+        $codigo = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($resp === false) {
+            echo json_encode(['ok' => false, 'error' => "curl ($errno): $error"]);
+            die("");
+        }
+        $data = json_decode($resp, true) ?: [];
+        if ($codigo !== 200) {
+            // 400 = faltan datos | 409 = sesion no iniciada | 500 = error de envio
+            echo json_encode(['ok' => false, 'error' => $data['error'] ?? "HTTP $codigo"]);
+            die("");
+        }
+        
+        // Guardando el chat:
+        //$cSql = "INSERT INTO wts_mensajes (telefono_origen, telefono_destino, mensaje, tipo, rol) VALUES (?, ?, ?, 'ENVIADO', ?)";
+        
+        $ar = [
+            'telefono_origen'  => $this->nro_propio,
+            'telefono_destino' => $numero,
+            'mensaje'          => $texto,
+            'tipo'             => 'ENVIADO',
+            'rol'              => 'human',
+        ];
+
+        traza($this->db->set($ar)->get_compiled_insert("wts_mensajes")); 
+
+        $this->db->set($ar)->insert("wts_mensajes");
+
+        //$this->db->query($cSql, [$this->nro_propio, $numero, $texto, 'human']);
+
+        echo json_encode([
+            'ok'         => true,
+            'message_id' => 'Se ejecuta correctamente',
+        ]);
+    }
+
+    /*
+    // ---- Uso --------------------------------------------------------------
+    $r = wts_enviar_texto_brigde('51999000111', 'Hola, este mensaje lo envio PHP');
+    if ($r['ok']) {
+        echo "Enviado OK, message_id={$r['message_id']}";
+    } else {
+        echo "Error: {$r['error']}";
+    }*/
 }

@@ -69,6 +69,7 @@
                         <th class="text-center">Msjes</th>
                         <th class="">Ultimo Msje</th>
                         <th class="text-center">Estado</th>
+                        <th class="text-center">Rol</th>
                         <th class="text-center">Opciones</th>
                         <!--<th class="">Nro.Propio</th>-->
                     </tr>
@@ -162,7 +163,7 @@
     }
 
     $(document).ready(function() {
-        $('#tabla-whatsapp').DataTable({
+        var tablaWhatsapp = $('#tabla-whatsapp').DataTable({
             ajax: { url: '<?= base_url("wts/historial_json") ?>', type: 'GET', dataSrc: 'data' },
             processing: true,
             columns: [
@@ -173,7 +174,8 @@
                 { data: 4, className: 'text-center' },
                 { data: 5},
                 { data: 6},
-                { data: 7}
+                { data: 7},
+                { data: 8}
             ],
             columnDefs: [
                 {
@@ -219,10 +221,21 @@
                     }
                 },{
                     targets: 7,
+                    render: function(d, type) {
+                        //return type === 'display' ? escHtml(d) : d;
+                        return d;
+                        /*if(d.trim() == 'human'){
+                            return "<div style=\"background-color:orange;text-align:center;border-radius:7px;\">" + d + "</div>"
+                        }else{
+                            return "<div style=\"background-color:skyblue;text-align:center;border-radius:7px;\">" + d + "</div>"
+                        }*/
+                    }
+                },{ // OPCIONES (LINKS)
+                    targets: 8,
                     render: function(d, type, row) {
                         if (type !== 'display') return '';
                         var telefono  = String(row[2] || '').replace(/^whatsapp:/i, '');
-                        var nroPropio = String(row[8] || '').replace(/^whatsapp:/i, '');
+                        var nroPropio = String(row[9] || '').replace(/^whatsapp:/i, '');
 
                         return '<a href="#" title="Ver" onclick="detalle(' + row[0] + ');return false;">' +
                                '<i class="bi bi-eye me-3" style="font-size:18px"></i></a>' +
@@ -271,6 +284,14 @@
             order: [[0, 'desc']],
             pageLength: 22
         });
+        // ===== Refresco automatico cada 30 segundos =====
+        // ajax.reload(..., false): el 2. parametro conserva la pagina actual
+        // del DataTable; por defecto (true) volveria a la pagina 1.
+        var REFRESCO_MS = 30 * 1000; // 30 segundos
+
+        setInterval(function () {
+            tablaWhatsapp.ajax.reload(null, false);
+        }, REFRESCO_MS);
     });
 
     function detalle(id) {
@@ -369,37 +390,34 @@
             $res.html('<div class="alert alert-warning py-2 mb-0">Escribe un mensaje antes de enviar.</div>');
             return;
         }
-
+        
         // Se le extrae el signo "+" al inicio del número
         var destino = telDestinoEnvio.replace(/^\+/, '');
         var origen = telOrigenEnvio.replace(/^\+/, '');
-
-        // URL local del controlador (proxy) — evita el bloqueo de CORS
-        var url = <?php echo json_encode(base_url('../varios/twilios/twilio_enviar_mensajes.php')); ?>
-            + '?origen=' + encodeURIComponent(origen)
-            + '&destino=' + encodeURIComponent(destino)
-            + '&rol=human' 
-            + '&msg=' + encodeURIComponent(msg);
-
-        $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Enviando...');
-
-        fetch(url)
-            .then(function(resp) { return resp.json(); })
-            .then(function(data) {
-                $btn.prop('disabled', false).html('<i class="bi bi-send me-1"></i> Enviar');
-
-                if (data && data.ok) {
-                    $res.html('<div class="alert alert-success py-2 mb-0"><i class="bi bi-check-circle me-1"></i> Mensaje enviado correctamente.</div>');
-                    $('#enviar-mensaje').val('');
+        
+        $.ajax({
+            data : {
+                numero : destino,
+                texto : encodeURIComponent(msg)
+            },
+            type: 'GET',
+            url:  '<?php echo base_url("wts/wts_enviar_texto_brigde"); ?>',
+            success: function(res){
+                console.log("Respuesta del servidor:", res);
+                res = JSON.parse(res)
+                if (res.ok) {
+                    $res.html('<div class="alert alert-success py-2 mb-0">Mensaje enviado correctamente.</div>');
+                    $btn.prop('disabled', true).html('<i class="bi bi-check2 me-1"></i> Enviado');
                 } else {
-                    var errorMsg = (data && data.error) ? data.error : 'El servicio no confirmó el envío.';
-                    $res.html('<div class="alert alert-danger py-2 mb-0"><i class="bi bi-x-circle me-1"></i> ' + errorMsg + '</div>');
+                    $res.html('<div class="alert alert-danger py-2 mb-0">Error al enviar el mensaje: ' + (res.error || 'Error desconocido') + '</div>');
                 }
-            })
-            .catch(function() {
-                $btn.prop('disabled', false).html('<i class="bi bi-send me-1"></i> Enviar');
-                $res.html('<div class="alert alert-danger py-2 mb-0"><i class="bi bi-x-circle me-1"></i> No se pudo enviar el mensaje. Verifica la conexión con el servicio.</div>');
-            });
+            },
+            error: function(xhr, status, error) {
+                alert("Error al enviar: " + error);
+                console.log(xhr.responseText);
+            }
+        })        
+            
     }
 
     function fmtFechaHora(str) {

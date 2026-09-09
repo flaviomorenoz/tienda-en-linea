@@ -182,7 +182,8 @@
     <div class="row">
         <div class="col-12 col-sm-5 col-md-4 col-lg-4 banner2a">
             <a class="navbar-brand fw-bold tol-logo" href="<?php echo base_url(); ?>">
-                <i class="bi bi-bag-heart-fill me-2"></i>
+                <!--<i class="bi bi-bag-heart-fill me-2"></i>-->
+                <img src="assets/img/rallas.png" style="height:25px;margin-bottom:4px;">
                 <?php echo $this->config->item('tienda_nombre'); ?>
             </a>
         </div>
@@ -251,8 +252,10 @@
             </svg>
             <span class="tol-301">Encuentra tu tienda</span>
         </div>
-        <div class="col-3 col-sm-1 banner2a div-ocultar">
-            <span class="tol-300">Puntos<br> Bonus</span>
+        <div class="col-3 col-sm-1 banner2a div-ocultar text-center">
+            <span class="tol-300">
+                <i class="bi bi-bag-heart-fill me-2" style="font-size: 1.5rem;"></i>
+            </span>
         </div>
         <div class="col-4 col-sm-2 col-md-2 col-lg-1 banner2a">
             <a href="<?php echo base_url('carrito'); ?>" class="btn btn-outline-light">
