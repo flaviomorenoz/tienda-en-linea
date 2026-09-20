@@ -61,7 +61,9 @@ class Producto_model extends CI_Model {
         $this->db->from('tec_categories c');
         $this->db->join('tec_products p', 'p.category_id = c.id', 'inner');
         $this->db->where('p.activo', '1');
-        $this->db->group_by('c.id, c.name');
+        // Se agrupa por NOMBRE y no por id: si tec_categories tiene dos registros
+        // con el mismo name (ids distintos), la categoría salía duplicada en el menú.
+        $this->db->group_by('c.name');
         $this->db->order_by('c.name', 'ASC');
         $rows = $this->db->get()->result();
         $categorias = array();

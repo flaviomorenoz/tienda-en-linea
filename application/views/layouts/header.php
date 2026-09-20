@@ -80,10 +80,12 @@
                         <?php echo htmlspecialchars($cat, ENT_QUOTES, 'UTF-8'); ?>
                     </a>
                 </li>
+                <?php endforeach; ?>
+                <?php /* Enlace estático: debe quedar FUERA del foreach de categorías
+                         (dentro se repetía una vez por cada categoría). */ ?>
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo base_url('quienes-somos'); ?>">Quiénes somos</a>
                 </li>
-                <?php endforeach; ?>
             </ul>
 
             <!-- Carrito -->
