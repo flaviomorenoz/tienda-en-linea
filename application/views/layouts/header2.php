@@ -169,6 +169,146 @@
             display: inline;
         }
     }
+
+    /* ===================================================
+       MENU LATERAL PLEGABLE (click en rallitas)
+       =================================================== */
+    #btn-menu-lateral {
+        cursor: pointer;
+    }
+
+    /* Fondo oscuro semitransparente detras del menu */
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.35);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .3s ease, visibility .3s ease;
+        z-index: 1080;
+    }
+    .sidebar-backdrop.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Panel vertical en la parte izquierda (blanco semitransparente) */
+    .sidebar-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 300px;
+        max-width: 88vw;
+        background: rgba(255, 255, 255, 0.88);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(250, 1, 131, 0.12);
+        box-shadow: 4px 0 26px rgba(0, 0, 0, 0.15);
+        transform: translateX(-100%);
+        transition: transform .32s ease;
+        z-index: 1090;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        font-family: var(--font);
+        color: #333;
+    }
+    .sidebar-menu.abierto {
+        transform: translateX(0);
+    }
+
+    /* Cabecera del panel */
+    .sidebar-cabeza {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 16px 18px 14px;
+        border-bottom: 1px solid rgba(250, 1, 131, 0.15);
+        background: linear-gradient(135deg, rgba(250, 1, 131, 0.08), rgba(255, 255, 255, 0));
+    }
+    .sidebar-titulo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font);
+        font-size: 19px;
+        font-weight: 600;
+        letter-spacing: .3px;
+        color: var(--primary);
+    }
+    .sidebar-cerrar {
+        border: none;
+        background: rgba(250, 1, 131, 0.10);
+        color: var(--primary);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        line-height: 1;
+        cursor: pointer;
+        transition: background .2s ease, color .2s ease, transform .2s ease;
+    }
+    .sidebar-cerrar:hover {
+        background: var(--primary);
+        color: #fff;
+        transform: rotate(90deg);
+    }
+
+    /* Lista de opciones */
+    .sidebar-nav {
+        list-style: none;
+        margin: 0;
+        padding: 12px 10px;
+        flex: 1;
+    }
+    .sidebar-nav li {
+        margin-bottom: 4px;
+    }
+    .sidebar-opcion {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        color: #333;
+        font-size: 15px;
+        font-weight: 500;
+        font-family: var(--font);
+        text-decoration: none;
+        transition: background .2s ease, color .2s ease, transform .2s ease;
+    }
+    .sidebar-opcion i {
+        width: 22px;
+        text-align: center;
+        font-size: 1.15rem;
+        color: var(--primary);
+        transition: color .2s ease;
+    }
+    .sidebar-opcion:hover {
+        background: var(--primary);
+        color: #fff;
+        transform: translateX(4px);
+    }
+    .sidebar-opcion:hover i {
+        color: #fff;
+    }
+
+    /* Pie del panel */
+    .sidebar-pie {
+        padding: 13px 18px;
+        border-top: 1px solid rgba(250, 1, 131, 0.15);
+        font-size: 12.5px;
+        color: #888;
+        font-family: var(--font);
+    }
 </style>
 <!-- NAVBAR -->
 <div class="container" style="display:block!important">
@@ -183,7 +323,7 @@
         <div class="col-12 col-sm-5 col-md-4 col-lg-4 banner2a">
             <a class="navbar-brand fw-bold tol-logo" href="<?php echo base_url(); ?>">
                 <!--<i class="bi bi-bag-heart-fill me-2"></i>-->
-                <img src="assets/img/rallas.png" style="height:25px;margin-bottom:4px;">
+                <img src="<?=base_url()?>assets/img/rallas.png" id="btn-menu-lateral" role="button" tabindex="0" alt="Abrir menú" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu-lateral" style="height:25px;margin-bottom:4px;">
                 <?php echo $this->config->item('tienda_nombre'); ?>
             </a>
         </div>
@@ -226,40 +366,52 @@
             </form>
         </div>
         <div class="col-3 col-sm-1 banner2a div-ocultar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="#000000" stroke-linejoin="round" stroke-width="2" d="M12 11a5 5 0 100-10 5 5 0 000 10zM1 22.91C1.21 17.92 6.029 14 12 14s10.79 4.01 11 9H1v-.09z"></path></svg>
-            <span class="tol-301">Inicia sesion</span>
+            <div class="row">
+                <!--<div class="col-sm-4" style="padding:9px 0px 0px 5px">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="#000000" stroke-linejoin="round" stroke-width="2" d="M12 11a5 5 0 100-10 5 5 0 000 10zM1 22.91C1.21 17.92 6.029 14 12 14s10.79 4.01 11 9H1v-.09z"></path></svg>
+                </div>
+                <div class="col-sm-8" style="padding:4px 0px 0px 2px">
+                    <div class="tol-301" style="width:60px">Inicia sesion</div>
+                </div>-->
+            </div>
         </div>
         <div class="col-3 col-sm-1 banner2a div-ocultar" style="padding-left:0px!important;padding-right:0px!important;">
             <!--<img src="assets/img/tiendita.png" style="height:40px">-->
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 64 64"
-                 width="24"
-                 height="24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2.5"
-                 stroke-linecap="round"
-                 stroke-linejoin="round">
+            <div class="row">
+                <div class="col-sm-3" style="padding:9px 0px 0px 5px">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 64 64"
+                        width="24"
+                        height="24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round">
 
-                <path d="M10 21 L14 12 Q15 10 18 10 H46 Q49 10 50 12 L54 21" />
-                <path d="M10 21 H54 V25 Q54 27 52 27 H12 Q10 27 10 25 Z" />
-                <path d="M13 27 V51" />
-                <path d="M51 27 V51" />
-                <path d="M13 51 H51" />
-                <path d="M32 27 V51" />
-                <path d="M29 38 H35" />
-                <path d="M10 51 H54" />
-            </svg>
-            <span class="tol-301">Encuentra tu tienda</span>
+                        <path d="M10 21 L14 12 Q15 10 18 10 H46 Q49 10 50 12 L54 21" />
+                        <path d="M10 21 H54 V25 Q54 27 52 27 H12 Q10 27 10 25 Z" />
+                        <path d="M13 27 V51" />
+                        <path d="M51 27 V51" />
+                        <path d="M13 51 H51" />
+                        <path d="M32 27 V51" />
+                        <path d="M29 38 H35" />
+                        <path d="M10 51 H54" />
+                    </svg>
+                </div>
+                <div class="col-sm-9" style="padding:4px 0px 0px 2px">
+                    <div class="tol-301">Encuentra tu tienda</div>
+                </div>
+            </div>
         </div>
         <div class="col-3 col-sm-1 banner2a div-ocultar text-center">
             <span class="tol-300">
                 <i class="bi bi-bag-heart-fill me-2" style="font-size: 1.5rem;"></i>
             </span>
         </div>
-        <div class="col-4 col-sm-2 col-md-2 col-lg-1 banner2a">
+        <div class="col-4 col-sm-2 col-md-2 col-lg-1 banner2a" style="padding-top: 0px;">
             <a href="<?php echo base_url('carrito'); ?>" class="btn btn-outline-light">
-                <img src="assets/img/carrito.svg" style="height:45px;">
+                <img src="<?=base_url()?>assets/img/carrito.svg" style="height:45px;">
                 <?php $count = isset($carrito_count) ? (int)$carrito_count : 0; ?>
                 <?php if ($count > 0): ?>
                 <?php echo $count; ?>
@@ -271,6 +423,49 @@
 
 </div>    
 
+
+<!-- MENU LATERAL PLEGABLE (blanco semitransparente, lado izquierdo) -->
+<div id="menu-lateral-backdrop" class="sidebar-backdrop"></div>
+<aside id="menu-lateral" class="sidebar-menu" aria-label="Menú de navegación">
+    <div class="sidebar-cabeza">
+        <span class="sidebar-titulo">
+            <i class="bi bi-grid-fill"></i> Menú
+        </span>
+        <button type="button" id="menu-lateral-cerrar" class="sidebar-cerrar" aria-label="Cerrar menú">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    <ul class="sidebar-nav">
+        <li>
+            <a class="sidebar-opcion" href="<?php echo base_url(); ?>">
+                <i class="bi bi-house-heart-fill"></i> Inicio
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-opcion" href="<?php echo base_url('tienda'); ?>">
+                <i class="bi bi-bag-heart-fill"></i> Catálogo
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-opcion" href="<?php echo base_url('carrito'); ?>">
+                <i class="bi bi-basket2-fill"></i> Mi carrito
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-opcion" href="<?php echo base_url('quienes-somos'); ?>">
+                <i class="bi bi-people-fill"></i> Quiénes somos
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-opcion" href="<?php echo base_url('libro-reclamaciones'); ?>">
+                <i class="bi bi-journal-text"></i> Libro de Reclamaciones
+            </a>
+        </li>
+    </ul>
+    <div class="sidebar-pie">
+        <?php echo $this->config->item('tienda_slogan'); ?>
+    </div>
+</aside>
 
 <!-- Mensajes flash -->
 <div class="container mt-3 div-ocultar">
@@ -293,3 +488,56 @@
 
 <!-- Contenido principal -->
 <main class="py-4">
+<script>
+    // ===================================================
+    //  MENU LATERAL PLEGABLE
+    // ===================================================
+    (function () {
+        var btn     = document.getElementById('btn-menu-lateral');
+        var menu    = document.getElementById('menu-lateral');
+        var backdrop = document.getElementById('menu-lateral-backdrop');
+        var cerrar  = document.getElementById('menu-lateral-cerrar');
+        if (!btn || !menu || !backdrop) return;
+
+        function abrirMenu(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            menu.classList.add('abierto');
+            backdrop.classList.add('show');
+            btn.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarMenu() {
+            menu.classList.remove('abierto');
+            backdrop.classList.remove('show');
+            btn.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        // Abrir al hacer click en la imagen de "rallas"
+        btn.addEventListener('click', abrirMenu);
+        // Soporte de teclado (Enter / Espacio) al estar enfocada
+        btn.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                abrirMenu(e);
+            }
+        });
+
+        // Cerrar al hacer click fuera (fondo oscuro), en la X o con Escape
+        backdrop.addEventListener('click', cerrarMenu);
+        if (cerrar) cerrar.addEventListener('click', cerrarMenu);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') cerrarMenu();
+        });
+
+        // Cerrar el panel al elegir una opción
+        var enlaces = menu.querySelectorAll('a');
+        for (var i = 0; i < enlaces.length; i++) {
+            enlaces[i].addEventListener('click', cerrarMenu);
+        }
+    })();
+</script>

@@ -153,4 +153,13 @@ class Tienda extends CI_Controller {
         if (!is_array($carrito)) return 0;
         return array_sum(array_column($carrito, 'cantidad'));
     }
+
+    function devoluciones(){
+        $data = array(
+            'titulo'        => 'Quiénes somos - ' . $this->config->item('tienda_nombre')
+        );
+        $this->load->view('layouts/header2', $data);
+        $this->load->view('tienda/devoluciones', $data);
+        $this->load->view('layouts/footer2');
+    }
 }

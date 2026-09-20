@@ -113,8 +113,6 @@
       <div class="col-md-3">
         <h6>Servicio al cliente</h6>
         <ul class="list-unstyled">
-          <li><a href="#">Cómo comprar</a></li>
-          <li><a href="#">Medio de Pago</a></li>
           <li><a href="<?php echo base_url('libro-reclamaciones'); ?>">Libro de Reclamaciones</a></li>
         </ul>
       </div>
@@ -134,8 +132,6 @@
       <div class="col-md-3">
         <h6>Tiendas</h6>
         <ul class="list-unstyled">
-          <li><a href="#">Bella Rose Barcelona</a></li>
-          <li><a href="#">Bella Rose Valencia</a></li>
           <li><a href="#">Outlet Online</a></li>
         </ul>
       </div>
@@ -146,7 +142,8 @@
         <ul class="list-unstyled">
           <li><a href="<?php echo base_url('quienes-somos'); ?>">Sobre nosotros</a></li>
           <li><a href="<?php echo base_url('contacto'); ?>">Contacto</a></li>
-          <li><a href="#">Preguntas frecuentes</a></li>
+          <!--<li><a href="#">Preguntas frecuentes</a></li>-->
+          <li><a href="<?php echo base_url('tienda/devoluciones'); ?>">Políticas de Cambio de Devoluciones</a></li>
         </ul>
         <!-- mostramos "Info lega..." tal cual aparece en la imagen (abreviado) -->
         <div class="mt-3">
@@ -157,11 +154,6 @@
     <!-- Línea inferior con copyright y enlaces legales (similar al estilo de la imagen) -->
     <div class="bottom-bar d-flex flex-wrap justify-content-between align-items-center">
       <span>© 2026 Bella Rose · Todos los derechos reservados</span>
-      <span>
-        <a href="#" class="me-3">Política de privacidad</a>
-        <a href="#" class="me-3">Cookies</a>
-        <a href="#">Condiciones de uso</a>
-      </span>
     </div>
 
   </div>
