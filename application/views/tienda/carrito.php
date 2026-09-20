@@ -116,8 +116,8 @@
                     </a>
                     <div class="d-flex gap-2">
                         <!--<button type="button" onclick="rellenar()">rellenar</button>-->
-                        <a href="#" onclick="ver_modal_paguito()" class="btn btn-primary btn-sm">
-                            <i class="bi bi-arrow-repeat me-1"></i>Pago verificado
+                        <a href="#" onclick="ver_modal_paguito()" class="btn btn-primary btn-sm" style="padding-top:7px;">
+                            <i class="bi bi-arrow-repeat me-1"></i>PAGAR
                         </a>
                         <button type="submit" class="btn btn-outline-dark">
                             <i class="bi bi-arrow-repeat me-1"></i>Actualizar
@@ -157,33 +157,14 @@
                                 <?php echo number_format($total, 2); ?>
                             </span>
                         </div>
-                        <div class="d-grid mt-4">
-                            <a href="<?php echo base_url('checkout'); ?>" class="btn btn-dark btn-lg">
-                                <i class="bi bi-lock-fill me-2"></i>Total del Pedido
-                            </a>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- CUADRO DEL YAPE ------------------>
-        <div class="row" style="margin-left:1px!important;">
-            <!-- Mensaje de yape -->
-            <div class="col-sm-6 col-lg-3" style="padding:4px;margin-top:4px!important;">
-                <div class="row defensa-01">
-                    <div class="col-sm-6 col-lg-6">
-                        <img src="<?= base_url("assets/img/yape.jpeg") ?>" style="height:74px;">
-                    </div>
-                    <div class="col-sm-6 col-lg-6 estilo-yape" style="padding:16px">
-                        991-629-237<br>Rosita Cha*
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-lg-4 estilo-courier" style="padding:16px;margin-top:4px!important;">
-                Envíos por Shalom, Olva Courier, Marvisur
-            </div>
+        <!-- AQUI VA EL ANTERIOR PROCESO -->
+            
         </div>
     </form>
 
