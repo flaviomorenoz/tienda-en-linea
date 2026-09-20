@@ -411,11 +411,17 @@
         </div>
         <div class="col-4 col-sm-2 col-md-2 col-lg-1 banner2a" style="padding-top: 0px;">
             <a href="<?php echo base_url('carrito'); ?>" class="btn btn-outline-light">
-                <img src="<?=base_url()?>assets/img/carrito.svg" style="height:45px;">
                 <?php $count = isset($carrito_count) ? (int)$carrito_count : 0; ?>
-                <?php if ($count > 0): ?>
-                <?php echo $count; ?>
-                <?php endif; ?>
+                <span class="position-relative d-inline-block">
+                    <img src="<?php echo base_url('assets/img/carrito.svg'); ?>" style="height:45px;" alt="Carrito de compras">
+                    <!-- Contador del carrito: visible en la parte superior derecha del icono.
+                         Se pinta con PHP en cada carga de página y conserva el id #carrito-badge
+                         para que assets/js/carrito.js pueda actualizarlo por AJAX
+                         (mismo contrato que layouts/header.php). -->
+                    <span id="carrito-badge"
+                          class="badge rounded-pill position-absolute top-0 start-100 translate-middle"
+                          style="background-color:#E91E63;"><?php echo $count; ?></span>
+                </span>
             </a>
         </div>
 

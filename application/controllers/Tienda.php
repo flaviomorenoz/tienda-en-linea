@@ -156,7 +156,8 @@ class Tienda extends CI_Controller {
 
     function devoluciones(){
         $data = array(
-            'titulo'        => 'Quiénes somos - ' . $this->config->item('tienda_nombre')
+            'titulo'        => 'Políticas de Cambio y Devoluciones - ' . $this->config->item('tienda_nombre'),
+            'carrito_count' => $this->_carrito_count(),
         );
         $this->load->view('layouts/header2', $data);
         $this->load->view('tienda/devoluciones', $data);
