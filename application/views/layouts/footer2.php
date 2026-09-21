@@ -141,7 +141,7 @@
         <h6>Otros</h6>
         <ul class="list-unstyled">
           <li><a href="<?php echo base_url('quienes-somos'); ?>">Sobre nosotros</a></li>
-          <li><a href="<?php echo base_url('contacto'); ?>">Contacto</a></li>
+          <li><a href="<?php echo base_url('contacto'); ?>">Redes Sociales</a></li>
           <!--<li><a href="#">Preguntas frecuentes</a></li>-->
           <li><a href="<?php echo base_url('tienda/devoluciones'); ?>">Políticas de Cambio de Devoluciones</a></li>
         </ul>
