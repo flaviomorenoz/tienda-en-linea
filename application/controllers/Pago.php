@@ -41,6 +41,9 @@ class Pago extends CI_Controller {
     }
 
     public function procesar() { // tipo_pago = 1 (Con tarjeta), 2 (Posiblemente con Yape), 3 (Pago sin confirmar)
+        
+        //
+
         $tipo_pago = (int)$this->input->post('tipo_pago');
         traza("Pago->procesar: tipo_pago=" . $tipo_pago);
         if ($this->input->method() !== 'post') {
@@ -140,6 +143,7 @@ class Pago extends CI_Controller {
 
             $mail = new PHPMailer(true);
 
+            $cac = $_SERVER["CLAVE_APLICACION_CORREO"];
             try {
 
                 // Configuración SMTP
@@ -147,7 +151,7 @@ class Pago extends CI_Controller {
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
                 $mail->Username   = 'flaviomorenoz@gmail.com';
-                $mail->Password   = 'ekwk lfoh upwh iail';
+                $mail->Password   = $cac;
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
 

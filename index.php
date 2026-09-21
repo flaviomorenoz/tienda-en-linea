@@ -7,9 +7,10 @@ if (file_exists($env_file)) {
         putenv("$key=$value");
         $_ENV[$key] = $value;
         $_SERVER[$key] = $value;
-        //echo("_SERVER[$key] = $value<br>\n");
+        //echo("_SERVER[$key] = " . $_SERVER[$key] . "<br>\n");
     }
 }
+//die("Fin");
 
 $_SERVER["SERVER_CAIDO_"] = 0;
 
