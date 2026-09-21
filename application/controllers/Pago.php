@@ -147,7 +147,7 @@ class Pago extends CI_Controller {
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
                 $mail->Username   = 'flaviomorenoz@gmail.com';
-                $mail->Password   = '<?= $_SERVER["CLAVE_APLICACION_CORREO"] ?>';
+                $mail->Password   = 'ekwk lfoh upwh iail';
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
 
