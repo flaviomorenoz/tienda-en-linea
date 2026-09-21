@@ -417,7 +417,13 @@ class CI_Session {
 				}
 				// Hacky, but 'old' will (implicitly) always be less than time() ;)
 				// DO NOT move this above the 'new' check!
-				elseif ($value < $current_time)
+				// FIX PHP 8: en PHP 7 la comparación 'old' < time() daba TRUE porque la cadena
+				// se convertía implícitamente a 0, pero en PHP 8 la comparación de una cadena
+				// no numérica contra un entero se hace como string y da FALSE, por lo que el
+				// flashdata nunca se borraba (los mensajes flash quedaban pegados en todas las
+				// páginas). Se hace explícito el caso 'old' para conservar el comportamiento
+				// original: mostrar el flash una vez y borrarlo en la siguiente petición.
+				elseif ($value === 'old' OR (is_int($value) && $value < $current_time))
 				{
 					unset($_SESSION[$key], $_SESSION['__ci_vars'][$key]);
 				}

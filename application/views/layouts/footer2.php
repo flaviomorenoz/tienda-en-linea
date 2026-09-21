@@ -152,7 +152,14 @@
     </div>
 
     <!-- Línea inferior con copyright y enlaces legales (similar al estilo de la imagen) -->
+    <style>
+      .blanqura{ color:white; }
+      .blanqura-tit{ font-weight:bold;color:white;}
+    </style>
     <div class="bottom-bar d-flex flex-wrap justify-content-between align-items-center">
+      <span class="blanqura-tit">Nro. :</span><span class="blanqura">WHATSAPP DE BELLAROSSE : 991629237</span><br>
+      <span class="blanqura-tit">Correo :</span><span class="blanqura">bellarosse176@gmail.com</span><br>
+      <span class="blanqura-tit">Direccion :</span><span class="blanqura">MZA. H LOTE 19 A.H. ENMANUEL PROV. CONST. DEL CALLAO - PROV. CONT. DEL CALLAO - VENTANILLA</span><br>
       <span>© 2026 Bella Rose · Todos los derechos reservados</span>
     </div>
 

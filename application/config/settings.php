@@ -4,7 +4,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // Datos de la tienda
 $config['tienda_nombre']    = 'Bella Rosse';
 $config['tienda_slogan']    = 'Ropa y accesorios para todos';
-$config['tienda_email']     = 'contacto@mitienda.com';
+
+// Correo que RECIBE los avisos de pedidos nuevos (ver Pago::_enviar_correo_pedido)
+$config['tienda_email']     = 'flaviomorenoz@gmail.com';
+// Cuenta SMTP que figura como remitente (debe coincidir con smtp_user de config/email.php)
+$config['email_remitente']  = 'flaviomorenoz@gmail.com';
 
 // Datos del proveedor para el Libro de Reclamaciones (Ley N° 29571)
 // Completar con los datos reales del negocio registrado en SUNAT.
