@@ -58,6 +58,8 @@ $config['csrf_regenerate'] = TRUE;
 $config['csrf_exclude_uris'] = array(
     'carrito/agregar',
     'carrito/actualizar_datos_cliente/\d+',
+    // Culqi Checkout envía el token por fetch (ver Carrito::recibe_token)
+    'carrito/recibe_token',
     'chat/preguntar',
     'chat/solicitar_vendedora',
     'chat/enviar',

@@ -28,10 +28,11 @@ class Pedido_model extends CI_Model {
             'dni'             => $datos['dni'],
             'nombres'         => $datos['nombres'],
             'observaciones'   => isset($datos['observaciones']) ? $datos['observaciones'] : '',
-            'archivo'         => $datos["archivo"]
+            'archivo'         => $datos["archivo"],
+            'correo'          => $datos["correo"]
         );
         $this->db->insert('pedidos_web', $insert);
-        
+        traza("Agrega pedido_web...");
         return $this->db->insert_id();
     }
 
@@ -42,11 +43,22 @@ class Pedido_model extends CI_Model {
             'talla'           => $datos['talla'],
             'cantidad'        => $datos['cantidad'],
             'precio_unitario' => $datos['precio_unitario'],
+            'id_unidad'       => $this->getIdUnidad($datos['unidad'])
         );
         $this->db->insert('detalle_pedido', $insert);
+        traza("Agrega detalle pedido...");
+    }
+
+    public function getIdUnidad($unidad){ // obtiene id_unidad
+        $query = $this->db->select("id")->from("tec_unidades")->where("descrip",$unidad)->get();
+        foreach($query->result() as $r){
+            return (int)$r->id;
+        }
+        return 0;
     }
 
     public function actualizar_pago($id, $estado_pago, $codigo_transaccion = '') {
+        traza("Actualiza Pedido...");
         $this->db->where('id', (int)$id);
         $this->db->update('pedidos_web', array(
             'estado_pago'          => $estado_pago,
@@ -89,10 +101,11 @@ class Pedido_model extends CI_Model {
     }
 
     public function get_detalle($id_pedido) {
-        $this->db->select('d.*, pr.name AS nombre, pr.imagen AS imagen_url, c.name AS categoria');
+        $this->db->select('d.*, pr.name AS nombre, pr.imagen AS imagen_url, c.name AS categoria, e.descrip unidades');
         $this->db->from('detalle_pedido d');
         $this->db->join('tec_products pr', 'pr.id = d.id_producto', 'left');
         $this->db->join('tec_categories c', 'c.id = pr.category_id', 'left');
+        $this->db->join('tec_unidades e', 'd.id_unidad = e.id', 'left');
         $this->db->where('d.id_pedido', (int)$id_pedido);
         return $this->db->get()->result();
     }

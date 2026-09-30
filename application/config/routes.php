@@ -19,6 +19,8 @@ $route['carrito/quitar/(:num)'] = 'carrito/quitar/$1';
 $route['carrito/actualizar'] = 'carrito/actualizar';
 $route['carrito/vaciar'] = 'carrito/vaciar';
 $route['carrito/actualizar_datos_cliente/(:num)'] = 'carrito/actualizar_datos_cliente/$1';
+// Culqi: recibe el token generado por el checkout JS (ver Carrito::recibe_token)
+$route['carrito/recibe_token'] = 'carrito/recibe_token';
 
 // Libro de Reclamaciones (Ley N° 29571 - D.S. N° 011-2011-PCM - D.S. N° 004-2024-PCM)
 $route['libro-reclamaciones']               = 'libro_reclamaciones/index';

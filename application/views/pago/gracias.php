@@ -55,6 +55,7 @@
                             <tr>
                                 <th>Producto</th>
                                 <th class="text-center">Talla</th>
+                                <th class="text-center">Unidad</th>
                                 <th class="text-center">Cant.</th>
                                 <th class="text-end">Subtotal</th>
                             </tr>
@@ -64,6 +65,7 @@
                             <tr>
                                 <td><?php echo htmlspecialchars($d->nombre); ?></td>
                                 <td class="text-center"><?php echo htmlspecialchars($d->talla); ?></td>
+                                <td class="text-center"><?php echo htmlspecialchars($d->unidades); ?></td>
                                 <td class="text-center"><?php echo $d->cantidad; ?></td>
                                 <td class="text-end">
                                     <?php echo $this->config->item('moneda_simbolo'); ?>
@@ -74,7 +76,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="fw-bold">
-                                <td colspan="3">Total</td>
+                                <td colspan="4">Total</td>
                                 <td class="text-end precio">
                                     <?php echo $this->config->item('moneda_simbolo'); ?>
                                     <?php echo number_format($pedido->total, 2); ?>

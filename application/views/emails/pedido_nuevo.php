@@ -61,6 +61,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <tr style="background:#f7f7f7;">
                                     <th align="left"   style="border-bottom:1px solid #dddddd;">Producto</th>
                                     <th align="center" style="border-bottom:1px solid #dddddd;">Talla</th>
+                                    <th align="center" style="border-bottom:1px solid #dddddd;">Unidad</th>
                                     <th align="center" style="border-bottom:1px solid #dddddd;">Cant.</th>
                                     <th align="right"  style="border-bottom:1px solid #dddddd;">P. unit.</th>
                                     <th align="right"  style="border-bottom:1px solid #dddddd;">Subtotal</th>
@@ -69,13 +70,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <tr>
                                     <td style="border-bottom:1px solid #eeeeee;"><?php echo htmlspecialchars($item['nombre'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td align="center" style="border-bottom:1px solid #eeeeee;"><?php echo htmlspecialchars($item['talla'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td align="center" style="border-bottom:1px solid #eeeeee;"><?php echo htmlspecialchars($item['unidad'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td align="center" style="border-bottom:1px solid #eeeeee;"><?php echo (int)$item['cantidad']; ?></td>
                                     <td align="right"  style="border-bottom:1px solid #eeeeee;"><?php echo $moneda . ' ' . number_format($item['precio'], 2); ?></td>
                                     <td align="right"  style="border-bottom:1px solid #eeeeee;"><?php echo $moneda . ' ' . number_format($item['precio'] * $item['cantidad'], 2); ?></td>
                                 </tr>
                                 <?php endforeach; ?>
                                 <tr>
-                                    <td colspan="4" align="right" style="padding-top:10px; font-weight:bold;">Total</td>
+                                    <td colspan="5" align="right" style="padding-top:10px; font-weight:bold;">Total</td>
                                     <td align="right" style="padding-top:10px; font-weight:bold; font-size:15px;"><?php echo $moneda . ' ' . number_format($total, 2); ?></td>
                                 </tr>
                             </table>

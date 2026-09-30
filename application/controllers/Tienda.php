@@ -74,6 +74,7 @@ class Tienda extends CI_Controller {
 
     public function detalle($id) {
         $id = (int)$id;
+        
         $producto = $this->Producto_model->get_por_id($id);
 
         if (!$producto) {
@@ -99,7 +100,8 @@ class Tienda extends CI_Controller {
             'tallas'        => $tallas,
             'relacionados'  => $relacionados,
             'carrito_count' => $this->_carrito_count(),
-            'descripcion'   => $this->db->query("select trim(descripcion) descripcion from tec_products where id = ?",$id)->row()->descripcion
+            'descripcion'   => $this->db->query("select trim(descripcion) descripcion from tec_products where id = ?",$id)->row()->descripcion,
+            'precios'       => $this->db->where("id_producto",$id)->get("tec_precios")->result()
         );
 
         $this->load->view('layouts/header', $data);
@@ -144,7 +146,7 @@ class Tienda extends CI_Controller {
                 isset($p->imagen3) ? $p->imagen3 : '',
             ), function($img) { return !empty($img); }));
             $p->imagenes = !empty($imgs) ? $imgs : array($p->imagen_url);
-            traza("_adjuntar_imagenes id={$p->id} imagenes=" . implode(' | ', $p->imagenes));
+            //traza("_adjuntar_imagenes id={$p->id} imagenes=" . implode(' | ', $p->imagenes));
         }
     }
 

@@ -107,10 +107,11 @@ class Pago extends CI_Controller {
             'dni'             => $this->input->post('dni', TRUE),
             'nombres'         => $this->input->post('nombres', TRUE),
             'observaciones'   => $this->input->post('observaciones', TRUE),
-            'archivo'         => $archivo_final
+            'archivo'         => $archivo_final,
+            'correo'          => $this->input->post('correo', true)
         );
 
-        //traza(print_r($datos_pedido,true));
+        traza(print_r($datos_pedido,true));
 
         $id_pedido = $this->Pedido_model->crear($datos_pedido);
 
@@ -162,7 +163,7 @@ class Pago extends CI_Controller {
                 );
 
                 // Destinatario
-                $mail->addAddress('bellarosse176@gmail.com');
+                //$mail->addAddress('bellarosse176@gmail.com');
                 $mail->addAddress('flaviomorenoz@hotmail.com');
 
                 // Contenido

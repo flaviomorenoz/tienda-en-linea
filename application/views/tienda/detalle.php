@@ -1,3 +1,38 @@
+<?php
+    $mi_precio = 0;
+
+    $x_unidad = $x_docena = $x_media_docena = "";
+    $hay_modalidad = false;
+
+    foreach($precios as $r){ 
+        if($r->id_unidad == '2'){ // docena
+            $mi_precio = $r->precio;
+            $x_docena = '1';
+        }
+
+        if($r->id_unidad == '3'){ // media docena
+            //$mi_precio = $r->precio;
+            $x_media_docena = '1';
+        }
+
+        $hay_modalidad = true;
+    }
+
+    // unidades
+    $cSql = "select a.id, trim(a.descrip) descrip, a.conversion, b.precio from tec_unidades a inner join tec_precios b on a.id=b.id_unidad where id_producto = ?";
+    $result   = $this->db->query($cSql, $producto->id)->result_array();
+    $ar_u     = $this->fm->conver_dropdown($result, "descrip", "descrip", array(''=>'Seleccione'));
+
+
+    echo "<script>\n";
+    echo "let ar2 = [];\n"; 
+    foreach($result as $r){
+        //echo "let mi_descrip = '" . $r["descrip"] . "';\n";
+        //echo "let mi_precio = " . $r["precio"] . ";\n";
+        echo "ar2['" . $r["descrip"] . "'] = " . $r["precio"] . ";\n";
+    }
+    echo "</script>\n";
+?>
 <div class="container">
 
     <style>
@@ -91,7 +126,7 @@
             <div class="precio-grande mb-3">
                 <span class="display-6 fw-bold text-dark">
                     <?php echo $this->config->item('moneda_simbolo'); ?>
-                    <?php echo number_format($producto->precio, 2); ?>
+                    <span id="precio"><?php echo number_format($mi_precio, 2); ?></span>
                 </span>
             </div>
             <?php endif; ?>
@@ -128,29 +163,14 @@
 
                 <!-- Cantidad -->
                 <div class="mb-4">
-                    <?php
-                        // Modalidades de venta según la tabla tec_products:
-                        // solo se muestra la opción si su campo correspondiente es '1'.
-                        $x_unidad       = isset($producto->x_unidad)       ? trim($producto->x_unidad)       : '';
-                        $x_docena       = isset($producto->x_docena)       ? trim($producto->x_docena)       : '';
-                        $x_media_docena = isset($producto->x_media_docena) ? trim($producto->x_media_docena) : '';
-                        $hay_modalidad  = ($x_unidad === '1' || $x_docena === '1' || $x_media_docena === '1');
-                    ?>
                     <?php if ($hay_modalidad): ?>
                     <div style="border-style:none; border-color:red;display:inline-block;">
                         <label class="form-label fw-semibold">Unidad</label>
                         <div class="input-group" style="max-width:160px;">
-                            <select name="select_unidad" id="select_unidad">
-                                <?php if ($x_unidad === '1'): ?>
-                                <option value="UNIDAD">Unidad</option>
-                                <?php endif; ?>
-                                <?php if ($x_docena === '1'): ?>
-                                <option value="DOCENA">Docena</option>
-                                <?php endif; ?>
-                                <?php if ($x_media_docena === '1'): ?>
-                                <option value="MEDIA DOCENA">1/2 Docena</option>
-                                <?php endif; ?>
-                            </select>
+                            <?php
+                                echo form_dropdown('select_unidad', $ar_u, 'DOCENA','class="form-control" id="select_unidad" required="required" onchange="coloca_precio(this)"');
+                            ?>
+                            <input type="hidden" name="hdn_precio" id="hdn_precio" value="">
                         </div>
                     </div>
                     <?php endif; ?>
@@ -275,4 +295,19 @@ function cambiarCantidad(delta) {
     document.getElementById("cantidad").value = valor_real
     */
 }
+
+function coloca_precio(obj){
+    document.getElementById("precio").innerHTML = ar2[obj.value]
+    document.getElementById("hdn_precio").value = ar2[obj.value]
+    //alert("Sois bendecido")
+}
+
+function dispara_change(){
+    let event = new Event('change');  // Create a new 'change' event
+    let obj = document.getElementById("select_unidad")
+    obj.dispatchEvent(event); // Dispatch it.
+}
+
+setTimeout(dispara_change,600);
+
 </script>
