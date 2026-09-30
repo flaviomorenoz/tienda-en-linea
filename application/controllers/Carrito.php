@@ -429,4 +429,28 @@ class Carrito extends CI_Controller {
             'redirect'  => base_url('pedido/gracias/' . $id_pedido),
         ));
     }
+
+    public function crear_orden() {
+        $payload = file_get_contents('php://input');   // string JSON tal cual
+
+        $ch = curl_init('https://api.culqi.com/v2/orders');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'Authorization: Bearer '.getenv('CULQI_LLAVE_PRIVADA'),
+            ],
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        echo $this->output
+            ->set_status_header($httpCode)
+            ->set_content_type('application/json')
+            ->set_output($response);
+    }
 }

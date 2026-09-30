@@ -900,9 +900,8 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
             }
         });
 
-        xhr.open("POST", "https://api.culqi.com/v2/orders");
-        xhr.setRequestHeader("Authorization", "Bearer <?= getenv('CULQI_LLAVE_PRIVADA') ?>");
-        xhr.setRequestHeader("content-type", "application/json");
+        xhr.open("POST", "<?= base_url() ?>carrito/crear_orden");
+
 
         xhr.send(data);
         
