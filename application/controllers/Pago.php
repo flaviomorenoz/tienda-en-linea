@@ -340,4 +340,215 @@ class Pago extends CI_Controller {
         if (!is_array($carrito)) return 0;
         return array_sum(array_column($carrito, 'cantidad'));
     }
+
+    public function preparar(){ // SE LLENA UN FORMULARIO PARA LUEGO ENVIAR DICHOS DATOS A CREAR LA ORDEN (ORDER)
+        $data = array(
+            'titulo'        => 'Mi Carrito - ' . $this->config->item('tienda_nombre'),
+            'total'         => $this->input->post("hdn_total_")
+        );
+        
+        $this->load->view('layouts/header', $data);
+        $this->load->view('tienda/preparar', $data);
+        $this->load->view('layouts/footer');
+    }
+
+    /**
+     * Crea la orden en Culqi antes de abrir su checkout
+     * (PAGAR -> crear_orden -> Culqi.open() -> carrito/recibe_token).
+     * Docs: https://apidocs.culqi.com/#tag/Ordenes/operation/crear-orden
+     *
+     * Espera un POST form-urlencoded desde views/tienda/carrito.php:
+     *   - csrf_token : lo valida CI antes de entrar aquí (config.php: csrf_protection = TRUE)
+     *   - payload    : JSON con client_details / metadata / expiration_date
+     *
+     * El amount NO se toma del cliente: se recalcula con el carrito de la sesión
+     * (Carrito::_calcular_total), igual que en recibe_token(), para que lo mostrado,
+     * lo guardado en sesión y lo que se cobrará coincidan.
+     *
+     * Responde SIEMPRE JSON (el JS lee responseText y espera el campo ->id).
+     */
+    public function crear_orden() {
+        /*
+        $this->output->set_content_type('application/json');
+        traza("Carrito->crear_orden: inicio");
+
+        if ($this->input->method() !== 'post') {
+            $this->output->set_status_header(405);
+            echo json_encode(array('error' => 'Método no permitido.'));
+            return;
+        }
+        */
+
+        // Llave privada de Culqi (index.php la carga desde application/config/.env)
+        $SECRET_KEY = getenv('CULQI_LLAVE_PRIVADA');
+        if ($SECRET_KEY === FALSE || $SECRET_KEY === '') {
+            $SECRET_KEY = isset($_SERVER['CULQI_LLAVE_PRIVADA']) ? $_SERVER['CULQI_LLAVE_PRIVADA'] : '';
+        }
+        if ($SECRET_KEY === '') {
+            traza("Carrito->crear_orden: falta CULQI_LLAVE_PRIVADA");
+            $this->output->set_status_header(500);
+            echo json_encode(array('error' => 'La pasarela no está configurada (falta la llave privada).'));
+            return;
+        }
+
+        /*
+            $datos = json_decode((string)$this->input->post('payload'), TRUE);
+            if (!is_array($datos)) {
+                traza("Carrito->crear_orden: payload inválido");
+                $this->output->set_status_header(400);
+                echo json_encode(array('error' => 'No se recibió la orden a preparar.'));
+                return;
+            }
+
+            $carrito = $this->session->userdata('carrito') ?: array();
+            if (empty($carrito)) {
+                $this->output->set_status_header(400);
+                echo json_encode(array('error' => 'Tu carrito está vacío.'));
+                return;
+            }
+
+
+            // Monto real del carrito en la sesión (en céntimos, como lo exige Culqi)
+            $total  = $this->_calcular_total($carrito);
+            $amount = (int)round($total * 100);
+
+            // Vigencia: la del cliente si es un timestamp futuro válido; si no, un día
+            $expiracion = isset($datos['expiration_date']) ? (int)$datos['expiration_date'] : 0;
+            if ($expiracion < time() + 300) {
+                $expiracion = time() + 86400;
+            }
+
+            // Número de orden único (Culqi no acepta order_number repetido en el comercio)
+            $order_number = 'PED-' . date('YmdHis') . '-' . mt_rand(1000, 9999);
+            $payload = array(
+                "amount"          => $amount,
+                "currency_code"   => "PEN",
+                "description"     => "Pedido tienda en línea - " . $this->config->item('tienda_nombre'),
+                "order_number"    => $order_number,
+                "expiration_date" => $expiracion,
+                "confirm"         => true,
+            );
+
+            // Datos del titular capturados en el checkout del carrito
+            $cliente = (isset($datos['client_details']) && is_array($datos['client_details']))
+                     ? $datos['client_details']
+                     : array();
+
+            if (!empty($cliente)) {
+                $payload['client_details'] = array(
+                    'first_name'   => isset($cliente['first_name'])   ? (string)$cliente['first_name']   : '',
+                    'last_name'    => isset($cliente['last_name'])    ? (string)$cliente['last_name']    : '',
+                    'email'        => isset($cliente['email'])        ? (string)$cliente['email']        : '',
+                    'phone_number' => isset($cliente['phone_number']) ? (string)$cliente['phone_number'] : '',
+                );
+            }
+
+            $metadata = (isset($datos['metadata']) && is_array($datos['metadata'])) ? $datos['metadata'] : array();
+            if (isset($metadata['dni']) && trim((string)$metadata['dni']) !== '') {
+                $payload['metadata'] = array('dni' => trim((string)$metadata['dni']));
+            }
+            traza("Carrito->crear_orden: total=$total amount=$amount order_number=$order_number");
+        */
+
+        $fecus = date("YmdHi");
+
+        // EXPIRATION
+        $fecha = new DateTime();
+        $fecha->modify('+1 day');
+        $fechin = $fecha->format('d-m-Y H:i:s');
+        $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
+
+        $nombre         = $this->input->post("nombres");
+        $apellido       = $this->input->post("apellidos");
+        $correo         = $this->input->post("correo");
+        $fono           = $this->input->post("celular");
+        $dni            = $this->input->post("dni");
+        $total_gral     = $this->input->post("total") * 100;
+
+        $payload = '{
+          "amount": ' . $total_gral . ',
+          "currency_code": "PEN",
+          "description": "Varios productos",
+          "order_number": "#id-' . $fecus . '",
+          "expiration_date": "' . $timestamp . '",
+          "client_details": {
+            "first_name": "'.$nombre.'",
+            "last_name": "'.$apellido.'",
+            "email": "'.$correo.'",
+            "phone_number": "'.$fono.'"
+          },
+          "confirm": true,
+          "metadata": {
+            "dni": "'.$dni.'"
+          }
+        }';
+
+        // Crear la orden en Culqi ---------------------------------------------
+        $ch = curl_init('https://api.culqi.com/v2/orders');
+
+        curl_setopt_array($ch, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_HTTPHEADER     => array(
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $SECRET_KEY,
+                'Accept: application/json'
+            ),
+            CURLOPT_TIMEOUT        => 30,
+        ));
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            $error_curl = curl_error($ch);
+            curl_close($ch);
+            traza("Carrito->crear_orden: error cURL -> " . $error_curl);
+            log_message('error', 'Carrito::crear_orden: error cURL: ' . $error_curl);
+            $this->output->set_status_header(502);
+            echo json_encode(array('error' => 'No se pudo contactar a la pasarela de pago. Intente nuevamente.'));
+            return;
+        }
+
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        $result = json_decode($response, true);
+        //traza("Carrito->crear_orden: HTTP $httpCode -> " . print_r($result, true));
+
+        $this->output->set_status_header($httpCode);
+
+        if (!is_array($result) || $httpCode >= 400) {
+            log_message('error', 'Carrito::crear_orden: HTTP ' . $httpCode . ': ' . $response);
+            echo $response; // Culqi devuelve user_message / merchant_message
+            return;
+        }
+
+        //traza("Carrito->crear_orden: orden creada " . $result['id'] . " (order_number=$order_number)");
+        //echo json_encode(array('id' => $result['id']));
+
+        $data = array(
+            'titulo'        => 'Mi Carrito - ' . $this->config->item('tienda_nombre'),
+            'total'         => $this->input->post("hdn_total_"),
+            'order'         => $result['id']
+        );
+        
+        $this->load->view('layouts/header', $data);
+        $this->load->view('tienda/preparar', $data);
+        $this->load->view('layouts/footer');
+    }
+
+    /*
+    public function ver_pasarela(){
+        $data = array(
+            'titulo'        => 'Mi Carrito - ' . $this->config->item('tienda_nombre'),
+            'total'         => $this->input->post("hdn_total_")
+        );
+        
+        $this->load->view('layouts/header', $data);
+        $this->load->view('tienda/pasarela', $data);
+        $this->load->view('layouts/footer');
+    }
+    */
+
 }
