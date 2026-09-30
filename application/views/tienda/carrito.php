@@ -177,11 +177,43 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
     </form>
 
     <script>
+        /* Botón "Inicia Pago": envía el formulario a pago/preparar. El total NO viaja en el
+           formulario (Pago::preparar lo recalcula con el carrito de la sesión): solo se
+           guardan antes las cantidades editadas y sin guardar, para que lo que se muestra
+           y lo que se cobrará coincidan. */
         function valido_preparar(){
-            let total = document.getElementById("resumen-total").innerHTML
-            document.getElementById("hdn_total_").value = total
-            //alert(`resumen-total: ${total}`)
-            return true;
+            if (!hay_cambios_cantidad()) return true;
+
+            guardar_cambios_y_continuar();
+            return false;
+        }
+
+        /* Guarda el carrito (carrito/actualizar) con el token CSRF vigente y, al terminar,
+           continúa con el envío del formulario hacia pago/preparar. */
+        function guardar_cambios_y_continuar(){
+            const formulario = document.querySelector('form[action$="carrito/actualizar"]');
+            if (!formulario) return;
+
+            const datos = new FormData(formulario);
+            datos.set(csrf_token_name, token_csrf_actual());
+
+            fetch(formulario.action, {
+                method: 'POST',
+                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                body: datos
+            })
+            .then(function(response){ return response.text(); })
+            .then(function(html){
+                // carrito/actualizar rota el token CSRF: se refresca antes de enviar
+                actualizar_token_csrf(html);
+                marcar_cantidades_originales();
+
+                document.getElementById('form_preparar').submit();
+            })
+            .catch(function(error){
+                console.error('No se pudieron guardar las cantidades:', error);
+                alert('No se pudieron guardar las cantidades del carrito. Intente nuevamente.');
+            });
         }
     </script>
     
@@ -199,7 +231,6 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
                 </td>
             </tr>
         </table>
-        <input type="hidden" name="hdn_total_" id="hdn_total_" value="0">
     <?= form_close(); ?>
     
     <?php endif; ?>
@@ -208,6 +239,10 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
 </div>
 <script>
 
+
+    // Names del CSRF de CodeIgniter (config.php: csrf_token_name / csrf_cookie_name)
+    const csrf_token_name  = '<?php echo $this->security->get_csrf_token_name(); ?>';
+    const csrf_cookie_name = '<?php echo $this->config->item('csrf_cookie_name'); ?>';
 
     // ¿El cliente cambió alguna cantidad respecto a la que se pintó al cargar la página?
     function hay_cambios_cantidad(){
@@ -294,13 +329,34 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
     }
 
 
-    function ver_modal_paguito(){
-        elemento = document.getElementById("form-pagos");
-        elemento.style.display = "block";
-        document.getElementById("tipo_pago").value = "0";
+    /* Resumen del carrito en vivo: subtotal de cada línea (cantidad x precio) y totales.
+       Es solo informativo: el monto que se cobra lo calcula el servidor con el carrito de
+       la sesión (ver Carrito::_calcular_total y Pago::crear_orden). */
+    function recalcular_resumen(){
+        let suma = 0;
+
+        document.querySelectorAll('tr[data-precio]').forEach(function(tr){
+            const precio = parseFloat(tr.getAttribute('data-precio')) || 0;
+            const input  = tr.querySelector('input[name^="cantidad"]');
+
+            let cantidad = input ? parseInt(input.value, 10) : 1;
+            if (isNaN(cantidad) || cantidad < 1) cantidad = 1;
+            if (cantidad > 99) cantidad = 99;
+
+            const subtotal = precio * cantidad;
+            suma += subtotal;
+
+            const celda = tr.querySelector('.subtotal-linea');
+            if (celda) celda.textContent = subtotal.toFixed(2);
+        });
+
+        // Las celdas del resumen muestran solo el número (el símbolo va fuera)
+        const resumen_subtotal = document.getElementById('resumen-subtotal');
+        const resumen_total    = document.getElementById('resumen-total');
+
+        if (resumen_subtotal) resumen_subtotal.textContent = suma.toFixed(2);
+        if (resumen_total)    resumen_total.textContent    = suma.toFixed(2);
     }
-
-
 
     // ---- Resumen del carrito en vivo: subtotal = cantidad x precio mostrado ----------
     document.querySelectorAll('input[name^="cantidad"]').forEach(function(input){

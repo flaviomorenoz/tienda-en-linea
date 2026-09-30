@@ -51,6 +51,8 @@ $route['admin/whatsapp/mensajes/(:any)'] = 'whatsapp/mensajes/$1';
 
 // Pago y checkout
 $route['checkout'] = 'pago/checkout';
+$route['pago/preparar'] = 'pago/preparar';
+$route['pago/crear_orden'] = 'pago/crear_orden';
 $route['pago/procesar'] = 'pago/procesar';
 $route['pedido/gracias/(:num)'] = 'pago/gracias/$1';
 $route['pedido/cancelado'] = 'pago/cancelado';

@@ -1,11 +1,31 @@
-<!-- SE ENTREGA LA VARIABLE total -->
-<div id="form-pagos" class="row" style="display:block">
-    <div class="col-sm-12">    
-        <?= form_open_multipart("pago/crear_orden", 'class="validation" name="form-checkout" id="form-checkout"'); ?>
+<?php
+/**
+ * Paso 1 del pago: datos de envío + apertura de la pasarela de Culqi (Yape).
+ *
+ * Flujo completo (ver application/controllers/Pago.php):
+ *   PAGAR -> POST pago/crear_orden    (crea la ORDEN en Culqi; sin order el checkout
+ *                                      no muestra Yape)                  -> settings.order
+ *         -> Culqi.open()             (celular + código de aprobación de Yape)
+ *         -> POST carrito/recibe_token (crea el CARGO /v2/charges)
+ *         -> redirect pago/procesar   (registra el pedido pagado)
+ *
+ * Variables que envía Pago::preparar(): $carrito y $total (recalculado en el servidor
+ * con el carrito de la sesión, nunca con lo que envíe el navegador).
+ */
+$carrito = isset($carrito) ? $carrito : array();
+$total   = isset($total) ? (float)$total : 0;
+
+$correo_tienda = trim((string)$this->config->item('tienda_email'));
+if (!filter_var($correo_tienda, FILTER_VALIDATE_EMAIL)) {
+    $correo_tienda = 'flaviomorenoz@gmail.com';
+}
+?>
+<div id="form-pagos" class="row">
+    <div class="col-sm-12">
+        <?= form_open_multipart("pago/crear_orden", 'name="form-checkout" id="form-checkout"'); ?>
             <div class="row g-4">
-                <!-- Columna izquierda: datos personales y pago -->
+                <!-- Columna izquierda: datos de envío -->
                 <div class="col-lg-7">
-                    <!-- Datos personales -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-white fw-semibold border-0 pt-3">
                             <i class="bi bi-person-circle me-2 text-dark"></i>Datos de envío
@@ -13,173 +33,188 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-5">
-                                    <label class="form-label">DNI <span class="text-danger">*</span></label>
-                                    <input type="text" name="dni" id="dni" class="form-control <?php echo form_error('dni') ? 'is-invalid' : ''; ?>"
-                                        placeholder="" maxlength="15"
+                                    <label class="form-label" for="dni">DNI <span class="text-danger">*</span></label>
+                                    <input type="text" name="dni" id="dni" class="form-control"
+                                        inputmode="numeric" maxlength="8" placeholder="12345678"
                                         value="<?php echo set_value('dni'); ?>" required>
-                                    <div class="invalid-feedback"><?php echo form_error('dni'); ?></div>
+                                    <div class="invalid-feedback">El DNI debe tener exactamente 8 dígitos numéricos.</div>
                                 </div>
                                 <div class="col-md-5">
-                                    <label class="form-label">Nombres completos <span class="text-danger">*</span></label>
-                                    <input type="text" name="nombres" id="nombres" class="form-control <?php echo form_error('nombres') ? 'is-invalid' : ''; ?>"
-                                        placeholder="Juan Pérez García"
+                                    <label class="form-label" for="nombres">Nombres <span class="text-danger">*</span></label>
+                                    <input type="text" name="nombres" id="nombres" class="form-control"
+                                        placeholder="Juan" maxlength="100"
                                         value="<?php echo set_value('nombres'); ?>" required>
-                                    <div class="invalid-feedback"><?php echo form_error('nombres'); ?></div>
+                                    <div class="invalid-feedback">Los nombres son requeridos.</div>
                                 </div>
                                 <div class="col-md-5">
-                                    <label class="form-label">Apellidos<span class="text-danger">*</span></label>
-                                    <input type="text" name="apellidos" id="apellidos" class="form-control <?php echo form_error('apellidos') ? 'is-invalid' : ''; ?>"
-                                        placeholder="Juan Pérez García"
+                                    <label class="form-label" for="apellidos">Apellidos <span class="text-danger">*</span></label>
+                                    <input type="text" name="apellidos" id="apellidos" class="form-control"
+                                        placeholder="Pérez García" maxlength="100"
                                         value="<?php echo set_value('apellidos'); ?>" required>
-                                    <div class="invalid-feedback"><?php echo form_error('apellidos'); ?></div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">Dirección de envío <span class="text-danger">*</span></label>
-                                    <input type="text" name="direccion_envio" id="direccion_envio"
-                                        class="form-control <?php echo form_error('direccion_envio') ? 'is-invalid' : ''; ?>"
-                                        placeholder="sitio..."
-                                        value="<?php echo set_value('direccion_envio'); ?>" required>
-                                    <div class="invalid-feedback"><?php echo form_error('direccion_envio'); ?></div>
+                                    <div class="invalid-feedback">Los apellidos son requeridos.</div>
                                 </div>
                                 <div class="col-md-5">
-                                    <label class="form-label">Email<span class="text-danger">*</span></label>
-                                    <input type="email" name="correo" id="correo"
-                                        class="form-control <?php echo form_error('correo') ? 'is-invalid' : ''; ?>"
-                                        placeholder="micorreo@" maxlength="80"
+                                    <label class="form-label" for="correo">Email <span class="text-danger">*</span></label>
+                                    <input type="email" name="correo" id="correo" class="form-control"
+                                        placeholder="micorreo@dominio.com" maxlength="80"
                                         value="<?php echo set_value('correo'); ?>" required>
-                                    <div class="invalid-feedback"><?php echo form_error('correo'); ?></div>
+                                    <div class="invalid-feedback">Ingrese un correo electrónico válido.</div>
                                 </div>
                                 <div class="col-md-5">
-                                    <label class="form-label">Celular <span class="text-danger">*</span></label>
-                                    <input type="tel" name="celular" id="celular"
-                                        class="form-control <?php echo form_error('celular') ? 'is-invalid' : ''; ?>"
-                                        placeholder="987654321" maxlength="20"
+                                    <label class="form-label" for="celular">Celular <span class="text-danger">*</span></label>
+                                    <input type="tel" name="celular" id="celular" class="form-control"
+                                        inputmode="numeric" maxlength="15" placeholder="987654321"
                                         value="<?php echo set_value('celular'); ?>" required>
-                                    <div class="invalid-feedback"><?php echo form_error('celular'); ?></div>
+                                    <div class="invalid-feedback">El celular es requerido (solo números).</div>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label">Referencia / Observaciones</label>
+                                    <label class="form-label" for="direccion_envio">Dirección de envío <span class="text-danger">*</span></label>
+                                    <input type="text" name="direccion_envio" id="direccion_envio" class="form-control"
+                                        placeholder="Av. Ejemplo 123, Dpto. 201 - Referencia"
+                                        value="<?php echo set_value('direccion_envio'); ?>" required>
+                                    <div class="invalid-feedback">La dirección de envío es requerida.</div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" for="observaciones">Referencia / Observaciones</label>
                                     <textarea name="observaciones" id="observaciones" class="form-control" rows="2"
                                             placeholder="Cerca al parque, piso 2, etc."><?php echo set_value('observaciones'); ?></textarea>
-                                    total:<input type="text" name="total" value="<?= $total ?>">
                                 </div>
                             </div>
-                            <div class="row g-3" style="margin-top: 10px;">
-                                <div class="col-10 text-center">
-                                    <?php /* El cobro real se hace con el botón PAGAR (pasarela Culqi).
-                                             Se desactiva este botón para NO usar el flujo de pago
-                                             simulado de Pago::procesar (Pasarela_model::simular_pago),
-                                             que marcaba el pedido como "Pagado" sin cobrar.
-                                    <button type="button" onclick="previo(0)" class="btn btn-dark btn-lg">
-                                        <i class="bi bi-lock-fill me-2"></i>Pagar ahora
-                                    </button>
-                                    */ ?>
-                                    <p class="text-muted small mb-0">
-                                        <i class="bi bi-shield-lock me-1"></i>
-                                        Al pulsar <strong>PAGAR</strong> se abrirá la pasarela segura de Culqi.
-                                    </p>
-                                    <input type="hidden" name="tipo_pago" id="tipo_pago" value="1">
-                                </div>
-                                <div class="col-2">
-                                    
-                                </div>
+                            <p class="text-muted small mt-3 mb-0">
+                                <i class="bi bi-shield-lock me-1"></i>
+                                Al pulsar <strong>PAGAR</strong> se abrirá la pasarela segura de Culqi
+                                para pagar con <strong>Yape</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna derecha: resumen del pedido (total del servidor) -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-dark text-white fw-semibold">
+                            <i class="bi bi-receipt me-2"></i>Resumen del pedido
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-3">
+                                <?php foreach ($carrito as $item): ?>
+                                <li class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="text-muted small">
+                                        <?php echo htmlspecialchars($item['nombre'], ENT_QUOTES, 'UTF-8'); ?>
+                                        <br>Talla <?php echo htmlspecialchars($item['talla'], ENT_QUOTES, 'UTF-8'); ?>
+                                        x <?php echo (int)$item['cantidad']; ?>
+                                    </span>
+                                    <span class="small text-nowrap">
+                                        <?php echo $this->config->item('moneda_simbolo'); ?>
+                                        <?php echo number_format($item['precio'] * $item['cantidad'], 2); ?>
+                                    </span>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Envío</span>
+                                <span class="text-success">A coordinar</span>
                             </div>
-                            <div class="row g-3" style="margin-top: 10px;">
-                                <img src="" id="img_pago" class="img-fluid" style="display:none; max-width: 200px; margin: 0 auto;">
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Total</span>
+                                <span><?php echo $this->config->item('moneda_simbolo'); ?> <?php echo number_format($total, 2); ?></span>
                             </div>
                         </div>
                     </div>
 
-                </div>
-
-                <!-- Columna derecha: resumen del pedido -->
-            </div>
-            <div class="row g-4">
-                <div class="col-sm-5 text-center">
-                </div>
-                <div class="col-sm-2 text-center">
-                    <button type="submit" id="btn_pagar" class="btn btn-primary btn-sm" style="padding-top:7px;">
+                    <div class="text-center mt-3">
+                        <button type="button" id="btn_pagar" class="btn btn-primary btn-lg">
                             <i class="bi bi-arrow-repeat me-1"></i>PAGAR
-                    </button>
-                </div>
-                <div class="col-sm-5 text-center">
+                        </button>
+                        <br>
+                        <a href="<?php echo base_url('carrito'); ?>" class="btn btn-link btn-sm mt-2">
+                            <i class="bi bi-arrow-left me-1"></i>Volver al carrito
+                        </a>
+                    </div>
                 </div>
             </div>
         <?= form_close(); ?>
-    </div> <!-- del col -->
-</div> <!-- del row --> 
-
+    </div>
+</div>
 <script src="https://js.culqi.com/checkout-js"></script>
 <script>
-    // Total del carrito calculado por el servidor (Carrito::_calcular_total).
-    // De aquí en adelante se mantiene en vivo: cantidad x precio mostrado en cada línea.
-    let total_carrito = <?php echo (float) $total; ?>;
-
-    // Nombres del campo y de la cookie CSRF (config.php: csrf_token_name / csrf_cookie_name)
+(function(){
+    // --------------------------------------------------------------------
+    // CSRF: CodeIgniter valida $_POST[csrf_token] contra la cookie
+    // (system/core/Security.php) y, con csrf_regenerate = TRUE, cada POST
+    // validado rota el token: por eso el token se lee de la cookie antes
+    // de cada envío con fetch.
+    // --------------------------------------------------------------------
     const csrf_token_name  = '<?php echo $this->security->get_csrf_token_name(); ?>';
     const csrf_cookie_name = '<?php echo $this->config->item('csrf_cookie_name'); ?>';
 
-    // Formatea un monto igual que number_format($monto, 2): 1,234.56
-    function formato_monto(monto){
-        monto = Math.round((parseFloat(monto) || 0) * 100) / 100;
-        const partes = monto.toFixed(2).split('.');
-        partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        return partes.join('.');
-    }
-
-
-    // Muestra el bloque de datos de envío (viene oculto) y lleva al usuario hasta él
-    function mostrar_datos_envio(){
-        const elemento = document.getElementById("form-pagos");
-        if (!elemento) return;
-        elemento.style.display = "block";
-        elemento.scrollIntoView({behavior: "smooth", block: "center"});
-    }
-
-    // Habilita/deshabilita el botón PAGAR mientras se procesa el cobro
-    function btn_procesando(activo){
-        const boton = document.getElementById("btn_pagar");
-        if (!boton) return;
-        if (activo) {
-            boton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Procesando...';
-            boton.style.pointerEvents = "none";
-            boton.style.opacity = "0.7";
-        } else {
-            boton.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>PAGAR';
-            boton.style.pointerEvents = "";
-            boton.style.opacity = "";
+    function token_desde_cookie(){
+        const galletas = document.cookie ? document.cookie.split('; ') : [];
+        for (let i = 0; i < galletas.length; i++) {
+            const partes = galletas[i].split('=');
+            if (partes[0] === csrf_cookie_name) {
+                return decodeURIComponent(partes.slice(1).join('='));
+            }
         }
+        return '';
     }
 
-    function validarDatosEnvio() {
+    function token_csrf_actual(){
+        const de_cookie = token_desde_cookie();
+        if (de_cookie) return de_cookie;
+
+        const campo = document.querySelector('#form-checkout input[name="' + csrf_token_name + '"]');
+        return campo ? campo.value : '';
+    }
+
+    // Refresca el campo oculto del formulario con el token vigente de la cookie
+    function refrescar_token_csrf(){
+        const nuevo = token_desde_cookie();
+        if (!nuevo) return;
+
+        document.querySelectorAll('#form-checkout input[name="' + csrf_token_name + '"]').forEach(function(input){
+            input.value = nuevo;
+        });
+    }
+
+    // Datos del formulario con el token CSRF vigente (nunca el campo viejo)
+    function datos_formulario(){
+        const datos = new FormData(document.getElementById('form-checkout'));
+        datos.set(csrf_token_name, token_csrf_actual());
+        return datos;
+    }
+    // --------------------------------------------------------------------
+    // Validación de los datos de envío (las mismas reglas del servidor)
+    // --------------------------------------------------------------------
+    function validarDatosEnvio(){
         let valido = true;
 
         const campos = [
-            {
-                el: document.getElementById('dni'),
-                test: function(v) { return /^\d{8}$/.test(v); },
-                msg: 'El DNI debe tener exactamente 8 dígitos numéricos.'
-            },
-            {
-                el: document.getElementById('nombres'),
-                test: function(v) { return v.length > 0; },
-                msg: 'Los nombres son requeridos.'
-            },
-            {
-                el: document.getElementById('direccion_envio'),
-                test: function(v) { return v.length > 0; },
-                msg: 'La dirección de envío es requerida.'
-            },
-            {
-                el: document.getElementById('celular'),
-                test: function(v) { return v.length > 0; },
-                msg: 'El celular es requerido.'
-            }
+            { el: document.getElementById('dni'),
+              test: function(v){ return /^\d{8}$/.test(v); },
+              msg: 'El DNI debe tener exactamente 8 dígitos numéricos.' },
+            { el: document.getElementById('nombres'),
+              test: function(v){ return v.length >= 2; },
+              msg: 'Los nombres son requeridos.' },
+            { el: document.getElementById('apellidos'),
+              test: function(v){ return v.length >= 2; },
+              msg: 'Los apellidos son requeridos.' },
+            { el: document.getElementById('correo'),
+              test: function(v){ return /^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/.test(v); },
+              msg: 'Ingrese un correo electrónico válido.' },
+            { el: document.getElementById('celular'),
+              test: function(v){ return /^\d{6,15}$/.test(v); },
+              msg: 'El celular es requerido (solo números).' },
+            { el: document.getElementById('direccion_envio'),
+              test: function(v){ return v.length >= 5; },
+              msg: 'La dirección de envío es requerida.' }
         ];
 
-        campos.forEach(function(campo) {
-            const val = campo.el.value.trim();
+        campos.forEach(function(campo){
+            const val      = campo.el.value.trim();
             const feedback = campo.el.nextElementSibling;
+
             if (!campo.test(val)) {
                 campo.el.classList.add('is-invalid');
                 campo.el.classList.remove('is-valid');
@@ -192,119 +227,52 @@
         });
 
         if (!valido) {
-            document.querySelector('#form-checkout .is-invalid').focus();
+            const primero = document.querySelector('#form-checkout .is-invalid');
+            if (primero) primero.focus();
         }
 
         return valido;
     }
 
-    ['dni','nombres','direccion_envio','celular'].forEach(function(id) {
+    ['dni', 'nombres', 'apellidos', 'correo', 'celular', 'direccion_envio'].forEach(function(id){
         const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('input', function() {
-                el.classList.remove('is-invalid', 'is-valid');
-            });
-        }
+        if (!el) return;
+
+        el.addEventListener('input', function(){
+            el.classList.remove('is-invalid', 'is-valid');
+        });
     });
 
-    function previo(){
-        if (!validarDatosEnvio()) return;
-        document.getElementById("form-checkout").submit();
-    }
+    // Bloquea el botón PAGAR mientras se procesa el cobro
+    function btn_procesando(activo){
+        const boton = document.getElementById('btn_pagar');
+        if (!boton) return;
 
-    function traer_datos(){
-        let id_c = document.getElementById("id_c").value;
-        if(id_c.trim() === "") return;
-
-        fetch('<?php echo base_url('carrito/actualizar_datos_cliente/'); ?>' + encodeURIComponent(id_c), {
-            method: 'POST',
-            // CI 3 valida el CSRF solo contra $_POST (system/core/Security.php:230):
-            // la cabecera X-CSRF-TOKEN no se lee, por eso el token va en el cuerpo.
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-            },
-            body: new URLSearchParams({
-                <?php echo $this->security->get_csrf_token_name(); ?>: token_csrf_actual(),
-                nombre_cliente: '',
-                celular_cliente: ''
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.ok) {
-                document.getElementById("nombres").value = data.nombre_cliente || '';
-                document.getElementById("celular").value = data.celular_cliente || '';
-                document.getElementById("img_pago").style.display = data.imagenes ? 'block' : 'none';
-                document.getElementById("img_pago").src = data.imagenes ? '<?php echo base_url('uploads/'); ?>' + data.imagenes : '';
-                console.log(data.nombre_cliente, data.celular_cliente);
-            } else {
-                alert('Error al obtener datos del cliente: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ocurrió un error al obtener los datos del cliente.');
-        });
-    }
-
-
-    // Subtotal en vivo de cada línea (cantidad x precio mostrado) y totales del resumen
-    /* Culqi Checkout v4 (js.culqi.com/checkout-js) NO expone Culqi.settings(): el monto se lee
-       del objeto real de configuración cada vez que se abre el modal (open() -> watch de
-       _isOpen -> createAndMountApp() -> culqiConfig.getUrlParamaters().amount). Por eso el monto
-       se escribe en esa configuración y se verifica en el objeto que usa el checkout. */
-    function actualizar_monto_culqi(monto_centimos){
-        if (typeof Culqi === 'undefined' || !Culqi) return false;
-
-        monto_centimos = Math.max(0, Math.round(parseFloat(monto_centimos) || 0));
-
-        try {
-            const configuracion = Culqi.culqiConfig;
-            let aplicado = false;
-
-            if (configuracion) {
-                if (typeof configuracion.setConfig === 'function') {
-                    configuracion.setConfig({ settings: { amount: monto_centimos } });
-                    aplicado = true;
-                } else {
-                    configuracion.settings = { amount: monto_centimos };
-                    aplicado = true;
-                }
-            }
-
-            // Verificación: si la configuración interna no tomó el valor, se escribe el objeto real
-            if (typeof Culqi.getSettingsReal === 'function') {
-                const real = Culqi.getSettingsReal();
-
-                if (real) {
-                    if (Math.round(parseFloat(real.amount) || 0) !== monto_centimos) {
-                        real.amount = monto_centimos;
-                        console.warn('Monto de Culqi ajustado por vía directa.');
-                    }
-
-                    aplicado = Math.round(parseFloat(real.amount) || 0) === monto_centimos;
-                }
-            }
-
-            return aplicado;
-        } catch (e) {
-            console.warn('No se pudo actualizar el monto en Culqi:', e);
-            return false;
+        if (activo) {
+            boton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Procesando...';
+            boton.style.pointerEvents = 'none';
+            boton.style.opacity = '0.7';
+        } else {
+            boton.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>PAGAR';
+            boton.style.pointerEvents = '';
+            boton.style.opacity = '';
         }
     }
-
+    // --------------------------------------------------------------------
+    // Culqi Checkout v4 (js.culqi.com/checkout-js), solo Yape
+    // --------------------------------------------------------------------
     const settings = {
-        title: "Culqi Store (BELLAROSSE)",
+        title: '<?php echo $this->config->item('tienda_nombre'); ?>',
         currency: "PEN",
-        amount: Math.round(total_carrito * 100), // monto en céntimos, según el total del carrito
-        order: "",
+        amount: <?php echo (int)round($total * 100); ?>,   // céntimos; lo confirma pago/crear_orden
+        order: "",                                         // lo asigna pago/crear_orden
         xculqirsaid: "<?= getenv('CULQI_LLAVE_RSA_ID') ?>",
-        rsapublickey: "<?= getenv('CULQI_LLAVE_RSA') ?>" 
+        rsapublickey: "<?= getenv('CULQI_LLAVE_RSA') ?>"
     };
 
     const publicKey = '<?= getenv('CULQI_LLAVE_PUBLICA') ?>';
 
-    // las opciones se ordenan según se configuren
+    // Solo Yape: el resto de medios queda deshabilitado en el checkout
     const paymentMethods = {
         tarjeta: false,
         yape: true,
@@ -315,417 +283,179 @@
     };
 
     const options = {
-        lang: "auto",
-        installments: true,
+        lang: "es",
+        installments: false,          // Yape es un pago único
         modal: true,
-        container: "#culqi-container", // Opcional
         paymentMethods: paymentMethods,
-        paymentMethodsSort: Object.keys(paymentMethods) // las opciones se ordenan según se configuren en paymentMethods
+        paymentMethodsSort: ['yape']
     };
 
     const client = {
-        email: "test2@demo.com"
+        email: '<?php echo $correo_tienda; ?>'
     };
 
     const appearance = {
         theme: "default",
         hiddenCulqiLogo: false,
-        hiddenBannerContent: false,
         hiddenBanner: false,
-        hiddenToolBarAmount: false,
-        menuType: "sidebar", // default/sidebar / sliderTop / select
-        buttonCardPayText: "Pagar tal monto", // hexadecimal
-        logo: "http://www.childrensociety.ms/wp-content/uploads/2019/11/MCS-Logo-2019-no-text.jpg",
-        defaultStyle: {
-            bannerColor: "blue", // hexadecimal
-            buttonBackground: "yellow", // hexadecimal
-            menuColor: "pink", // hexadecimal
-            linksColor: "green", // hexadecimal
-            buttonTextColor: "blue", // hexadecimal
-            priceColor: "red"
-        },
-        variables: {
-            fontFamily: "Verdana",
-            fontWeightNormal: "500",
-            borderRadius: "8px",
-            colorBackground: "#0A2540",
-            colorPrimary: "#EFC078",
-            colorPrimaryText: "#1A1B25",
-            colorText: "white",
-            colorTextSecondary: "white",
-            colorTextPlaceholder: "#727F96",
-            colorIconTab: "white",
-            colorLogo: "dark",
-            soyUnaVariable: "rgb(100,100,100)"
-        },
-        rules: {
-            ".Culqi-Main-Container": {
-                background: "rgb(226,132,199)",
-                fontFamily: "var(--fontFamily)"
-            },
-            ".Culqi-ToolBanner": {
-                background: "rgb(223,44,172)",
-                fontFamily: "var(--fontFamily)",
-                color: "white"
-            },
-            // cambia el color del texto y del ícono
-            ".Culqi-Toolbar-Price": {
-                color: "red",
-                fontFamily: "var(--fontFamily)"
-            },
-            // cambia el color solo del ícono
-            ".Culqi-Toolbar-Price .Culqi-Icon": {
-                color: "blue"
-            },
-            ".Culqi-Main-Method": {
-                background: "rgb(250,210,239)",
-                padding: "10px 20px",
-                color: "rgb(100,100,100)"
-            },
-
-            // aplica color al texto del link y al Icon del link
-            ".Culqi-Text-Link": {
-                color: "red"
-            },
-            // Solo aplica color al Icon del link
-            ".Culqi-Text-Link .Culqi-Icon": {
-                color: "rgb(100,100,100)"
-            },
-            // Message, color aplica para text e ícono
-            ".Culqi-message": {
-                color: "rgb(100,100,100)"
-            },
-            // cambia el color solo del ícono
-            ".Culqi-message .Culqi-Icon": {
-                color: "red"
-            },
-            ".Culqi-message-warning": {
-                background: "white",
-                color: "orange"
-            },
-            ".Culqi-message-info": {
-                background: "white",
-                color: "black"
-            },
-            ".Culqi-message-error": {
-                background: "black",
-                color: "yellow"
-            },
-            ".Culqi-message-error .Culqi-Icon": {
-                color: "yellow"
-            },
-
-            // aplica a los labels
-            ".Culqi-Label": {
-                color: "var(--soyUnaVariable)",
-                marginBottom: "20px"
-            },
-            ".Culqi-Input": {
-                border: "1px solid red",
-                color: "var(--soyUnaVariable)"
-            },
-            ".Culqi-Input:focus": {
-                border: "2px solid black"
-            },
-            ".Culqi-Input.input-valid": {
-                border: "1px solid pink",
-                background: "black",
-                color: "var(--colorText)"
-            },
-            ".Culqi-Input-Icon-Spinner": {
-                color: "red"
-            },
-            ".Culqi-Input-Select": {
-                border: "1px solid red",
-                color: "blue"
-            },
-            // aplica para al hacer hover en los options del select
-            ".Culqi-Input-Select-Options-Hover": {
-                color: "red",
-                background: "black"
-            },
-            // aplica para el seleccionado al ser activado
-            ".Culqi-Input-Select-Selected": {
-                color: "green"
-            },
-            ".Culqi-Input-Select.active": {
-                // aplica cuando le das click al control
-                border: "1px solid red",
-                background: "pink"
-            },
-            // aplica al listado de cuotas
-            ".Culqi-Input-Select-Options": {
-                background: "gray"
-            },
-            // aplica a los botones
-            ".Culqi-Button": {
-                background: "red"
-            },
-
-            //--------Menu GENERALES----------------
-            // el color se aplica para el texto y el ícono del menú
-            ".Culqi-Menu": {
-                color: "blue"
-                //background: "white",
-            },
-
-            // el color se aplica para el ícono del menú
-            ".Culqi-Menu .Culqi-Icon": {
-                color: "green"
-            },
-            //-------FIN Menu GENERALES----------------
-
-            //--------- MENU SELECT-------------
-            // aplica cuando el select esta seleccionado
-            ".Culqi-Menu-Selected": {
-                //background: "orange",
-                color: "#D621A5"
-                //border: "1px solid white",
-            },
-            ".Culqi-Menu-Selected .Culqi-Icon": {
-                //background: "orange",
-                color: "red"
-                //border: "1px solid white",
-            },
-            // aplica cuando para las opciones del select menú
-            ".Culqi-Menu-Options": {
-                background: "orange"
-            },
-            // aplica para las opciones del select menú cuando se hace hover
-            ".Culqi-Menu-Options-Hover": {
-                background: "green",
-                color: "red"
-            },
-            // aplica para los ICONOS de las opciones del select menú cuando se hace hover
-            ".Culqi-Menu-Options-Hover .Culqi-Icon": {
-                color: "blue"
-            }
-
-            //--------- FIN SELECT-------------
-
-            //----------------- MENU SLIDERTOP Y SIDEBAR----------------------
-            /*
-            ".Culqi-Menu-Item": {
-                background: "black",
-                color: "red",
-            },
-
-            // cambia el color para el item menu, tanto texto e ícono seleccionado (no aplica en el select menu)
-            ".Culqi-Menu-Item.active": {
-                color: "white",
-                //border: "1px solid white",
-            },
-            // cambia el color para el ICONO del item menu seleccionado (no aplica en el select menu)
-            ".Culqi-Menu-Item.active .Culqi-Icon": {
-                color: "blue",
-            },
-
-            // MODIFICA EL TEXTO DEL MENÚ(no aplica al menú select)
-            ".Culqi-Menu-Item-Text": { // reemplaza a la clase .Culqi-Menu-Item
-                "font-size": "12px",
-                color: "green",
-            },
-
-
-            // cambia el color de los ICONOS ARROW DE sliderTop
-            ".Culqi-Menu .Culqi-Icon-Arrow": {
-                color: "blue",
-            },
-            // CAMBIA EL COLOR DE LA BARRA LATERAL DE SIDEBAR
-            ".Culqi-Menu-Item.active .Culqi-Bar": {
-                background: "blue"
-            },
-            */
-        }
+        menuType: "sidebar"
     };
 
-
-    const handleCulqiAction = () => {
-        if (Culqi.token) {
-            const token = Culqi.token.id;
-            console.log("Se ha creado un Token: ", token);
-
-            // Ruta generada por PHP (base_url)
-            const url = '<?= base_url("carrito/recibe_token") ?>';
-
-            // Enviar el token + los datos de envío del formulario
-            const form = document.getElementById('form-checkout');
-            if (!form) {
-                alert('No se encontró el formulario de datos de envío.');
-                btn_procesando(false);
-                return;
-            }
-
-            const datosPago = new FormData(form);
-            datosPago.append('token', token);
-
-            fetch(url, {
-                method: 'POST',
-                body: datosPago
-            })
-            .then(response => response.json())
-            .then(res => {
-                console.log(res);
-                if (res.ok) {
-                    
-                    // EL PAGO ESTA PROCESADO CORRECTAMENTE
-                    
-
-                    window.location.href = res.redirect;
-                } else {
-                    alert('No se pudo procesar el pago: ' + res.error);
-                    btn_procesando(false);
-                }
-            })
-            .catch(error => {
-                console.error('Error en la petición:', error);
-                alert('Ocurrió un error al procesar el pago. Intente nuevamente.');
-                btn_procesando(false);
-            });
-
-        } else if (Culqi.order) {
-            const order = Culqi.order;
-            console.log("Se ha creado el objeto Order: ", order);
-            alert('El pago con Yape/billetera todavía no está habilitado. Use una tarjeta.');
-            btn_procesando(false);
-        } else {
-            console.log("Errorrr : ", Culqi.error);
-            const mensaje = (Culqi.error && Culqi.error.user_message) ? Culqi.error.user_message : 'No se pudo iniciar el pago.';
-            alert(mensaje);
-            btn_procesando(false);
-        }
-    };
-
-    const config = {
-        settings,
-        client,
-        options,
-        appearance
-    };
+    const config = { settings, client, options, appearance };
 
     const Culqi = new CulqiCheckout(publicKey, config);
+    /* Respuesta JSON del controlador; si algo devuelve HTML (p. ej. un error de
+       CSRF de CodeIgniter) se avisa con un mensaje legible. */
+    function respuesta_json(response){
+        return response.text().then(function(texto){
+            const limpio = (texto || '').trim();
 
-    Culqi.culqi = handleCulqiAction; // ejecuta la funcion
+            if (limpio.charAt(0) !== '{') {
+                if (response.status === 403) {
+                    // CodeIgniter deniega el POST cuando el token CSRF caducó
+                    throw new Error('Su sesión expiró. Recargue la página e intente nuevamente.');
+                }
 
-    let btn = document.getElementById("btn_pagar");
-
-    if (btn) {
-        btn.addEventListener("click", (e) => {
-            e.preventDefault();
-            console.log("Iniciando la carga de la Pasarela");
-
-            // 1. Mostrar los datos de envío y validarlos antes de cobrar
-            mostrar_datos_envio();
-            if (!validarDatosEnvio()) {
-                return;
+                throw new Error('El servidor no devolvió JSON (HTTP ' + response.status + ').');
             }
 
-            // 2. Abrir la pasarela de Culqi
-            btn_procesando(true);
-
-            /* 3. Si el cliente cambió las cantidades en la vista, se guardan primero en la
-                  sesión: así el total mostrado, el de la sesión y el que cobra Culqi coinciden. */
-            sincronizar_carrito()
-                .then(function(html){
-                    // 4. El resumen y el monto de la pasarela ya reflejan el total real
-                    recalcular_resumen();
-
-                    /* 5. Lo mostrado y lo que cobrará Culqi (el total de la sesión, calculado por
-                          Carrito::_calcular_total) deben ser iguales: si no coinciden no se abre la
-                          pasarela, porque se cobraría un monto distinto al de la pantalla. */
-                    const total_servidor = total_servidor_centimos(html);
-
-                    if (total_servidor !== null && total_servidor !== Math.round(total_carrito * 100)) {
-                        alert('No se pudieron guardar todas las cantidades. El servidor calculó ' +
-                              formato_monto(total_servidor / 100) +
-                              '. Se recargará el carrito para mostrar los valores reales.');
-                        window.location.reload();
-                        return;
-                    }
-
-                    // ***********************************************
-                    //crear_orden(); // nombre, apellido, correo, fono, dni
-                    // ***********************************************
-
-                    
-                })
-                /*.catch(function(){
-                    alert('No se pudieron guardar los cambios del carrito. Intente nuevamente.');
-                    btn_procesando(false);
-                });*/
+            return JSON.parse(limpio);
         });
     }
 
-    function sincronizar_carrito(){
-        return new Promise(function(resolve, reject){
-            const formulario = document.querySelector('form[action$="carrito/actualizar"]');
+    /* El checkout lee su configuración cada vez que se abre (open() -> getUrlParamaters()
+       -> amount/order), por eso los valores que devuelve pago/crear_orden se escriben en
+       la configuración viva antes de Culqi.open(). */
+    function fijar_config_culqi(valores){
+        if (typeof valores.amount === 'number') settings.amount = valores.amount;
+        if (valores.order)                      settings.order  = valores.order;
+        if (valores.email)                      client.email    = valores.email;
 
-            // Sin formulario o sin cambios pendientes: no hay nada que guardar
-            if (!formulario || !hay_cambios_cantidad()) {
-                resolve(false);
-                return;
+        const configuracion = Culqi.culqiConfig;
+        if (!configuracion) return;
+
+        try {
+            if (typeof configuracion.setConfig === 'function') {
+                configuracion.setConfig({
+                    settings: { amount: settings.amount, order: settings.order },
+                    client:   { email: client.email }
+                });
+            } else {
+                configuracion.settings = Object.assign({}, configuracion.settings, {
+                    amount: settings.amount,
+                    order:  settings.order
+                });
+                configuracion.client = Object.assign({}, configuracion.client, {
+                    email: client.email
+                });
+            }
+        } catch (e) {
+            console.warn('No se pudo fijar la configuración de Culqi:', e);
+        }
+    }
+
+    // Callback que Culqi ejecuta al confirmar el pago en el checkout
+    const handleCulqiAction = function(){
+        /* Yape confirma con el token del pago (tkn_/ype_); otros medios resuelven con el
+           objeto Order. Se acepta cualquiera de los dos: el servidor los vuelve a validar. */
+        const objeto = (Culqi.token && Culqi.token.id) ? Culqi.token : (Culqi.order || null);
+
+        if (!objeto || !objeto.id) {
+            const mensaje = (Culqi.error && (Culqi.error.user_message || Culqi.error.merchant_message))
+                          ? (Culqi.error.user_message || Culqi.error.merchant_message)
+                          : '';
+
+            if (mensaje) {
+                alert(mensaje);
+            } else {
+                console.log('Checkout cerrado sin token:', Culqi.error || Culqi.token);
             }
 
-            fetch(formulario.action, {
+            btn_procesando(false);
+            return;
+        }
+
+        console.log('Culqi devolvió ' + objeto.object + ': ' + objeto.id);
+
+        // El CARGO se crea en el servidor con los datos de envío + el token
+        const datos = datos_formulario();
+        datos.append('token', objeto.id);
+
+        fetch('<?= base_url('carrito/recibe_token') ?>', {
+            method: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            body: datos
+        })
+        .then(respuesta_json)
+        .then(function(res){
+            if (!res.ok) throw new Error(res.error || 'No se pudo procesar el pago.');
+
+            // recibe_token rota el token CSRF: se refresca el campo antes de continuar
+            refrescar_token_csrf();
+            Culqi.close();
+
+            // Cargo aprobado: pago/procesar registra el pedido y muestra el agradecimiento
+            window.location.href = res.redirect;
+        })
+        .catch(function(error){
+            console.error('No se pudo cobrar:', error);
+            alert(error.message || 'Ocurrió un error al procesar el pago. Intente nuevamente.');
+            btn_procesando(false);
+        });
+    };
+
+    Culqi.culqi = handleCulqiAction;
+    // --------------------------------------------------------------------
+    // Botón PAGAR: 1) crea la orden en Culqi  2) abre el checkout
+    // --------------------------------------------------------------------
+    const btn_pagar = document.getElementById('btn_pagar');
+
+    if (btn_pagar) {
+        btn_pagar.addEventListener('click', function(e){
+            e.preventDefault();
+
+            if (!validarDatosEnvio()) return;
+
+            btn_procesando(true);
+
+            // El checkout muestra el correo del cliente
+            const campo_correo = document.getElementById('correo');
+            if (campo_correo && campo_correo.value.trim() !== '') {
+                client.email = campo_correo.value.trim();
+            }
+
+            /* La ORDEN es obligatoria para que el checkout muestre Yape. El monto lo calcula
+               el servidor con el carrito de la sesión: nunca se confía en el navegador. */
+            fetch('<?= base_url('pago/crear_orden') ?>', {
                 method: 'POST',
-                body: new FormData(formulario),
-                headers: {'X-Requested-With': 'XMLHttpRequest'}
+                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                body: datos_formulario()
             })
-            .then(function(response){
-                if (!response.ok) throw new Error('HTTP ' + response.status);
-                return response.text();
-            })
-            .then(function(html){
-                actualizar_token_csrf(html);
-                /* Devuelve el HTML del carrito ya guardado: con él se verifica, antes de abrir la
-                   pasarela, que el total del servidor coincide con el total que se muestra. */
-                resolve(html || '');
+            .then(respuesta_json)
+            .then(function(res){
+                if (!res.ok) throw new Error(res.error || 'No se pudo iniciar el pago.');
+
+                // crear_orden rota el token CSRF: se refresca el campo oculto
+                refrescar_token_csrf();
+
+                // El checkout cobrará el monto y la orden confirmados por el servidor
+                fijar_config_culqi({
+                    amount: res.amount,
+                    order:  res.order,
+                    email:  client.email
+                });
+
+                console.log('Orden Culqi creada: ' + res.order + ' (' + res.order_number + ')');
+
+                // Abrir la pasarela: celular + código de aprobación de Yape
+                Culqi.open();
             })
             .catch(function(error){
-                console.error('No se pudo guardar el carrito:', error);
-                reject(error);
+                console.error('No se pudo crear la orden:', error);
+                alert(error.message || 'No se pudo iniciar el pago. Intente nuevamente.');
+                btn_procesando(false);
             });
         });
     }
-
-    function recalcular_resumen(){
-        let suma = 0;
-
-        document.querySelectorAll('tr[data-precio]').forEach(function(tr){
-            const precio = parseFloat(tr.getAttribute('data-precio')) || 0;
-            const input  = tr.querySelector('input[type="number"]');
-
-            let cantidad = input ? parseInt(input.value, 10) : 1;
-            if (isNaN(cantidad) || cantidad < 1) cantidad = 1;
-            if (cantidad > 99) cantidad = 99;
-
-            const subtotal = precio * cantidad;
-            suma += subtotal;
-
-            const celda = tr.querySelector('.subtotal-linea');
-            if (celda) celda.textContent = formato_monto(subtotal);
-        });
-
-        total_carrito = Math.round(suma * 100) / 100;
-
-        const resumen_subtotal = document.getElementById('resumen-subtotal');
-        const resumen_total    = document.getElementById('resumen-total');
-        if (resumen_subtotal) resumen_subtotal.textContent = formato_monto(total_carrito);
-        if (resumen_total)    resumen_total.textContent    = formato_monto(total_carrito);
-
-        // Monto de la pasarela (en céntimos), igual al total que se muestra
-        settings.amount = Math.round(total_carrito * 100);
-        actualizar_monto_culqi(settings.amount);
-    }
+})();
 </script>
-
-<!--<div class="container">
-    <div class="row">
-        <div class="col-sm-2">
-            <a href="#" id="btn_pagar" class="btn btn-primary btn-sm" style="padding-top:7px;">
-                <i class="bi bi-arrow-repeat me-1"></i>PAGAR
-            </a>
-        </div>
-    </div>
-</div>-->
-

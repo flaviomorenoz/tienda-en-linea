@@ -190,17 +190,21 @@ class Carrito extends CI_Controller {
     }
 
     /**
-     * Recibe el token generado por Culqi Checkout (JS) y crea el cargo.
-     * Docs: https://apidocs.culqi.com/#tag/Cargos/operation/crear-cargo
+     * Recibe el token generado por Culqi Checkout (JS) y CREA EL CARGO
+     * (POST /v2/charges). Docs: https://apidocs.culqi.com/#tag/Cargos/operation/crear-cargo
      *
      * Flujo:
-     *   1. Valida el token y los datos de envío enviados por POST.
+     *   1. Valida el token y los datos del titular enviados por POST.
      *   2. Cobra en Culqi el total real del carrito (en céntimos).
-     *   3. Si el cargo queda "pagado": registra pedidos_web + detalle_pedido,
-     *      vacía el carrito, avisa por correo y devuelve la URL de agradecimiento.
+     *   3. Si el cargo queda "pagado": guarda en sesión el cargo y los datos del
+     *      titular (pago_cargo / pago_datos / pago_total) y devuelve la URL de
+     *      pago/procesar, que es quien registra el pedido.
+     *
+     * El pedido NO se registra aquí: así una sola ruta (Pago::procesar) escribe en
+     * pedidos_web y el flujo queda orden -> token -> cargo -> pedido.
      *
      * Responde SIEMPRE JSON (el JS hace response.json()):
-     *   OK    -> {"ok":true,  "id_pedido":N, "redirect":".../pedido/gracias/N"}
+     *   OK    -> {"ok":true, "cargo":"chr_...", "redirect":".../pago/procesar"}
      *   Error -> {"ok":false, "error":"mensaje para mostrar al cliente"}
      */
     public function recibe_token(){
@@ -218,7 +222,16 @@ class Carrito extends CI_Controller {
         if ($token === '') {
             traza("Carrito->recibe_token: token vacío");
             $this->output->set_status_header(400);
-            echo json_encode(array('ok' => false, 'error' => 'No se recibió el token de la tarjeta.'));
+            echo json_encode(array('ok' => false, 'error' => 'No se recibió el token del pago.'));
+            return;
+        }
+
+        // El checkout devuelve el token del pago (tkn_/ype_) y, en los medios que se
+        // resuelven con órdenes, el id de esa orden (ord_): Culqi valida el source_id.
+        if (strpos($token, 'tkn_') !== 0 && strpos($token, 'ype_') !== 0 && strpos($token, 'ord_') !== 0) {
+            traza("Carrito->recibe_token: token inesperado ($token)");
+            $this->output->set_status_header(400);
+            echo json_encode(array('ok' => false, 'error' => 'No se recibió un token de pago válido.'));
             return;
         }
 
@@ -229,14 +242,16 @@ class Carrito extends CI_Controller {
             return;
         }
 
-        // Datos del cliente capturados en el formulario de checkout del carrito
+        // Datos del titular capturados en el formulario de datos de envío (pago/preparar)
         $datos_pedido = array(
             'dni'             => trim((string)$this->input->post('dni', TRUE)),
             'nombres'         => trim((string)$this->input->post('nombres', TRUE)),
+            'apellidos'       => trim((string)$this->input->post('apellidos', TRUE)),
+            'correo'          => trim((string)$this->input->post('correo', TRUE)),
             'direccion_envio' => trim((string)$this->input->post('direccion_envio', TRUE)),
             'celular'         => trim((string)$this->input->post('celular', TRUE)),
             'observaciones'   => trim((string)$this->input->post('observaciones', TRUE)),
-            'archivo'         => NULL,
+            'archivo'         => NULL,   // el pago es por pasarela: no hay comprobante que subir
         );
 
         if (!preg_match('/^\d{8}$/', $datos_pedido['dni'])) {
@@ -245,9 +260,16 @@ class Carrito extends CI_Controller {
             return;
         }
 
-        if ($datos_pedido['nombres'] === '' || $datos_pedido['direccion_envio'] === '' || $datos_pedido['celular'] === '') {
+        if ($datos_pedido['nombres'] === '' || $datos_pedido['apellidos'] === ''
+            || $datos_pedido['direccion_envio'] === '' || $datos_pedido['celular'] === '') {
             $this->output->set_status_header(400);
-            echo json_encode(array('ok' => false, 'error' => 'Complete los datos de envío (nombres, dirección y celular).'));
+            echo json_encode(array('ok' => false, 'error' => 'Complete los datos de envío (nombres, apellidos, dirección y celular).'));
+            return;
+        }
+
+        if (!filter_var($datos_pedido['correo'], FILTER_VALIDATE_EMAIL)) {
+            $this->output->set_status_header(400);
+            echo json_encode(array('ok' => false, 'error' => 'Ingrese un correo electrónico válido.'));
             return;
         }
 
@@ -282,13 +304,36 @@ class Carrito extends CI_Controller {
             return;
         }
 
-        $total  = $this->_calcular_total($carrito);
+        /* El monto sale del total guardado en sesión al crear la orden (pago_total) y, si no
+           está, del carrito de la sesión: el navegador nunca envía el monto a cobrar. */
+        $total_sesion = $this->session->userdata('pago_total');
+
+        if ($total_sesion === FALSE || $total_sesion === NULL) {
+            $total = $this->_calcular_total($carrito);
+        } else {
+            $total = (float)$total_sesion;
+        }
+
         $amount = (int)round($total * 100); // Culqi trabaja en céntimos
 
-        $email = trim((string)$this->config->item('tienda_email'));
+        // Correo del cargo: el del cliente; si no es válido, el de la tienda
+        $email = $datos_pedido['correo'];
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $email = trim((string)$this->config->item('tienda_email'));
+        }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $email = 'flaviomorenoz@gmail.com';
         }
+
+        /* La orden con la que se abrió el checkout (ver Pago::crear_orden) y su número viajan
+           en los metadatos del cargo: así el pago se puede cruzar con el pedido en Culqi. */
+        $metadata = array('documentNumber' => $datos_pedido['dni']);
+
+        $orden        = (string)$this->session->userdata('pago_orden');
+        $order_number = (string)$this->session->userdata('pago_order_number');
+
+        if ($orden !== '')        $metadata['order']        = $orden;
+        if ($order_number !== '') $metadata['order_number'] = $order_number;
 
         // 2. Construir el payload del cargo ----------------------------------
         $payload = array(
@@ -303,12 +348,10 @@ class Carrito extends CI_Controller {
                 "address_city"   => "Lima",
                 "country_code"   => "PE",
                 "first_name"     => $datos_pedido['nombres'],
-                "last_name"      => $datos_pedido['nombres'],
+                "last_name"      => $datos_pedido['apellidos'],
                 "phone_number"   => $datos_pedido['celular']
             ),
-            "metadata" => array(
-                "documentNumber" => $datos_pedido['dni']
-            )
+            "metadata" => $metadata
         );
 
         traza("Carrito->recibe_token: total=$total amount=$amount email=$email");
@@ -381,7 +424,7 @@ class Carrito extends CI_Controller {
                || strpos($codigo, 'AUT') === 0;
 
         if (!$pagado) {
-            $motivo = 'El pago no fue aprobado. Intente con otra tarjeta.';
+            $motivo = 'El pago no fue aprobado. Intente nuevamente.';
             if (!empty($outcome['user_message'])) {
                 $motivo = $outcome['user_message'];
             } elseif (!empty($outcome['merchant_message'])) {
@@ -397,38 +440,22 @@ class Carrito extends CI_Controller {
 
         traza("Carrito->recibe_token: cargo aprobado " . $result['id'] . " ($tipo/$codigo)");
 
-        // 5. Registrar el pedido pagado --------------------------------------
-        $datos_pedido['total'] = $total;
+        /* El pedido NO se registra aquí: se guarda el cargo aprobado y los datos del titular
+           en sesión, y pago/procesar() (la redirección final) escribe en pedidos_web. Así el
+           pedido solo se crea cuando el cobro ya está aprobado. */
+        $this->session->set_userdata(array(
+            'pago_token' => $token,
+            'pago_cargo' => $result['id'],
+            'pago_datos' => $datos_pedido,
+            'pago_total' => $total,
+        ));
 
-        $id_pedido = $this->Pedido_model->crear($datos_pedido);
-
-        foreach ($carrito as $item) {
-            $this->Pedido_model->agregar_detalle(array(
-                'id_pedido'       => $id_pedido,
-                'id_producto'     => $item['id'],
-                'talla'           => $item['talla'],
-                'cantidad'        => $item['cantidad'],
-                'precio_unitario' => $item['precio'],
-                'unidad'          => $item['unidad']
-            ));
-        }
-
-        $this->Pedido_model->actualizar_pago($id_pedido, 'Pagado', $result['id']);
-        
-        $this->session->unset_userdata('carrito');
-        
-        traza("Carrito->recibe_token: pedido $id_pedido pagado con cargo " . $result['id']);
-
-        // Aviso por correo: si falla, el pedido ya quedó registrado y el JSON sale igual
-        $this->load->library('notificador_pedido');
-        
-        $this->notificador_pedido->enviar($id_pedido, $datos_pedido, $carrito, $total);
+        traza("Carrito->recibe_token: cargo aprobado " . $result['id'] . " -> pendiente de registrar en pago/procesar");
 
         echo json_encode(array(
-            'ok'        => true,
-            'id_pedido' => $id_pedido,
-            'mensaje'   => 'Pago procesado correctamente.',
-            'redirect'  => base_url('pedido/gracias/' . $id_pedido),
+            'ok'       => true,
+            'cargo'    => $result['id'],
+            'redirect' => base_url('pago/procesar'),
         ));
     }
 
