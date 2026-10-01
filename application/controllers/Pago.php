@@ -21,6 +21,19 @@ error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE &
  * procesar() NO cobra nada: el cobro lo hace Carrito::recibe_token. Se dejó de usar
  * Pasarela_model::simular_pago(), que marcaba el pedido como "Pagado" con un código
  * falso sin cobrar.
+ *
+ * Trazabilidad de tiempos (traza.txt)
+ * -----------------------------------
+ * Cada endpoint mide sus pasos con el helper 'funciones' (traza_inicio/traza_paso/
+ * traza_fin) y deja una línea por paso, con el tiempo del paso y el acumulado:
+ *
+ *   [2026-09-30 18:23:16.139] pago/procesar |  3) INSERT pedidos_web | +  39.10 ms | acum   39.10 ms | id_pedido=57
+ *
+ * Flujos instrumentados: pago/preparar, pago/crear_orden, pago/procesar,
+ * pedido/gracias, carrito/recibe_token y correo (Notificador_pedido).
+ *
+ * El correo (SMTP de Gmail) NO debe estar en el camino crítico: ver
+ * _responder_navegador(), que responde al navegador antes de mandarlo.
  */
 class Pago extends CI_Controller {
 
@@ -60,7 +73,10 @@ class Pago extends CI_Controller {
      * se guarda en sesión (pago_total) y lo que se cobrará en Culqi salen de la misma fuente.
      */
     public function preparar(){
+        traza_inicio('pago/preparar');
+
         $carrito = $this->session->userdata('carrito') ?: array();
+        traza_paso('1. carrito de la sesión', 'items=' . count($carrito), 'pago/preparar');
 
         if (empty($carrito)) {
             $this->session->set_flashdata('error', 'Tu carrito está vacío.');
@@ -69,7 +85,7 @@ class Pago extends CI_Controller {
         }
 
         $total = $this->_calcular_total($carrito);
-        traza("Pago->preparar: total de sesión = " . $total);
+        traza_paso('2. total del carrito', 'total=' . $total, 'pago/preparar');
 
         $data = array(
             'titulo'        => 'Datos de envío y pago - ' . $this->config->item('tienda_nombre'),
@@ -80,8 +96,11 @@ class Pago extends CI_Controller {
         );
 
         $this->load->view('layouts/header', $data);
+        traza_paso('3. vista layouts/header', '', 'pago/preparar');
         $this->load->view('tienda/preparar', $data);
+        traza_paso('4. vista tienda/preparar (formulario de datos)', '', 'pago/preparar');
         $this->load->view('layouts/footer', $data);
+        traza_fin('formulario de datos de envío pintado', 'pago/preparar');
     }
     /**
      * Paso 2: crea la orden en Culqi ANTES de abrir su checkout.
@@ -100,6 +119,7 @@ class Pago extends CI_Controller {
      */
     public function crear_orden() {
         $this->output->set_content_type('application/json');
+        traza_inicio('pago/crear_orden');
 
         if ($this->input->method() !== 'post') {
             $this->output->set_status_header(405);
@@ -117,7 +137,7 @@ class Pago extends CI_Controller {
         // Llave privada de Culqi (index.php la carga desde application/config/.env)
         $SECRET_KEY = $this->_culqi_llave_privada();
         if ($SECRET_KEY === '') {
-            traza("Pago->crear_orden: falta CULQI_LLAVE_PRIVADA");
+            traza_fin('pasarela sin llave privada', 'pago/crear_orden');
             $this->output->set_status_header(500);
             echo json_encode(array('ok' => FALSE, 'error' => 'La pasarela no está configurada (falta la llave privada).'));
             return;
@@ -127,7 +147,7 @@ class Pago extends CI_Controller {
         $datos = $this->_datos_pedido_post();
         $error = $this->_validar_datos_pedido($datos);
         if ($error !== '') {
-            traza("Pago->crear_orden: " . $error);
+            traza_fin('datos del titular inválidos: ' . $error, 'pago/crear_orden');
             $this->output->set_status_header(400);
             echo json_encode(array('ok' => FALSE, 'error' => $error));
             return;
@@ -162,7 +182,8 @@ class Pago extends CI_Controller {
             'metadata'        => array('dni' => $datos['dni']),
         );
 
-        traza("Pago->crear_orden: total=$total amount=$amount order_number=$order_number");
+        traza_paso('1. datos del titular validados + payload de la orden',
+            'total=' . $total . ' amount=' . $amount . ' order_number=' . $order_number, 'pago/crear_orden');
 
         $ch = curl_init('https://api.culqi.com/v2/orders');
 
@@ -183,7 +204,8 @@ class Pago extends CI_Controller {
         if (curl_errno($ch)) {
             $error_curl = curl_error($ch);
             curl_close($ch);
-            traza("Pago->crear_orden: error cURL -> " . $error_curl);
+            traza_paso('2. POST /v2/orders (Culqi)', 'ERROR cURL: ' . $error_curl, 'pago/crear_orden');
+            traza_fin('sin orden: no se pudo contactar a Culqi', 'pago/crear_orden');
             log_message('error', 'Pago::crear_orden: error cURL: ' . $error_curl);
             $this->output->set_status_header(502);
             echo json_encode(array('ok' => FALSE, 'error' => 'No se pudo contactar a la pasarela de pago. Intente nuevamente.'));
@@ -194,6 +216,7 @@ class Pago extends CI_Controller {
         curl_close($ch);
 
         $result = json_decode($response, TRUE);
+        traza_paso('2. POST /v2/orders (Culqi)', 'HTTP ' . $httpCode, 'pago/crear_orden');
         traza("Pago->crear_orden: HTTP $httpCode -> " . print_r($result, TRUE));
 
         if (!is_array($result) || $httpCode >= 400 || empty($result['id'])) {
@@ -206,6 +229,7 @@ class Pago extends CI_Controller {
                 }
             }
             log_message('error', 'Pago::crear_orden: HTTP ' . $httpCode . ': ' . $response);
+            traza_fin('sin orden: Culqi respondió HTTP ' . $httpCode, 'pago/crear_orden');
             $this->output->set_status_header(400);
             echo json_encode(array('ok' => FALSE, 'error' => $mensaje));
             return;
@@ -220,12 +244,15 @@ class Pago extends CI_Controller {
             'pago_total'        => $total,
         ));
 
+        traza_paso('3. orden y datos del titular guardados en la sesión', 'orden=' . $result['id'], 'pago/crear_orden');
+
         echo json_encode(array(
             'ok'           => TRUE,
             'order'        => $result['id'],
             'order_number' => $order_number,
             'amount'       => $amount,
         ));
+        traza_fin('orden lista para abrir el checkout de Culqi', 'pago/crear_orden');
     }
 
     /**
@@ -237,22 +264,40 @@ class Pago extends CI_Controller {
      *
      * Es idempotente: si el pedido ya se registró (recargar la URL, volver atrás),
      * pago_id_pedido lo devuelve a pedido/gracias/{id} sin crear otro pedido.
+     *
+     * Orden de trabajo (cada paso queda medido en traza.txt):
+     *
+     *   3) INSERT pedidos_web                        ) BD: milisegundos
+     *   4) INSERT detalle_pedido                     )
+     *   5) UPDATE estado_pago + código de transacción )
+     *   6) limpieza de la sesión                     )
+     *   7) respuesta al navegador (302, ver _responder_navegador)
+     *   8) aviso por correo (SMTP de Gmail)          -> segundos, ya sin cliente esperando
+     *
+     * El correo se manda DESPUÉS de responderle al navegador (ver _responder_navegador):
+     * antes de este cambio el cliente se quedaba en la pantalla de "Compra exitosa"
+     * esperando todo lo que tardara Gmail en aceptar el mensaje.
      */
     public function procesar() {
+        traza_inicio('pago/procesar');
         $carrito   = $this->session->userdata('carrito') ?: array();
         $cargo     = $this->session->userdata('pago_cargo');
         $datos     = $this->session->userdata('pago_datos');
         $total     = $this->session->userdata('pago_total');
         $id_pagado = $this->session->userdata('pago_id_pedido');
 
-        traza("Pago->procesar: cargo=" . ($cargo ? $cargo : '(vacío)'));
+        traza_paso('1. datos del cobro leídos de la sesión',
+            'cargo=' . ($cargo ? $cargo : '(vacío)') . ' items=' . count($carrito) . ' total=' . $total
+            . ' ya_registrado=' . ($id_pagado ? $id_pagado : 'no'), 'pago/procesar');
 
         if (!empty($id_pagado)) {
+            traza_fin('el pedido ya estaba registrado: redirect directo (idempotente)', 'pago/procesar');
             redirect('pedido/gracias/' . (int)$id_pagado);
             return;
         }
 
         if (!is_array($datos) || empty($cargo) || empty($carrito)) {
+            traza_fin('no hay cobro aprobado pendiente: redirect a carrito', 'pago/procesar');
             $this->session->set_flashdata('error', 'No hay un pago aprobado pendiente de registrar.');
             redirect('carrito');
             return;
@@ -261,6 +306,7 @@ class Pago extends CI_Controller {
         if ($total === FALSE || $total === NULL) {
             $total = $this->_calcular_total($carrito);
         }
+        traza_paso('2. total del pedido', 'total=' . $total, 'pago/procesar');
 
         // Datos que se guardan en pedidos_web (ver Pedido_model::crear)
         $datos_pedido = array(
@@ -275,7 +321,8 @@ class Pago extends CI_Controller {
         );
 
         $id_pedido = $this->Pedido_model->crear($datos_pedido);
-        traza("Pago->procesar: pedido $id_pedido registrado con el cargo $cargo");
+        traza_paso('3. INSERT en pedidos_web (Pedido_model->crear)',
+            'id_pedido=' . $id_pedido . ' cargo=' . $cargo, 'pago/procesar');
 
         foreach ($carrito as $item) {
             $this->Pedido_model->agregar_detalle(array(
@@ -287,29 +334,49 @@ class Pago extends CI_Controller {
                 'unidad'          => isset($item['unidad']) ? $item['unidad'] : NULL,
             ));
         }
+        traza_paso('4. INSERT del detalle (1 INSERT + 1 SELECT de unidad por ítem)',
+            'items=' . count($carrito), 'pago/procesar');
 
         // El código de la transacción es el id del cargo aprobado en Culqi
         $this->Pedido_model->actualizar_pago($id_pedido, 'Pagado', $cargo);
+        traza_paso('5. UPDATE del pago en pedidos_web', 'estado=Pagado cargo=' . $cargo, 'pago/procesar');
 
         // Marca de idempotencia + limpieza del carrito y de los datos del pago
         $this->session->set_userdata('pago_id_pedido', $id_pedido);
         $this->session->unset_userdata(array(
             'carrito', 'pago_orden', 'pago_order_number', 'pago_token', 'pago_cargo', 'pago_datos', 'pago_total',
         ));
+        traza_paso('6. sesión limpiada (queda la marca de idempotencia)', '', 'pago/procesar');
 
-        // Aviso por correo: si falla, el pedido ya quedó registrado
+        /* Hasta aquí el pedido ya está cobrado y registrado: la pantalla de "Compra
+           exitosa" no puede quedarse esperando al SMTP de Gmail. Primero se responde al
+           navegador (302 + cierre de la sesión) y recién después se manda el aviso. */
+        $this->_responder_navegador('pedido/gracias/' . $id_pedido);
+
+        // Aviso por correo: si falla, el pedido ya quedó registrado y el cliente ya vio su pantalla
+        traza_paso('8. aviso por correo al cliente y a la tienda (SMTP)', 'correo=' . $datos_pedido['correo'], 'pago/procesar');
         $this->load->library('notificador_pedido');
         $this->notificador_pedido->enviar($id_pedido, $datos_pedido, $carrito, $total);
 
-        redirect('pedido/gracias/' . $id_pedido);
+        traza_fin('pedido ' . $id_pedido . ' registrado; el cliente ya estaba en la pantalla de confirmación', 'pago/procesar');
+
+        /* La respuesta ya salió con Connection: close: se corta aquí para que CodeIgniter
+           no intente enviar cabeceras por segunda vez ("headers already sent"). */
+        exit;
     }
 
     public function gracias($id_pedido) {
+        traza_inicio('pedido/gracias');
+
         $id_pedido = (int)$id_pedido;
         $pedido    = $this->Pedido_model->get_por_id($id_pedido);
+        traza_paso('1. SELECT pedidos_web (get_por_id)', 'id_pedido=' . $id_pedido, 'pedido/gracias');
+
         $detalle   = $this->Pedido_model->get_detalle($id_pedido);
+        traza_paso('2. SELECT del detalle (get_detalle)', 'lineas=' . count($detalle), 'pedido/gracias');
 
         if (!$pedido) {
+            traza_fin('pedido inexistente: redirect a tienda', 'pedido/gracias');
             redirect('tienda');
             return;
         }
@@ -322,8 +389,11 @@ class Pago extends CI_Controller {
         );
 
         $this->load->view('layouts/header', $data);
+        traza_paso('3. vista layouts/header', '', 'pedido/gracias');
         $this->load->view('pago/gracias', $data);
+        traza_paso('4. vista pago/gracias (pantalla "Compra exitosa")', '', 'pedido/gracias');
         $this->load->view('layouts/footer');
+        traza_fin('pantalla de confirmación pintada', 'pedido/gracias');
     }
 
     public function cancelado() {
@@ -345,6 +415,58 @@ class Pago extends CI_Controller {
             $total += $item['precio'] * $item['cantidad'];
         }
         return $total;
+    }
+
+    /**
+     * Responde al navegador con el redirect y devuelve el control al controller,
+     * dejando el proceso vivo para seguir trabajando (mandar el correo).
+     *
+     * Por qué existe
+     * --------------
+     * El aviso por correo sale por el SMTP de Gmail: 1-3 s normales y, cuando la red
+     * bloquea el 587/465, hasta el Timeout de PHPMailer. Mientras ese envío ocurría
+     * ANTES del redirect, el navegador se quedaba esperando en blanco para pintar la
+     * pantalla de "Compra exitosa".
+     *
+     * Qué hace
+     * --------
+     *  1. session_write_close(): PHP deja el archivo de sesión con lock exclusivo
+     *     mientras el script vive. Sin cerrarlo, el navegador que sigue el redirect
+     *     (pedido/gracias) se queda esperando en session_start() a que termine el
+     *     correo y el arreglo no serviría de nada.
+     *  2. Manda el 302 con Content-Length: 0 y Connection: close y vacía los buffers
+     *     (fastcgi_finish_request() en php-fpm, flush() en mod_php): desde ese momento
+     *     el cliente ya tiene su respuesta y el trabajo que sigue es invisible.
+     *  3. ignore_user_abort(TRUE): si el cliente corta, el correo igual termina de salir.
+     */
+    private function _responder_navegador($ruta) {
+        $url = base_url($ruta);
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
+        $this->output->set_status_header(302);
+        $this->output->set_header('Location: ' . $url, TRUE);
+        $this->output->set_header('Content-Length: 0');
+        $this->output->set_header('Connection: close');
+
+        $this->output->_display('');
+
+        while (ob_get_level() > 0) {
+            @ob_end_flush();
+        }
+
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        } else {
+            @flush();
+        }
+
+        traza_paso('7. 302 enviado al navegador (respuesta cerrada al cliente)', $url, 'pago/procesar');
+
+        ignore_user_abort(TRUE);
+        @set_time_limit(120);
     }
 
     /** Datos del titular capturados en views/tienda/preparar.php. */

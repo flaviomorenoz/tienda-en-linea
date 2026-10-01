@@ -18,6 +18,113 @@ function traza($msg, $nombre_file="traza.txt"){
 }
 
 /**
+ * Igual que traza(), pero con marca de tiempo en milisegundos.
+ *
+ * traza() solo llega a segundos, que no alcanza para saber CUANTO tarda cada paso
+ * del flujo de pago. Estas lineas se escriben asi:
+ *
+ *   [2026-09-30 18:23:16.139] pago/procesar |  3) Pedido_model->crear | +   39.10 ms | acum    39.10 ms | id=57
+ *
+ * Medir el flujo completo:
+ *
+ *   traza_inicio('pago/procesar');            // marca 0
+ *   traza_paso('1. sesion leida', 'items=2'); // tiempo desde el paso anterior
+ *   traza_fin('redirect pedido/gracias/57');  // tiempo total del flujo
+ */
+function traza_ms($msg, $nombre_file="traza.txt"){
+    $ahora = microtime(TRUE);
+    $sello = date("Y-m-d H:i:s") . sprintf(".%03d", (int)floor(($ahora - floor($ahora)) * 1000));
+    $gestor = fopen($nombre_file,"a+");
+    fputs($gestor, "[" . $sello . "] " . $msg . "\n");
+    fclose($gestor);
+}
+
+/** Arranca la medicion de tiempos de un flujo (pago/procesar, pedido/gracias, ...). */
+function traza_inicio($flujo = "flujo", $detalle = ""){
+    $ahora = microtime(TRUE);
+    $GLOBALS["_traza_tiempos"][$flujo] = array(
+        "inicio" => $ahora,
+        "ultimo" => $ahora,
+        "paso"   => 0,
+    );
+
+    $uri = "";
+    if (isset($_SERVER["REQUEST_URI"])) {
+        $uri = $_SERVER["REQUEST_URI"];
+    } elseif (isset($_SERVER["argv"])) {
+        $uri = implode(" ", $_SERVER["argv"]);
+    }
+    if ($uri !== "") {
+        $detalle = trim($detalle . " uri=" . $uri);
+    }
+
+    traza_ms($flujo . " | INICIO | " . $detalle);
+}
+
+/**
+ * Anota un paso del flujo: el delta desde el paso anterior y el acumulado.
+ * Si el flujo no se inicio con traza_inicio(), se inicia aqui.
+ */
+function traza_paso($etiqueta, $detalle = "", $flujo = "flujo"){
+    $ahora = microtime(TRUE);
+
+    if (!isset($GLOBALS["_traza_tiempos"][$flujo])) {
+        $GLOBALS["_traza_tiempos"][$flujo] = array(
+            "inicio" => $ahora,
+            "ultimo" => $ahora,
+            "paso"   => 0,
+        );
+    }
+    $estado = &$GLOBALS["_traza_tiempos"][$flujo];
+    $estado["paso"]++;
+    $delta = ($ahora - $estado["ultimo"]) * 1000;
+    $total = ($ahora - $estado["inicio"]) * 1000;
+    $estado["ultimo"] = $ahora;
+
+    traza_ms(sprintf("%s | %2d) %-44s | +%9.2f ms | acum %9.2f ms%s",
+        $flujo,
+        $estado["paso"],
+        $etiqueta,
+        $delta,
+        $total,
+        ($detalle !== "" ? " | " . $detalle : "")
+    ));
+}
+
+/** Cierra la medicion del flujo escribiendo el tiempo total y suelta su estado. */
+function traza_fin($detalle = "", $flujo = "flujo"){
+    $ahora = microtime(TRUE);
+
+    if (!isset($GLOBALS["_traza_tiempos"][$flujo])) {
+        traza_ms($flujo . " | FIN | " . $detalle);
+        return;
+    }
+
+    $estado = $GLOBALS["_traza_tiempos"][$flujo];
+    traza_ms(sprintf("%s | %2d) %-44s | +%9.2f ms | TOTAL %8.2f ms%s",
+        $flujo,
+        $estado["paso"] + 1,
+        "FIN",
+        ($ahora - $estado["ultimo"]) * 1000,
+        ($ahora - $estado["inicio"]) * 1000,
+        ($detalle !== "" ? " | " . $detalle : "")
+    ));
+
+    unset($GLOBALS["_traza_tiempos"][$flujo]);
+}
+
+/**
+ * Salida del debug SMTP de PHPMailer hacia traza.txt (con milisegundos).
+ * Se activa con MAIL_SMTP_DEBUG=2 (servidor) o 3 (todo) en application/config/.env
+ * y se engancha como $mail->Debugoutput = 'traza_smtp';
+ * PHPMailer nunca escribe las credenciales del AUTH (las reemplaza por
+ * "[credentials hidden]"), así que el archivo se puede compartir sin riesgo.
+ */
+function traza_smtp($str, $nivel = 0){
+    traza_ms("correo | SMTP[" . $nivel . "] " . rtrim((string)$str));
+}
+
+/**
  * Devuelve la URL completa de la imagen de un producto.
  * Normaliza el valor guardado en BD (p.imagen / imagen2 / imagen3) para que:
  *  - 'short01.png'                    -> base_url('assets/img/productos/short01.png')

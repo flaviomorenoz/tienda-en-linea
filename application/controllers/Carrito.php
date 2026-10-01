@@ -209,7 +209,7 @@ class Carrito extends CI_Controller {
      */
     public function recibe_token(){
         $this->output->set_content_type('application/json');
-        traza("Carrito->recibe_token: inicio");
+        traza_inicio('carrito/recibe_token');
 
         // 1. Validaciones de entrada -----------------------------------------
         if ($this->input->method() !== 'post') {
@@ -220,7 +220,7 @@ class Carrito extends CI_Controller {
 
         $token = trim((string)$this->input->post('token'));
         if ($token === '') {
-            traza("Carrito->recibe_token: token vacío");
+            traza_fin('token vacío: no se cobra', 'carrito/recibe_token');
             $this->output->set_status_header(400);
             echo json_encode(array('ok' => false, 'error' => 'No se recibió el token del pago.'));
             return;
@@ -229,7 +229,7 @@ class Carrito extends CI_Controller {
         // El checkout devuelve el token del pago (tkn_/ype_) y, en los medios que se
         // resuelven con órdenes, el id de esa orden (ord_): Culqi valida el source_id.
         if (strpos($token, 'tkn_') !== 0 && strpos($token, 'ype_') !== 0 && strpos($token, 'ord_') !== 0) {
-            traza("Carrito->recibe_token: token inesperado ($token)");
+            traza_fin('token inesperado (' . substr($token, 0, 12) . '): no se cobra', 'carrito/recibe_token');
             $this->output->set_status_header(400);
             echo json_encode(array('ok' => false, 'error' => 'No se recibió un token de pago válido.'));
             return;
@@ -237,6 +237,7 @@ class Carrito extends CI_Controller {
 
         $carrito = $this->session->userdata('carrito') ?: array();
         if (empty($carrito)) {
+            traza_fin('carrito vacío: no se cobra', 'carrito/recibe_token');
             $this->output->set_status_header(400);
             echo json_encode(array('ok' => false, 'error' => 'Tu carrito está vacío.'));
             return;
@@ -298,7 +299,7 @@ class Carrito extends CI_Controller {
             $SECRET_KEY = isset($_SERVER['CULQI_LLAVE_PRIVADA']) ? $_SERVER['CULQI_LLAVE_PRIVADA'] : '';
         }
         if ($SECRET_KEY === '') {
-            traza("Carrito->recibe_token: falta CULQI_LLAVE_PRIVADA");
+            traza_fin('falta CULQI_LLAVE_PRIVADA: no se cobra', 'carrito/recibe_token');
             $this->output->set_status_header(500);
             echo json_encode(array('ok' => false, 'error' => 'La pasarela no está configurada (falta la llave privada).'));
             return;
@@ -354,7 +355,9 @@ class Carrito extends CI_Controller {
             "metadata" => $metadata
         );
 
-        traza("Carrito->recibe_token: total=$total amount=$amount email=$email");
+        traza_paso('1. token y datos del titular validados + payload del cargo',
+            'total=' . $total . ' amount=' . $amount . ' email=' . $email . ' token=' . substr($token, 0, 12) . '...',
+            'carrito/recibe_token');
 
         // 3. Crear el cargo en Culqi -----------------------------------------
         $ch = curl_init('https://api.culqi.com/v2/charges');
@@ -376,7 +379,8 @@ class Carrito extends CI_Controller {
         if (curl_errno($ch)) {
             $error_curl = curl_error($ch);
             curl_close($ch);
-            traza("Carrito->recibe_token: error cURL -> " . $error_curl);
+            traza_paso('2. POST /v2/charges (Culqi)', 'ERROR cURL: ' . $error_curl, 'carrito/recibe_token');
+            traza_fin('sin cobro: no se pudo contactar a Culqi', 'carrito/recibe_token');
             log_message('error', 'Carrito::recibe_token: error cURL: ' . $error_curl);
             $this->output->set_status_header(502);
             echo json_encode(array('ok' => false, 'error' => 'No se pudo contactar a la pasarela de pago. Intente nuevamente.'));
@@ -387,6 +391,7 @@ class Carrito extends CI_Controller {
         curl_close($ch);
 
         $result = json_decode($response, true);
+        traza_paso('2. POST /v2/charges (Culqi)', 'HTTP ' . $httpCode, 'carrito/recibe_token');
         traza("Carrito->recibe_token: HTTP $httpCode -> " . print_r($result, true));
 
         // 4. Evaluar la respuesta de Culqi -----------------------------------
@@ -403,6 +408,7 @@ class Carrito extends CI_Controller {
                     $mensaje = $result['merchant_message'];
                 }
             }
+            traza_fin('cargo rechazado (HTTP ' . $httpCode . '): el cliente sigue en el checkout', 'carrito/recibe_token');
             log_message('error', 'Carrito::recibe_token: cargo rechazado (HTTP ' . $httpCode . '): ' . $response);
             echo json_encode(array(
                 'ok'      => false,
@@ -430,6 +436,7 @@ class Carrito extends CI_Controller {
             } elseif (!empty($outcome['merchant_message'])) {
                 $motivo = $outcome['merchant_message'];
             }
+            traza_fin('cargo no pagado (' . $tipo . '/' . $codigo . '): el cliente sigue en el checkout', 'carrito/recibe_token');
             log_message('error', 'Carrito::recibe_token: cargo no pagado (' . $tipo . '/' . $codigo . '): ' . $response);
             echo json_encode(array(
                 'ok'    => false,
@@ -438,7 +445,7 @@ class Carrito extends CI_Controller {
             return;
         }
 
-        traza("Carrito->recibe_token: cargo aprobado " . $result['id'] . " ($tipo/$codigo)");
+        traza_paso('3. cargo aprobado por Culqi', $result['id'] . ' (' . $tipo . '/' . $codigo . ')', 'carrito/recibe_token');
 
         /* El pedido NO se registra aquí: se guarda el cargo aprobado y los datos del titular
            en sesión, y pago/procesar() (la redirección final) escribe en pedidos_web. Así el
@@ -450,7 +457,9 @@ class Carrito extends CI_Controller {
             'pago_total' => $total,
         ));
 
-        traza("Carrito->recibe_token: cargo aprobado " . $result['id'] . " -> pendiente de registrar en pago/procesar");
+        traza_paso('4. cargo y datos del titular guardados en la sesión',
+            'cargo=' . $result['id'] . ' -> pendiente de registrar en pago/procesar', 'carrito/recibe_token');
+        traza_fin('el navegador pasa a pago/procesar', 'carrito/recibe_token');
 
         echo json_encode(array(
             'ok'       => true,
