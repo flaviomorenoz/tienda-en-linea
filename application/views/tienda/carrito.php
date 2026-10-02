@@ -218,16 +218,17 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
     </script>
     
     <?= form_open_multipart("pago/preparar", 'class="validation" id="form_preparar" onsubmit="return valido_preparar()"'); ?>
-        <table style="width:100%">
+        <table style="width:100%; margin-top:7px;">
             <tr>
-                <td style="width:40%">
+                <td style="width:35%">
                 </td>
-                <td style="width:20%" class="text-center">
-                    <button type="submit" id="btn_pagar0" class="btn btn-primary btn-sm" style="padding-top:7px;">
+                <td style="width:30%" class="text-center">
+                    
+                </td>
+                <td style="width:35%;text-align:right">
+                    <button type="submit" id="btn_pagar0" class="btn btn-primary btn-md" style="padding-top:7px;">
                         <i class="bi bi-arrow-repeat me-1"></i>Inicia Pago
                     </button>
-                </td>
-                <td style="width:40%">
                 </td>
             </tr>
         </table>

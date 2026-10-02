@@ -56,7 +56,8 @@ class Notificador_pedido {
         $tienda    = $this->CI->config->item('tienda_nombre');
         $destino   = trim((string)$this->CI->config->item('tienda_email'));
         $remitente = trim((string)$this->CI->config->item('email_remitente'));
-
+        traza("remitente/destino : {$remitente}/{$destino}");
+        
         if ($remitente === '') {
             $remitente = $destino;
         }
