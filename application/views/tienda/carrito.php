@@ -226,9 +226,9 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
                     
                 </td>
                 <td style="width:35%;text-align:right">
-                    <!--<button type="submit" id="btn_pagar0" class="btn btn-primary btn-md" style="padding-top:7px;">
+                    <button type="submit" id="btn_pagar0" class="btn btn-primary btn-md" style="padding-top:7px;">
                         <i class="bi bi-arrow-repeat me-1"></i>Inicia Pago
-                    </button>-->
+                    </button>
                 </td>
             </tr>
         </table>
