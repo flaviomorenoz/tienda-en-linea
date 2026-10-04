@@ -363,7 +363,6 @@ main > .container-fluid {
     display: block;
     max-width: 100%;
     border-radius: 8px;
-    cursor: zoom-in;
 }
 
 .chat-ia-msg-vendedor {

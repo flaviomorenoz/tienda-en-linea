@@ -1,0 +1,113 @@
+/* ===================================================
+   LUPA (zoom) DE LAS IMAGENES DE PRODUCTO
+   ===================================================
+   Efecto de lente que sigue al cursor y amplia la zona apuntada. Se usa en:
+     - tienda/detalle.php  (imagen principal, grande)
+     - tienda/home.php     (imagen principal de cada tarjeta del catalogo)
+
+   Estilos compartidos: antes vivian dentro de detalle.php y solo servian a esa
+   vista. Al pasar aqui, el home puede usar el mismo efecto sin duplicar CSS.
+
+   Lo activa assets/js/lupa.js (iniciarLupa).
+   =================================================== */
+
+/* Marco de la imagen: referencia de posicion para la lente. En el detalle ya
+   traia position:relative desde el tema; en las tarjetas del home se asegura. */
+.product-detail-img-wrapper,
+.product-img-wrapper {
+    position: relative;
+}
+
+.product-detail-img-wrapper img.product-detail-img,
+.product-img-wrapper img.product-img {
+    cursor: zoom-in;
+}
+
+/* En el home la tarjeta y el marco recortan su contenido (overflow:hidden), lo
+   que cortaria la lente. Mientras la lupa esta activa se permite desbordar; al
+   salir el cursor se vuelve al recorte normal. Se aplica a la tarjeta concreta
+   (la clase la pone/quita el JS), no a todas. */
+.product-card.lupa-activa,
+.product-img-wrapper.lupa-activa {
+    overflow: visible;
+}
+
+/* Lente que sigue al cursor. El tamano se define aqui y el JS lo lee. */
+.product-detail-lupa {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    background-color: #111;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    z-index: 6;
+    /* El borde va con box-shadow para no desplazar el origen del fondo. */
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.95),
+                0 0 0 3px rgba(0, 0, 0, 0.30),
+                0 10px 26px rgba(0, 0, 0, 0.45);
+    will-change: transform, background-position;
+}
+
+.product-detail-lupa.activa {
+    opacity: 1;
+}
+
+/* Aviso para que el usuario descubra el zoom. */
+.product-detail-lupa-hint {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 0.75rem;
+    line-height: 1;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.product-detail-lupa-hint i {
+    font-size: 0.95rem;
+}
+
+.product-detail-img-wrapper.lupa-activa .product-detail-lupa-hint,
+.product-img-wrapper.lupa-activa .product-detail-lupa-hint {
+    opacity: 0;
+}
+
+/* En las tarjetas del home el aviso se ve mas chico, para no tapar la foto, y
+   aparece recien cuando el cursor entra a la tarjeta: en una grilla de decenas
+   de productos, decenas de pastillas fijas ensucian el catalogo. */
+.product-img-wrapper .product-detail-lupa-hint {
+    right: 6px;
+    bottom: 6px;
+    padding: 3px 8px;
+    font-size: 0.68rem;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.product-card:hover .product-img-wrapper .product-detail-lupa-hint {
+    opacity: 1;
+}
+
+/* En pantallas tactiles no hay hover: se oculta el aviso. */
+@media (hover: none), (pointer: coarse) {
+    .product-detail-lupa-hint {
+        display: none;
+    }
+    .product-detail-img-wrapper img.product-detail-img,
+    .product-img-wrapper img.product-img {
+        cursor: default;
+    }
+}

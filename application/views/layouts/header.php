@@ -44,6 +44,8 @@
     $tema_css = $CI->Ajustes_model->get_tema_activo();
     ?>
     <link href="<?php echo base_url('assets/css/' . $tema_css . '?v=5'); ?>" rel="stylesheet">
+    <!-- Lupa (zoom) de las imagenes de producto: detalle y tarjetas del home -->
+    <link href="<?php echo base_url('assets/css/lupa.css?v=1'); ?>" rel="stylesheet">
 </head>
 <body>
 

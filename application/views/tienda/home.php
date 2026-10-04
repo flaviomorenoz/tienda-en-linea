@@ -98,8 +98,10 @@
                                  id="<?php echo $img_id; ?>"
                                  alt="<?php echo htmlspecialchars($p->nombre, ENT_QUOTES, 'UTF-8'); ?>"
                                  class="product-img"
+                                 data-lupa-zoom="2.5"
                                  onerror="this.onerror=null;this.src='<?php echo $img_default; ?>'"
                                  data-combre="<?php echo htmlspecialchars($img_principal, ENT_QUOTES, 'UTF-8'); ?>">
+                            <span class="product-detail-lupa-hint"><i class="bi bi-zoom-in"></i> Ampliar</span>
                             <?php if (!$p->tiene_precio): ?>
                             <span class="badge bg-secondary product-badge">Consultar</span>
                             <?php endif; ?>
@@ -179,4 +181,15 @@ function quitar_ocultacion(enlace){
     }
     return false;
 }
+
+// Lupa (zoom) de la imagen principal de cada tarjeta. La implementacion esta en
+// assets/js/lupa.js (la misma que usa tienda/detalle.php) y se engancha a todas
+// las imagenes del catalogo de una sola pasada. Se espera a DOMContentLoaded
+// porque este script corre antes de que los layouts carguen lupa.js.
+document.addEventListener('DOMContentLoaded', function () {
+    iniciarLupa({
+        selector: 'img.product-img',
+        wrapper: '.product-img-wrapper'
+    });
+});
 </script>
