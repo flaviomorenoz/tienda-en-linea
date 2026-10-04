@@ -550,13 +550,14 @@ main > .container-fluid {
     /* Miniaturas de producto */
     .product-thumbs {
         display: flex;
-        gap: 5px;
+    flex-wrap: wrap;
+        gap: 4px;
         justify-content: center;
-        padding: 6px 8px 2px;
+        padding: 5px 6px 2px;
     }
     .product-thumbs img {
-        width: 48px;
-        height: 48px;
+        width: 36px;
+        height: 36px;
         object-fit: cover;
         border-radius: 5px;
         cursor: pointer;

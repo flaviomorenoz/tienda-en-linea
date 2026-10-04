@@ -85,9 +85,8 @@
                 <div class="card product-card h-100 border-0 shadow-sm">
                     <!-- Imagen principal -->
                     <?php
-                        $trz_img2 = isset($p->imagen2) ? $p->imagen2 : '';
-                        $trz_img3 = isset($p->imagen3) ? $p->imagen3 : '';
-                        //traza("home.php producto id=" . $p->id . " nombre='" . $p->nombre . "' imagen_url='" . $p->imagen_url . "' imagen2='" . $trz_img2 . "' imagen3='" . $trz_img3 . "' img(0)='" . $p->imagenes[0] . "'");
+                        // Las imagenes vienen de tec_products.imagen .. imagen6 (hasta 6),
+                        // ya ordenadas y sin las vacias, en Tienda::_imagenes_de().
                         $img_principal = ruta_imagen_producto($p->imagenes[0]);
                         $img_default   = base_url('assets/img/default.png');
                         $img_id        = 'prod-img-' . $p->id;

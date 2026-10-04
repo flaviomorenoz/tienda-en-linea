@@ -84,14 +84,7 @@ class Tienda extends CI_Controller {
 
         $tallas      = $this->Producto_model->get_tallas($id);
         $relacionados = $this->Producto_model->get_relacionados($id, $producto->categoria);
-        $imagenes    = array_values(array_filter(array(
-            $producto->imagen_url,
-            isset($producto->imagen2) ? $producto->imagen2 : '',
-            isset($producto->imagen3) ? $producto->imagen3 : '',
-        ), function($img) { return !empty($img); }));
-        if (empty($imagenes)) {
-            $imagenes = array($producto->imagen_url);
-        }
+        $imagenes    = $this->_imagenes_de($producto);
 
         $data = array(
             'titulo'        => $producto->nombre . ' - ' . $this->config->item('tienda_nombre'),
@@ -140,14 +133,34 @@ class Tienda extends CI_Controller {
     private function _adjuntar_imagenes(&$productos) {
         if (empty($productos)) return;
         foreach ($productos as $p) {
-            $imgs = array_values(array_filter(array(
-                isset($p->imagen_url) ? $p->imagen_url : '',
-                isset($p->imagen2) ? $p->imagen2 : '',
-                isset($p->imagen3) ? $p->imagen3 : '',
-            ), function($img) { return !empty($img); }));
-            $p->imagenes = !empty($imgs) ? $imgs : array($p->imagen_url);
+            $p->imagenes = $this->_imagenes_de($p);
             //traza("_adjuntar_imagenes id={$p->id} imagenes=" . implode(' | ', $p->imagenes));
         }
+    }
+
+    /**
+     * Imagenes de un producto, en orden y sin las vacias.
+     *
+     * Son las columnas tec_products.imagen .. imagen6 (hasta 6 imagenes, las llena el
+     * ERP en products/add): la primera es la principal. Si el producto todavia no tiene
+     * ninguna se devuelve su unico valor para que la vista tenga siempre un arreglo con
+     * algo (asi count($imagenes) no revienta).
+     */
+    private function _imagenes_de($producto) {
+        $columnas = array('imagen_url', 'imagen2', 'imagen3', 'imagen4', 'imagen5', 'imagen6');
+
+        $imgs = array();
+        foreach ($columnas as $col) {
+            if (isset($producto->$col) && trim((string)$producto->$col) !== '') {
+                $imgs[] = $producto->$col;
+            }
+        }
+
+        if (empty($imgs)) {
+            return array(isset($producto->imagen_url) ? $producto->imagen_url : '');
+        }
+
+        return $imgs;
     }
 
     private function _carrito_count() {

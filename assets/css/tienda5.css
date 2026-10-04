@@ -505,15 +505,16 @@ main > .container-fluid {
    =================================================== */
 .product-thumbs {
     display: flex;
-    gap: 5px;
+    flex-wrap: wrap;
+    gap: 4px;
     justify-content: center;
-    padding: 6px 8px 2px;
+    padding: 5px 6px 2px;
     background: #ffffff;
 }
 
 .product-thumbs img {
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     object-fit: cover;
     border-radius: 0;
     cursor: pointer;

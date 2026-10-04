@@ -9,7 +9,7 @@ class Producto_model extends CI_Model {
 
     public function get_todos($categoria = NULL, $termino = '') {
         /*
-            $this->db->select('p.id, p.name AS nombre, p.descripcion, p.price AS precio, p.tiene_precio, p.imagen AS imagen_url, p.imagen2, p.imagen3, p.activo, p.id_seccion, c.name AS categoria, s.descrip_seccion AS seccion, COALESCE(SUM(pt.stock), 0) AS stock_total');
+            $this->db->select('p.id, p.name AS nombre, p.descripcion, p.price AS precio, p.tiene_precio, p.imagen AS imagen_url, p.imagen2, p.imagen3, p.imagen4, p.imagen5, p.imagen6, p.activo, p.id_seccion, c.name AS categoria, s.descrip_seccion AS seccion, COALESCE(SUM(pt.stock), 0) AS stock_total');
             $this->db->from('tec_products p');
             $this->db->join('tec_categories c', 'c.id = p.category_id', 'left');
             $this->db->join('web_secciones s', 's.id = p.id_seccion', 'left');
@@ -26,12 +26,12 @@ class Producto_model extends CI_Model {
                 $this->db->or_like('LOWER(s.descrip_seccion)', $termino_l);
                 $this->db->group_end();
             }
-            $this->db->group_by('p.id, p.name, p.descripcion, p.price, p.tiene_precio, p.imagen, p.imagen2, p.imagen3, p.activo, p.id_seccion, c.id, c.name, s.id, s.descrip_seccion');
+            $this->db->group_by('p.id, p.name, p.descripcion, p.price, p.tiene_precio, p.imagen, p.imagen2, p.imagen3, p.imagen4, p.imagen5, p.imagen6, p.activo, p.id_seccion, c.id, c.name, s.id, s.descrip_seccion');
             $this->db->order_by('p.id', 'ASC');
             //echo $this->db->get_compiled_select(); // This will output the SQL query for debugging purposes
         */
         
-        $this->db->select('p.id, p.name AS nombre, p.descripcion, coalesce(tp.precio, p.price, 1) AS precio, p.tiene_precio, p.imagen AS imagen_url, p.imagen2, p.imagen3, p.activo, p.id_seccion, c.name AS categoria, s.descrip_seccion AS seccion, COALESCE(SUM(pt.stock), 0) AS stock_total');
+        $this->db->select('p.id, p.name AS nombre, p.descripcion, coalesce(tp.precio, p.price, 1) AS precio, p.tiene_precio, p.imagen AS imagen_url, p.imagen2, p.imagen3, p.imagen4, p.imagen5, p.imagen6, p.activo, p.id_seccion, c.name AS categoria, s.descrip_seccion AS seccion, COALESCE(SUM(pt.stock), 0) AS stock_total');
         $this->db->from('tec_products p');
         $this->db->join('tec_categories c', 'c.id = p.category_id', 'left');
         $this->db->join('web_secciones s', 's.id = p.id_seccion', 'left');
@@ -49,7 +49,7 @@ class Producto_model extends CI_Model {
             $this->db->or_like('LOWER(s.descrip_seccion)', $termino_l);
             $this->db->group_end();
         }
-        $this->db->group_by('p.id, p.name, p.descripcion, coalesce(tp.precio, p.price, 1), p.tiene_precio, p.imagen, p.imagen2, p.imagen3, p.activo, p.id_seccion, c.id, c.name, s.id, s.descrip_seccion');
+        $this->db->group_by('p.id, p.name, p.descripcion, coalesce(tp.precio, p.price, 1), p.tiene_precio, p.imagen, p.imagen2, p.imagen3, p.imagen4, p.imagen5, p.imagen6, p.activo, p.id_seccion, c.id, c.name, s.id, s.descrip_seccion');
         $this->db->order_by('p.id', 'ASC');
         //echo $this->db->get_compiled_select(); // This will output the SQL query for debugging purposes
         //die("FIN");
@@ -57,7 +57,7 @@ class Producto_model extends CI_Model {
     }
 
     public function get_por_id($id) {
-        $this->db->select('p.id, p.name AS nombre, p.descripcion, p.price AS precio, p.tiene_precio, p.imagen AS imagen_url, p.imagen2, p.imagen3, p.x_unidad, p.x_docena, p.x_media_docena, p.activo, c.name AS categoria');
+        $this->db->select('p.id, p.name AS nombre, p.descripcion, p.price AS precio, p.tiene_precio, p.imagen AS imagen_url, p.imagen2, p.imagen3, p.imagen4, p.imagen5, p.imagen6, p.x_unidad, p.x_docena, p.x_media_docena, p.activo, c.name AS categoria');
         $this->db->from('tec_products p');
         $this->db->join('tec_categories c', 'c.id = p.category_id', 'left');
         $this->db->where('p.id', (int)$id);

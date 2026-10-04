@@ -151,6 +151,8 @@
         <!-- Imagen del producto -->
         <div class="col-md-6">
             <?php
+                // $imagenes trae hasta 6 nombres (tec_products.imagen .. imagen6), ya
+                // ordenados y sin las vacias, desde Tienda::_imagenes_de().
                 $det_img_principal = ruta_imagen_producto($imagenes[0]); //base_url('../erp-en-linea/assets/img/productos/' . $imagenes[0]);
                 $det_img_default   = base_url('../erp-en-linea/assets/img/productos/default1.jpg');
                 $det_img_id        = 'detalle-img-principal';
