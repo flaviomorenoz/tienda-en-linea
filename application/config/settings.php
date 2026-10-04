@@ -6,7 +6,7 @@ $config['tienda_nombre']    = 'Bella Rosse';
 $config['tienda_slogan']    = 'Ropa y accesorios para todos';
 
 // Correo que RECIBE los avisos de pedidos nuevos (ver Pago::_enviar_correo_pedido)
-$config['tienda_email']     = 'flaviomorenoz@gmail.com';
+$config['tienda_email']     = 'bellarosse176@gmail.com';
 // Cuenta SMTP que figura como remitente (debe coincidir con smtp_user de config/email.php)
 $config['email_remitente']  = 'flaviomorenoz@gmail.com';
 

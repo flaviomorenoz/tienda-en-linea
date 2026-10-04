@@ -20,6 +20,17 @@ if (!filter_var($correo_tienda, FILTER_VALIDATE_EMAIL)) {
     $correo_tienda = 'flaviomorenoz@gmail.com';
 }
 ?>
+<!-- Texto de ejemplo (placeholder) mas claro que el #6c757d de Bootstrap, que en este
+     formulario se confundia con lo que escribe el cliente. Se deja tambien aqui, acotado
+     a #form-pagos, para que el cambio se mantenga aunque se cambie el tema de la tienda.
+     Mismo bloque que en tienda/checkout.php: si se ajusta el color, cambiar los dos. -->
+<style>
+    #form-pagos .form-control::placeholder,
+    #form-pagos .form-select::placeholder {
+        color: #b3aca6;
+        opacity: 1;
+    }
+</style>
 <div id="form-pagos" class="row">
     <div class="col-sm-12">
         <?= form_open_multipart("pago/crear_orden", 'name="form-checkout" id="form-checkout"'); ?>

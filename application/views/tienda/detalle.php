@@ -234,7 +234,7 @@
                         <label class="form-label fw-semibold">Unidad</label>
                         <div class="input-group" style="max-width:160px;">
                             <?php
-                                echo form_dropdown('select_unidad', $ar_u, 'DOCENA','class="form-control" id="select_unidad" required="required" onchange="coloca_precio(this)"');
+                                echo form_dropdown('select_unidad', $ar_u, 'DOCENA','class="" id="select_unidad" required="required" onchange="coloca_precio(this)"');
                             ?>
                             <input type="hidden" name="hdn_precio" id="hdn_precio" value="">
                         </div>

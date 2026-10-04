@@ -68,7 +68,7 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
                                          recalcular_resumen() lo usa para el subtotal en vivo (cantidad x precio). -->
                                     <tr data-precio="<?php echo (float)$item['precio']; ?>">
                                         <td>
-                                            <img src="<?php echo base_url("../erp-en-linea/assets/img/productos/".$item['imagen']); ?>"
+                                            <img src="<?php echo $_ENV["RUTA_DOMINIO_ERP"] . "/assets/img/productos/" . $item['imagen']; ?>"
                                                  alt="<?php echo htmlspecialchars($item['nombre'], ENT_QUOTES, 'UTF-8'); ?>"
                                                  class="rounded" width="60" height="70"
                                                  style="object-fit:cover;"
@@ -99,7 +99,7 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
                                             <input type="text" 
                                                 name="unidad[<?php echo $i; ?>]"
                                                 value="<?= $item['unidad'] ?>"
-                                                class="form-control form-control-sm text-center">
+                                                class="form-control form-control-sm text-center" readonly>
                                         </td>
                                         <td class="text-end text-muted">
                                             <?php echo $this->config->item('moneda_simbolo'); ?>
@@ -135,10 +135,10 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
                         <button type="submit" class="btn btn-outline-dark">
                             <i class="bi bi-arrow-repeat me-1"></i>Actualizar
                         </button>
-                        <a href="<?php echo base_url('carrito/vaciar'); ?>" class="btn btn-outline-danger"
+                        <!--<a href="<?php echo base_url('carrito/vaciar'); ?>" class="btn btn-outline-danger"
                            onclick="return confirm('¿Vaciar todo el carrito?')">
                             <i class="bi bi-trash me-1"></i>Vaciar
-                        </a>
+                        </a>-->
                     </div>
                 </div>
             </div>

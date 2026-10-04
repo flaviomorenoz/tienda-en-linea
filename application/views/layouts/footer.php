@@ -31,13 +31,19 @@
                 $CI =& get_instance();
                 if (!isset($CI->Producto_model)) { $CI->load->model('Producto_model'); }
                 $cats = $CI->Producto_model->get_categorias();
+                $i=1;
                 foreach ($cats as $cat):
                 ?>
                 <a href="<?php echo base_url('tienda/categoria/' . urlencode($cat)); ?>"
                    class="d-block text-white-50 small text-decoration-none mb-1 footer-cat-link">
                     <i class="bi bi-chevron-right me-1"></i><?php echo htmlspecialchars($cat, ENT_QUOTES, 'UTF-8'); ?>
                 </a>
-                <?php endforeach; ?>
+                <?php 
+                if($i==3){
+                    break;
+                }
+                $i++;
+                endforeach; ?>
             </div>
         </div>
         <hr class="border-secondary mt-4">

@@ -1,3 +1,14 @@
+<!-- Texto de ejemplo (placeholder) mas claro que el #6c757d de Bootstrap, que en este
+     formulario se confundia con lo que escribe el cliente. Se deja tambien aqui, acotado
+     a #form-checkout, para que el cambio se mantenga aunque se cambie el tema de la tienda.
+     Mismo bloque que en tienda/preparar.php: si se ajusta el color, cambiar los dos. -->
+<style>
+    #form-checkout .form-control::placeholder,
+    #form-checkout .form-select::placeholder {
+        color: #b3aca6;
+        opacity: 1;
+    }
+</style>
 <div class="container">
     <h2 class="fw-bold mb-1"><i class="bi bi-lock-fill me-2"></i>Finalizar compra</h2>
     <p class="text-muted mb-4">Completa tus datos para procesar el pedido</p>

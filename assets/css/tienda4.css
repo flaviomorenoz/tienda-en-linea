@@ -362,8 +362,13 @@ main > .container-fluid {
     box-shadow: 0 0 0 0.25rem rgba(250,1,131,0.15);
 }
 
-.form-control::placeholder {
-    color: #777;
+/* Bootstrap 5 usa #6c757d, que en los formularios de pago/checkout se ve casi
+   como el texto real; se aclara a un gris calido. El texto que escribe el
+   cliente no cambia. */
+.form-control::placeholder,
+.form-select::placeholder {
+    color: #b3aca6;
+    opacity: 1;
 }
 
 .form-label {

@@ -583,3 +583,17 @@ main > .container-fluid {
     display: none;
 }
 
+/* ===================================================
+   TEXTO DE EJEMPLO DE LOS CAMPOS (placeholder)
+   Bootstrap 5 pinta el placeholder con #6c757d, que en los
+   formularios de pago/checkout se ve casi como el texto real.
+   Se aclara a un gris calido y se fuerza opacity:1 porque
+   Bootstrap lo dibuja con opacidad. El texto que escribe el
+   cliente no cambia.
+   =================================================== */
+.form-control::placeholder,
+.form-select::placeholder {
+    color: #b3aca6;
+    opacity: 1;
+}
+

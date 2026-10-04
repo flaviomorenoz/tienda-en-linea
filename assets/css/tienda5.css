@@ -22,6 +22,7 @@
     --card-bg:       #ffffff;
     --color-tol-tit:   #3A3735;
     --color-tol-fondo: #ffffff;
+    --rosa-suave:   rgb(252,116,186);
 }
 
 /* Base */
@@ -60,7 +61,7 @@ main > .container-fluid {
    NAVBAR (estilo Aruma: blanco, letras carbón)
    =================================================== */
 #navbar-tienda {
-    background: #ffffff;
+    background: rgb(255,232,244);
     box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     border-bottom: 1px solid var(--borde);
     padding: 0.75rem 0;
@@ -562,7 +563,7 @@ main > .container-fluid {
    FOOTER (Aruma: oscuro con columnas)
    =================================================== */
 .footer-tienda {
-    background: var(--negro);
+    background: var(--rosa-suave);
     border-top: 3px solid var(--primary);
     color: #d9d5d0;
 }
@@ -575,7 +576,7 @@ main > .container-fluid {
 }
 
 .footer-tienda .color-fuente-bella {
-    color: #b5b0ab;
+    color: white;
 }
 
 .footer-tienda a.color-fuente-bella {
@@ -587,7 +588,7 @@ main > .container-fluid {
 }
 
 .footer-cat-link {
-    color: #b5b0ab !important;
+    color: white !important;
 }
 
 .footer-cat-link:hover {
@@ -820,4 +821,18 @@ main > .container-fluid {
    =================================================== */
 .texto-descrip.div-ocultar {
     display: none;
+}
+
+/* ===================================================
+   TEXTO DE EJEMPLO DE LOS CAMPOS (placeholder)
+   Bootstrap 5 pinta el placeholder con #6c757d, que en los
+   formularios de pago/checkout se ve casi como el texto real.
+   Se aclara a un gris calido y se fuerza opacity:1 porque
+   Bootstrap lo dibuja con opacidad. El texto que escribe el
+   cliente no cambia.
+   =================================================== */
+.form-control::placeholder,
+.form-select::placeholder {
+    color: #b3aca6;
+    opacity: 1;
 }
