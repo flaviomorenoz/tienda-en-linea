@@ -179,7 +179,13 @@ class Pago extends CI_Controller {
                 'email'        => $datos['correo'],
                 'phone_number' => $datos['celular'],
             ),
-            'metadata'        => array('dni' => $datos['dni']),
+            'metadata'          => array(
+                'dni'           => $datos['dni'],
+                //'dpto'          => $datos['dpto'],
+                //'prov'          => $datos['prov'],
+                //'distrito'      => $datos['distrito'],
+            )
+
         );
 
         traza_paso('1. datos del titular validados + payload de la orden',
@@ -279,16 +285,17 @@ class Pago extends CI_Controller {
      * esperando todo lo que tardara Gmail en aceptar el mensaje.
      */
     public function procesar() {
-        traza_inicio('pago/procesar');
+        traza_inicio('*********pago/procesar************');
         $carrito   = $this->session->userdata('carrito') ?: array();
         $cargo     = $this->session->userdata('pago_cargo');
         $datos     = $this->session->userdata('pago_datos');
         $total     = $this->session->userdata('pago_total');
         $id_pagado = $this->session->userdata('pago_id_pedido');
 
-        traza_paso('1. datos del cobro leídos de la sesión',
-            'cargo=' . ($cargo ? $cargo : '(vacío)') . ' items=' . count($carrito) . ' total=' . $total
-            . ' ya_registrado=' . ($id_pagado ? $id_pagado : 'no'), 'pago/procesar');
+        //traza("*************AGARRA QUE AHI TE VIENE*******************");
+        //traza(print_r($_SESSION,true));
+
+        //traza_paso('1. datos del cobro leídos de la sesión','cargo=' . ($cargo ? $cargo : '(vacío)') . ' items=' . count($carrito) . ' total=' . $total . ' ya_registrado=' . ($id_pagado ? $id_pagado : 'no'), 'pago/procesar');
 
         if (!empty($id_pagado)) {
             traza_fin('el pedido ya estaba registrado: redirect directo (idempotente)', 'pago/procesar');
@@ -306,7 +313,7 @@ class Pago extends CI_Controller {
         if ($total === FALSE || $total === NULL) {
             $total = $this->_calcular_total($carrito);
         }
-        traza_paso('2. total del pedido', 'total=' . $total, 'pago/procesar');
+        //traza_paso('2. total del pedido', 'total=' . $total, 'pago/procesar');
 
         // Datos que se guardan en pedidos_web (ver Pedido_model::crear)
         $datos_pedido = array(
@@ -318,11 +325,14 @@ class Pago extends CI_Controller {
             'observaciones'   => isset($datos['observaciones']) ? $datos['observaciones'] : '',
             'archivo'         => NULL,   // el pago es por pasarela: no hay comprobante que subir
             'correo'          => $datos['correo'],
+            'dpto'              => trim($this->session->userdata('dpto')),
+            'prov'              => trim($this->session->userdata('prov')),
+            'distrito'          => trim($this->session->userdata('distrito')),
+            'tipo_envio'        => trim($this->session->userdata('tipo_envio')),
+            'quien_recibe'      => trim($this->session->userdata('quien_recibe'))
         );
-
+        
         $id_pedido = $this->Pedido_model->crear($datos_pedido);
-        traza_paso('3. INSERT en pedidos_web (Pedido_model->crear)',
-            'id_pedido=' . $id_pedido . ' cargo=' . $cargo, 'pago/procesar');
 
         foreach ($carrito as $item) {
             $this->Pedido_model->agregar_detalle(array(
@@ -334,19 +344,18 @@ class Pago extends CI_Controller {
                 'unidad'          => isset($item['unidad']) ? $item['unidad'] : NULL,
             ));
         }
-        traza_paso('4. INSERT del detalle (1 INSERT + 1 SELECT de unidad por ítem)',
-            'items=' . count($carrito), 'pago/procesar');
+        //traza_paso('4. INSERT del detalle (1 INSERT + 1 SELECT de unidad por ítem)','items=' . count($carrito), 'pago/procesar');
 
         // El código de la transacción es el id del cargo aprobado en Culqi
         $this->Pedido_model->actualizar_pago($id_pedido, 'Pagado', $cargo);
-        traza_paso('5. UPDATE del pago en pedidos_web', 'estado=Pagado cargo=' . $cargo, 'pago/procesar');
+        //traza_paso('5. UPDATE del pago en pedidos_web', 'estado=Pagado cargo=' . $cargo, 'pago/procesar');
 
         // Marca de idempotencia + limpieza del carrito y de los datos del pago
         $this->session->set_userdata('pago_id_pedido', $id_pedido);
         $this->session->unset_userdata(array(
             'carrito', 'pago_orden', 'pago_order_number', 'pago_token', 'pago_cargo', 'pago_datos', 'pago_total',
         ));
-        traza_paso('6. sesión limpiada (queda la marca de idempotencia)', '', 'pago/procesar');
+        //traza_paso('6. sesión limpiada (queda la marca de idempotencia)', '', 'pago/procesar');
 
         /* Hasta aquí el pedido ya está cobrado y registrado: la pantalla de "Compra
            exitosa" no puede quedarse esperando al SMTP de Gmail. Primero se responde al
@@ -354,11 +363,11 @@ class Pago extends CI_Controller {
         $this->_responder_navegador('pedido/gracias/' . $id_pedido);
 
         // Aviso por correo: si falla, el pedido ya quedó registrado y el cliente ya vio su pantalla
-        traza_paso('8. aviso por correo al cliente y a la tienda (SMTP)', 'correo=' . $datos_pedido['correo'], 'pago/procesar');
+        //traza_paso('8. aviso por correo al cliente y a la tienda (SMTP)', 'correo=' . $datos_pedido['correo'], 'pago/procesar');
         $this->load->library('notificador_pedido');
         $this->notificador_pedido->enviar($id_pedido, $datos_pedido, $carrito, $total);
 
-        traza_fin('pedido ' . $id_pedido . ' registrado; el cliente ya estaba en la pantalla de confirmación', 'pago/procesar');
+        //traza_fin('pedido ' . $id_pedido . ' registrado; el cliente ya estaba en la pantalla de confirmación', 'pago/procesar');
 
         /* La respuesta ya salió con Connection: close: se corta aquí para que CodeIgniter
            no intente enviar cabeceras por segunda vez ("headers already sent"). */
@@ -479,6 +488,11 @@ class Pago extends CI_Controller {
             'celular'         => trim((string)$this->input->post('celular', TRUE)),
             'direccion_envio' => trim((string)$this->input->post('direccion_envio', TRUE)),
             'observaciones'   => trim((string)$this->input->post('observaciones', TRUE)),
+            //'dpto'          => $this->input->post("dpto", true),
+            //'prov'          => $this->input->post("prov", true),
+            //'distrito'      => $this->input->post("distrito", true),
+            //'tipo_envio'    => $this->input->post("tipo_envio", true),
+            //'quien_recibe'  => $this->input->post("quien_recibe", true)
         );
     }
 

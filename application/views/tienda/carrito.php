@@ -1,8 +1,8 @@
 <?php
-$fecha = new DateTime();
-$fecha->modify('+1 day');
-$fechin = $fecha->format('d-m-Y H:i:s');
-$timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
+    /*$fecha = new DateTime();
+    $fecha->modify('+1 day');
+    $fechin = $fecha->format('d-m-Y H:i:s');
+    $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();*/
 ?>
 <style>
     .defensa-01{
@@ -135,10 +135,10 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
                         <button type="submit" class="btn btn-outline-dark">
                             <i class="bi bi-arrow-repeat me-1"></i>Actualizar
                         </button>
-                        <!--<a href="<?php echo base_url('carrito/vaciar'); ?>" class="btn btn-outline-danger"
+                        <a href="<?php echo base_url('carrito/vaciar'); ?>" class="btn btn-outline-danger"
                            onclick="return confirm('¿Vaciar todo el carrito?')">
                             <i class="bi bi-trash me-1"></i>Vaciar
-                        </a>-->
+                        </a>
                     </div>
                 </div>
             </div>
@@ -172,8 +172,118 @@ $timestamp = DateTime::createFromFormat('d-m-Y H:i:s', $fechin)->getTimestamp();
             </div>
         </div>
 
-        <!-- AQUI VA EL ANTERIOR PROCESO -->
-            
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            color: #111;
+        }
+
+
+        /* Campos */
+        .campo {
+            height: 40px;
+            border: 4px solid #111;
+            border-radius: 0;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 5px 10px;
+        }
+
+        .campo::placeholder {
+            color: #111;
+            opacity: 1;
+        }
+
+        .campo:focus {
+            box-shadow: none;
+            border-color: #000;
+        }
+
+        /* Campos pequeños */
+        .campo-ubicacion {
+            width: 100%;
+        }
+
+        /* Agencias */
+        .agencia {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .agencia input[type="radio"] {
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
+
+        .agencia-nombre {
+            width: 70px;
+        }
+
+        .agencia-url {
+            margin-left: 5px;
+        }
+
+        /* Nota */
+        .nota {
+            margin-top: 30px;
+            line-height: 1.6;
+            font-weight: bold;
+            color: IndianRed;
+        }
+
+        .contacto {
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        /* Separador */
+        .separador {
+            border-left: 5px solid #111;
+        }
+
+        .espaciado-carrito{
+            margin-bottom: 7px;
+        }
+
+        .enlace-agencia{
+            font-size:11px;
+        }
+
+        /* Flechitas rojas */
+        .flecha {
+            color: red;
+            font-weight: bold;
+            font-size: 20px;
+            line-height: 10px;
+            margin-left: 50px;
+            height: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 767px) {
+
+            .separador {
+                border-left: none;
+                border-top: 5px solid #111;
+                margin-top: 30px;
+                padding-top: 20px;
+            }
+
+            .opcion-envio {
+                padding: 10px 15px;
+            }
+
+            .nota {
+                font-size: 14px;
+            }
+        }
+    </style>
+      
     </form>
 
     <script>

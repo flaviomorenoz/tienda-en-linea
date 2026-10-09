@@ -1,7 +1,34 @@
 <style>
     .muesca{
         color:rgb(100,150,255);
-        text-align:right!important;
+        display: inline-block;
+        font-size:0.80rem;
+    }
+    .muesca a{
+        color:rgb(60,110,200);
+    }
+    .descuento-por{
+        font-family:arial;
+        background-color:var(--primary);
+        color:white;
+        font-weight:bold;
+        border-style:solid;
+        border-color:red;
+        border-radius:8px;
+        font-size:0.95rem;
+        display: inline-block;
+    }
+    .precio-gris{
+        font-family:arial;
+        color:gray;
+        font-weight:bold!important;
+        font-size:1rem;
+    }
+    .precio-actual{
+        font-family:arial;
+        color:rgb(120,60,20);
+        font-weight:bold!important;
+        font-size:1rem;
     }
 </style>
 <div class="container" style="padding-top:0px!important;">
@@ -131,17 +158,42 @@
                             <a href="<?php echo base_url('tienda/producto/' . $p->id); ?>" class="text-dark text-decoration-none product-name-link">
                                 <?php echo htmlspecialchars($p->nombre, ENT_QUOTES, 'UTF-8'); ?>
                             </a><br>
-                            <div id="div-muesca" class="muesca"><a href="#" onclick="quitar_ocultacion(this); return false;">Ver m&aacute;s...</a></div>
+                            <div id="div-comen" class="muesca" style="width:45%;text-align:left!important;"><a href="#" onclick="mostrar_popup_comentario()">Comenta</a></div>
+                            <div id="div-muesca" class="muesca" style="width:45%;text-align:right!important;"><a href="#" onclick="quitar_ocultacion(this); return false;">Ver m&aacute;s...</a></div>
                             <span id="div-descrip_<?php echo $p->id; ?>" class="texto-descrip div-ocultar"><pre><?php echo $p->descripcion; ?></pre></span>
                         </h6>
 
                         <div class="mt-auto">
-                            <?php if ($p->tiene_precio && $p->precio): ?>
+                            <?php if ($p->tiene_precio && $p->precio): 
+                                //print_r($p); die("Fin");
+                            ?>
+
                             <!-- ******* Precio y botón compra ******* -->
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="precio fw-bold fs-5">
-                                    <?php echo $this->config->item('moneda_simbolo'); ?>
-                                    <?php echo number_format($p->precio, 2); ?>
+                                <span class="">
+                                    <?php
+                                        $simb   = $this->config->item('moneda_simbolo');
+                                        $pr      = number_format($p->precio, 2);
+                                        
+                                        $p_precio      = "<span class=\"precio-actual\">" . $simb." ".$pr."</span>";
+                                        
+                                        if(is_null($p->precio_oferta)){
+                                            echo $p_precio;
+                                        }else{
+                                            if($p->precio_oferta*1 > 0){
+                                                // Calculando en porcentaje de dscto     
+                                                $porcentaje = 100 - round($p->precio_oferta * 100 / $p->precio,0);
+
+                                                $p_ofer = number_format($p->precio_oferta, 2);
+
+                                                $p_precio_ofer = "<span class=\"precio-gris\"><s>".$simb.$pr."</s></span>&nbsp; <span class=\"precio-actual\">".$simb.$p_ofer . "</span> <div class=\"descuento-por\">{$porcentaje}% DSCTO</div>";        
+
+                                                echo $p_precio_ofer;
+                                            }else{
+                                                echo $p_precio;
+                                            }
+                                        }
+                                    ?>
                                 </span>
                             </div>
                             <a href="<?php echo base_url('tienda/producto/' . $p->id); ?>"

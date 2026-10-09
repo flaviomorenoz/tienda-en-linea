@@ -10,13 +10,13 @@ class Tienda extends CI_Controller {
     }
 
     public function index() {
-        traza("Tienda.index: base_url='" . base_url() . "' FCPATH='" . FCPATH . "'");
+        //traza("Tienda.index: base_url='" . base_url() . "' FCPATH='" . FCPATH . "'");
         $categoria  = $this->input->get('categoria');
         $termino    = $this->input->get('q', TRUE);
         $termino    = $termino !== NULL ? trim($termino) : '';
         $categorias = $this->Producto_model->get_categorias();
         $productos  = $this->Producto_model->get_todos($categoria ?: NULL, $termino);
-        traza("Tienda.index: cantidad productos=" . count($productos) . " termino='$termino'");
+        //traza("Tienda.index: cantidad productos=" . count($productos) . " termino='$termino'");
         $this->_adjuntar_imagenes($productos);
 
         $this->_render_catalogo(
@@ -29,7 +29,7 @@ class Tienda extends CI_Controller {
     }
 
     public function categoria($cat) {
-        traza("Tienda.categoria: base_url='" . base_url() . "' FCPATH='" . FCPATH . "' cat='$cat'");
+        //traza("Tienda.categoria: base_url='" . base_url() . "' FCPATH='" . FCPATH . "' cat='$cat'");
         $cat        = rawurldecode($cat);
         $categorias = $this->Producto_model->get_categorias();
         $productos  = $this->Producto_model->get_todos($cat);

@@ -134,23 +134,6 @@ function traza_smtp($str, $nivel = 0){
  * para diagnosticar el problema en producción.
  */
 function ruta_imagen_producto($img) {
-    /*
-    $url = base_url('../erp-en-linea/assets/img/productos/');
-    $url_default = base_url('../tienda-en-linea/assets/img/default.png');
-    if (empty($img)) {
-        traza("ruta_imagen_producto: entrada vacia -> '$url'");
-        return $url_default;
-    }else{
-        $url = $url . $img;
-    }
-
-    // URL con protocolo, data URI o ruta absoluta que inicia con '/'
-    if (preg_match('#^(https?://|data:|/)#i', $img)) {
-        traza("ruta_imagen_producto: entrada='$img' -> URL externa/absoluta, se usa tal cual");
-        return $img;
-    }
-    */
-    //$url = "https://cubifact.com/erp-en-linea/assets/img/productos/{$img}";
     $url = $_SERVER["RUTA_DOMINIO_ERP"] . "/assets/img/productos/" . $img;
 
     // Si el valor ya trae la carpeta 'assets/', no la duplicamos.

@@ -29,7 +29,12 @@ class Pedido_model extends CI_Model {
             'nombres'         => $datos['nombres'],
             'observaciones'   => isset($datos['observaciones']) ? $datos['observaciones'] : '',
             'archivo'         => $datos["archivo"],
-            'correo'          => $datos["correo"]
+            'correo'          => $datos["correo"],
+            'dpto'              => $datos["dpto"],
+            'prov'              => $datos["prov"],
+            'distrito'          => $datos["distrito"],
+            'tipo_envio'        => $datos["tipo_envio"],
+            'quien_recibe'      => trim($datos["quien_recibe"])
         );
         $this->db->insert('pedidos_web', $insert);
         traza("Agrega pedido_web...");

@@ -365,7 +365,7 @@ main > .container-fluid {
 
 .btn-outline-secondary {
     color: var(--texto);
-    border-color: var(--borde);
+    border-color: rgb(100,100,100);
     background: transparent;
     font-size: 0.75rem;
     font-weight: 500;
@@ -474,7 +474,8 @@ main > .container-fluid {
 .precio {
     color: var(--negro);
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 0.95rem!important;
+    font-family: sans-serif;
 }
 
 .precio::before {
@@ -564,7 +565,7 @@ main > .container-fluid {
    FOOTER (Aruma: oscuro con columnas)
    =================================================== */
 .footer-tienda {
-    background: var(--rosa-suave);
+    background: var(--primary);
     border-top: 3px solid var(--primary);
     color: #d9d5d0;
 }

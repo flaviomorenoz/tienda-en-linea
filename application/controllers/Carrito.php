@@ -39,7 +39,7 @@ class Carrito extends CI_Controller {
 
         $id_producto    = (int)$this->input->post('id_producto', TRUE);
     
-        $talla          = $this->input->post('talla', TRUE);
+        $talla          = trim($this->input->post('select_talla', TRUE));
     
         $cantidad       = max(1, (int)$this->input->post('cantidad', TRUE));
 
@@ -62,7 +62,7 @@ class Carrito extends CI_Controller {
 
         if (isset($carrito[$key])) {
             $carrito[$key]['cantidad'] += $cantidad;
-            traza("Carrito->agregar: producto ya en carrito, nueva cantidad=" . $carrito[$key]['cantidad']);
+            
         } else {
             $carrito[$key] = array(
                 'id'        => $id_producto,
@@ -74,8 +74,8 @@ class Carrito extends CI_Controller {
                 'categoria' => $producto->categoria,
                 'unidad'    => $unidad
             );
-            traza("Carrito->agregar: producto agregado al carrito, cantidad=" . $cantidad);
-            traza(print_r($carrito, true));
+            //traza("Carrito->agregar: producto agregado al carrito, cantidad=" . $cantidad);
+            
         }
 
         // LO GUARDA EN VARIABLE DE SESSION
@@ -209,7 +209,7 @@ class Carrito extends CI_Controller {
      */
     public function recibe_token(){
         $this->output->set_content_type('application/json');
-        traza_inicio('carrito/recibe_token');
+        traza_inicio('******************carrito/recibe_token********************');
 
         // 1. Validaciones de entrada -----------------------------------------
         if ($this->input->method() !== 'post') {
@@ -220,7 +220,7 @@ class Carrito extends CI_Controller {
 
         $token = trim((string)$this->input->post('token'));
         if ($token === '') {
-            traza_fin('token vacío: no se cobra', 'carrito/recibe_token');
+            //traza_fin('token vacío: no se cobra', 'carrito/recibe_token');
             $this->output->set_status_header(400);
             echo json_encode(array('ok' => false, 'error' => 'No se recibió el token del pago.'));
             return;
@@ -229,7 +229,7 @@ class Carrito extends CI_Controller {
         // El checkout devuelve el token del pago (tkn_/ype_) y, en los medios que se
         // resuelven con órdenes, el id de esa orden (ord_): Culqi valida el source_id.
         if (strpos($token, 'tkn_') !== 0 && strpos($token, 'ype_') !== 0 && strpos($token, 'ord_') !== 0) {
-            traza_fin('token inesperado (' . substr($token, 0, 12) . '): no se cobra', 'carrito/recibe_token');
+            //traza_fin('token inesperado (' . substr($token, 0, 12) . '): no se cobra', 'carrito/recibe_token');
             $this->output->set_status_header(400);
             echo json_encode(array('ok' => false, 'error' => 'No se recibió un token de pago válido.'));
             return;
@@ -237,7 +237,7 @@ class Carrito extends CI_Controller {
 
         $carrito = $this->session->userdata('carrito') ?: array();
         if (empty($carrito)) {
-            traza_fin('carrito vacío: no se cobra', 'carrito/recibe_token');
+            //traza_fin('carrito vacío: no se cobra', 'carrito/recibe_token');
             $this->output->set_status_header(400);
             echo json_encode(array('ok' => false, 'error' => 'Tu carrito está vacío.'));
             return;
@@ -276,22 +276,23 @@ class Carrito extends CI_Controller {
 
         // Comprobante opcional (mismo tratamiento que Pago->procesar)
         /*
-        if (isset($_FILES['archivo']) && strlen($_FILES['archivo']['tmp_name']) > 0) {
-            $archivo_tmp  = $_FILES['archivo']['tmp_name'];
-            $archivo_name = $_FILES['archivo']['name'];
+            if (isset($_FILES['archivo']) && strlen($_FILES['archivo']['tmp_name']) > 0) {
+                $archivo_tmp  = $_FILES['archivo']['tmp_name'];
+                $archivo_name = $_FILES['archivo']['name'];
 
-            if ($_FILES['archivo']['size'] > 2097152) {
-                $this->output->set_status_header(400);
-                echo json_encode(array('ok' => false, 'error' => 'El archivo adjunto debe pesar como máximo 2 MB.'));
-                return;
-            }
+                if ($_FILES['archivo']['size'] > 2097152) {
+                    $this->output->set_status_header(400);
+                    echo json_encode(array('ok' => false, 'error' => 'El archivo adjunto debe pesar como máximo 2 MB.'));
+                    return;
+                }
 
-            $archivo_final = "img_" . date("Y-m-d_His") . "_" . $archivo_name;
-            if (!move_uploaded_file($archivo_tmp, "../erp-en-linea/uploads/compruebas/" . $archivo_final)) {
-                $archivo_final = NULL;
+                $archivo_final = "img_" . date("Y-m-d_His") . "_" . $archivo_name;
+                if (!move_uploaded_file($archivo_tmp, "../erp-en-linea/uploads/compruebas/" . $archivo_final)) {
+                    $archivo_final = NULL;
+                }
+                $datos_pedido['archivo'] = $archivo_final;
             }
-            $datos_pedido['archivo'] = $archivo_final;
-        }*/
+        */
 
         // Llave privada de Culqi (index.php la carga desde application/config/.env)
         $SECRET_KEY = getenv('CULQI_LLAVE_PRIVADA');
@@ -299,7 +300,7 @@ class Carrito extends CI_Controller {
             $SECRET_KEY = isset($_SERVER['CULQI_LLAVE_PRIVADA']) ? $_SERVER['CULQI_LLAVE_PRIVADA'] : '';
         }
         if ($SECRET_KEY === '') {
-            traza_fin('falta CULQI_LLAVE_PRIVADA: no se cobra', 'carrito/recibe_token');
+            //traza_fin('falta CULQI_LLAVE_PRIVADA: no se cobra', 'carrito/recibe_token');
             $this->output->set_status_header(500);
             echo json_encode(array('ok' => false, 'error' => 'La pasarela no está configurada (falta la llave privada).'));
             return;
@@ -326,9 +327,19 @@ class Carrito extends CI_Controller {
             $email = 'flaviomorenoz@gmail.com';
         }
 
-        /* La orden con la que se abrió el checkout (ver Pago::crear_orden) y su número viajan
-           en los metadatos del cargo: así el pago se puede cruzar con el pedido en Culqi. */
+        /* La orden con la que se abrió el checkout (ver Pago::crear_orden) y su número viajan en los metadatos del cargo: así el pago se puede cruzar con el pedido en Culqi. */
+        /**A PARTIR DE AQUI SE CONSTRUYE LA METADATA *********************************************************************/
         $metadata = array('documentNumber' => $datos_pedido['dni']);
+
+        //$metadata['dpto'] = $this->input->post('dpto');
+        //$metadata['prov'] = $this->input->post('prov');
+        //$metadata['distrito'] = $this->input->post('distrito');
+
+        $this->session->set_userdata('dpto', $this->input->post('dpto'));
+        $this->session->set_userdata('prov', $this->input->post('prov'));
+        $this->session->set_userdata('distrito', $this->input->post('distrito'));
+        $this->session->set_userdata('tipo_envio', $this->input->post('tipo_envio'));
+        $this->session->set_userdata('quien_recibe', $this->input->post('quien_recibe'));
 
         $orden        = (string)$this->session->userdata('pago_orden');
         $order_number = (string)$this->session->userdata('pago_order_number');
@@ -355,9 +366,7 @@ class Carrito extends CI_Controller {
             "metadata" => $metadata
         );
 
-        traza_paso('1. token y datos del titular validados + payload del cargo',
-            'total=' . $total . ' amount=' . $amount . ' email=' . $email . ' token=' . substr($token, 0, 12) . '...',
-            'carrito/recibe_token');
+        //traza_paso('1. token y datos del titular validados + payload del cargo', 'total=' . $total . ' amount=' . $amount . ' email=' . $email . ' token=' . substr($token, 0, 12) .'...','carrito/recibe_token');
 
         // 3. Crear el cargo en Culqi -----------------------------------------
         $ch = curl_init('https://api.culqi.com/v2/charges');
@@ -379,8 +388,8 @@ class Carrito extends CI_Controller {
         if (curl_errno($ch)) {
             $error_curl = curl_error($ch);
             curl_close($ch);
-            traza_paso('2. POST /v2/charges (Culqi)', 'ERROR cURL: ' . $error_curl, 'carrito/recibe_token');
-            traza_fin('sin cobro: no se pudo contactar a Culqi', 'carrito/recibe_token');
+            //traza_paso('2. POST /v2/charges (Culqi)', 'ERROR cURL: ' . $error_curl, 'carrito/recibe_token');
+            //traza_fin('sin cobro: no se pudo contactar a Culqi', 'carrito/recibe_token');
             log_message('error', 'Carrito::recibe_token: error cURL: ' . $error_curl);
             $this->output->set_status_header(502);
             echo json_encode(array('ok' => false, 'error' => 'No se pudo contactar a la pasarela de pago. Intente nuevamente.'));
@@ -391,8 +400,8 @@ class Carrito extends CI_Controller {
         curl_close($ch);
 
         $result = json_decode($response, true);
-        traza_paso('2. POST /v2/charges (Culqi)', 'HTTP ' . $httpCode, 'carrito/recibe_token');
-        traza("Carrito->recibe_token: HTTP $httpCode -> " . print_r($result, true));
+        //traza_paso('2. POST /v2/charges (Culqi)', 'HTTP ' . $httpCode, 'carrito/recibe_token');
+        //traza("Carrito->recibe_token: HTTP $httpCode -> " . print_r($result, true));
 
         // 4. Evaluar la respuesta de Culqi -----------------------------------
         $es_error = !is_array($result)
@@ -408,7 +417,7 @@ class Carrito extends CI_Controller {
                     $mensaje = $result['merchant_message'];
                 }
             }
-            traza_fin('cargo rechazado (HTTP ' . $httpCode . '): el cliente sigue en el checkout', 'carrito/recibe_token');
+            //traza_fin('cargo rechazado (HTTP ' . $httpCode . '): el cliente sigue en el checkout', 'carrito/recibe_token');
             log_message('error', 'Carrito::recibe_token: cargo rechazado (HTTP ' . $httpCode . '): ' . $response);
             echo json_encode(array(
                 'ok'      => false,
@@ -436,7 +445,7 @@ class Carrito extends CI_Controller {
             } elseif (!empty($outcome['merchant_message'])) {
                 $motivo = $outcome['merchant_message'];
             }
-            traza_fin('cargo no pagado (' . $tipo . '/' . $codigo . '): el cliente sigue en el checkout', 'carrito/recibe_token');
+            //traza_fin('cargo no pagado (' . $tipo . '/' . $codigo . '): el cliente sigue en el checkout', 'carrito/recibe_token');
             log_message('error', 'Carrito::recibe_token: cargo no pagado (' . $tipo . '/' . $codigo . '): ' . $response);
             echo json_encode(array(
                 'ok'    => false,
@@ -445,7 +454,7 @@ class Carrito extends CI_Controller {
             return;
         }
 
-        traza_paso('3. cargo aprobado por Culqi', $result['id'] . ' (' . $tipo . '/' . $codigo . ')', 'carrito/recibe_token');
+        //traza_paso('3. cargo aprobado por Culqi', $result['id'] . ' (' . $tipo . '/' . $codigo . ')', 'carrito/recibe_token');
 
         /* El pedido NO se registra aquí: se guarda el cargo aprobado y los datos del titular
            en sesión, y pago/procesar() (la redirección final) escribe en pedidos_web. Así el
@@ -457,9 +466,8 @@ class Carrito extends CI_Controller {
             'pago_total' => $total,
         ));
 
-        traza_paso('4. cargo y datos del titular guardados en la sesión',
-            'cargo=' . $result['id'] . ' -> pendiente de registrar en pago/procesar', 'carrito/recibe_token');
-        traza_fin('el navegador pasa a pago/procesar', 'carrito/recibe_token');
+        //traza_paso('4. cargo y datos del titular guardados en la sesión','cargo=' . $result['id'] . ' -> pendiente de registrar en pago/procesar', 'carrito/recibe_token');
+        //traza_fin('el navegador pasa a pago/procesar', 'carrito/recibe_token');
 
         echo json_encode(array(
             'ok'       => true,

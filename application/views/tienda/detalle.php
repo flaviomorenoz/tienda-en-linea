@@ -1,3 +1,4 @@
+<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 <?php
     $mi_precio = 0;
 
@@ -68,11 +69,34 @@
             padding: 0;
             margin: 0.25rem 0 0;
         }
+        .bloque-elemento{
+            border-style:none; border-color:red; display:inline-block; margin: 5px 7px;
+        }
 
         /* La lupa (zoom) ya no se define aqui: sus estilos viven en
            assets/css/lupa.css, compartidos con las tarjetas de tienda/home.php.
            Lo que queda en esta vista es solo el marco y el aviso. */
+
+        /* Previsualizacion de imagenes de la venta (tooltip con miniaturas) */
+        #popup_fotos{
+            display: none;
+            position: fixed;
+            z-index: 20000;
+            max-width: 420px;
+            padding: 6px;
+            background: #fff;
+            border: 1px solid #999;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        #example a.ver_fotos{
+            text-decoration: none;
+        }
+
     </style>
+
+    <!-- Contenedor flotante para las miniaturas de imagenes -->
+    <div id="popup_fotos"></div>
 
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
@@ -172,7 +196,7 @@
                 <!-- Cantidad -->
                 <div class="mb-4">
                     <?php if ($hay_modalidad): ?>
-                    <div style="border-style:none; border-color:red;display:inline-block;">
+                    <div class="bloque-elemento">
                         <label class="form-label fw-semibold">Unidad</label>
                         <div class="input-group" style="max-width:160px;">
                             <?php
@@ -182,13 +206,38 @@
                         </div>
                     </div>
                     <?php endif; ?>
-                    <div style="border-style:none; border-color:red;display:inline-block;">
+
+                    <div class="bloque-elemento" style="margin-right:0px;">
+                        <label class="form-label fw-semibold">Talla</label>
+                        <div class="input-group" style="">
+                            <?php
+                                $ar         = array();
+                                $cSql       = "select a.id, a.id_producto, b.name, a.cod_talla
+                                    from tec_product_tallas a
+                                    inner join tec_products b on a.id_producto = b.id
+                                    where a.id_producto = ?";
+                                $result     = $this->db->query($cSql,$producto->id)->result_array();
+                                $ar_talla   = $this->fm->conver_dropdown($result, "cod_talla", "cod_talla", array(''=>'Seleccione'));
+
+                                echo form_dropdown('select_talla', $ar_talla, '','class="" id="select_talla" required="required"');
+                            ?>
+                        </div>
+                    </div>
+
+                    <div class="bloque-elemento" style="margin-left:0px;">
+                        <button type="button" class="btn btn-danger btn-sm ver_fotos" data-fotos="<?=base_url()?>assets/img/truzas_mujer.jpeg">?</button>
+                    </div>
+                    <script>
+                        
+                    </script>
+
+                    <div class="bloque-elemento">
                         <label class="form-label fw-semibold">Cantidad</label>
-                        <div class="input-group" style="max-width:160px;">
+                        <div class="input-group" style="max-width:260px;">
                             <button type="button" class="btn btn-outline-secondary" onclick="cambiarCantidad(-1)">
                                 <i class="bi bi-dash"></i>
                             </button>
-                            <input type="number" class="form-control text-center" name="cantidad"
+                            <input type="number" class="text-center" name="cantidad"
                                 id="cantidad" value="1" min="1" max="99">
                             <button type="button" class="btn btn-outline-secondary" onclick="cambiarCantidad(1)">
                                 <i class="bi bi-plus"></i>
@@ -197,13 +246,24 @@
                     </div>
                     
                 </div>
+
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-dark btn-lg">
-                        <i class="bi bi-cart-plus me-2"></i>Agregar al carrito
-                    </button>
-                    <a href="<?php echo base_url('carrito'); ?>" class="btn btn-outline-secondary">
-                        <i class="bi bi-cart3 me-2"></i>Ver carrito
-                    </a>
+                    <table style="width: 100%;">
+                        <tr>
+                            <th style="width:100%; text-align: center; padding: 10px 5px;">
+                                <button type="submit" class="btn btn-dark btn-lg" style="width:250px">
+                                    <i class="bi bi-cart-plus me-2"></i>Agregar al carrito
+                                </button>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="width:100%; text-align: center;">
+                                <a href="<?php echo base_url('carrito'); ?>" class="btn btn-outline-secondary" style="width:250px">
+                                    <i class="bi bi-cart3 me-2"></i>Ver carrito
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </form>
 
@@ -318,18 +378,103 @@ function dispara_change(){
 
 setTimeout(dispara_change,600);
 
-</script>
-
-<!-- Lupa (zoom) de la imagen principal. La implementacion esta en
-     assets/js/lupa.js (compartida con las tarjetas de tienda/home.php): aqui
-     solo se engancha a esta imagen. El aviso de "Pasa el cursor para ampliar"
-     esta mas arriba, junto a la imagen. Se espera a DOMContentLoaded porque este
-     script corre antes de que el layout cargue lupa.js. -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () { // Lupa (zoom) de la imagen principal. La implementacion esta en assets/js/lupa.js (compartida con las tarjetas de tienda/home.php): aqui
+     
     iniciarLupa({
         img: 'detalle-img-principal',
         wrapper: '.product-detail-img-wrapper'
     });
 });
+
+// Previsualizacion de las imagenes de la venta al pasar el mouse por el icono ("?").
+// El src real depende del sexo del producto, que se consulta por ajax
+// (products/getSexo); por eso el popup recien se muestra dentro del success.
+var tFoto      = null;
+var sexoProd   = null;   // cache del sexo devuelto por products/getSexo
+var hoverFotos = false;
+
+// Guia de tallas (truza) segun el codigo de sexo que devuelve products/getSexo.
+// Si el codigo no esta en el mapa se respeta la url de data-fotos.
+var TRUZAS = {
+    'H': 'assets/img/truzas_hombre.jpeg',
+    'M': 'assets/img/truzas_mujer.jpeg',
+    'O': 'assets/img/truzas_ninos.jpeg',
+    'A': 'assets/img/truzas_ninas.jpeg'
+};
+
+// Coloca #popup_fotos al lado del boton señalado. El rectangulo se pide aqui,
+// sobre el elemento del DOM: dentro del callback de $.ajax "this" NO es el
+// boton (jQuery lo reemplaza por el objeto de opciones de la peticion), y por
+// eso reventaba this.getBoundingClientRect().
+function colocaPopupFotos($pop, el) {
+    var rect = el.getBoundingClientRect();
+    var w    = $pop.outerWidth();
+    var h    = $pop.outerHeight();
+
+    var left = rect.right + 8;
+    if((left + w) > $(window).width()){ left = rect.left - w - 8; }
+    if(left < 4){ left = 4; }
+
+    var top = rect.top;
+    if((top + h) > $(window).height()){ top = $(window).height() - h - 8; }
+    if(top < 4){ top = 4; }
+
+    $pop.css({top: top + 'px', left: left + 'px'});
+}
+
+function pintaFotosVenta(el, urls) {
+    var cod = (sexoProd || '').toUpperCase().charAt(0);
+    var cad = '';
+
+    for(var i=0; i<urls.length; i++){
+        if(urls[i].length == 0){ continue; }
+        // Rutas absolutas: las relativas ("assets/img/...") se resolvian contra
+        // /tienda/producto/<id>/ y la imagen no cargaba.
+        var src = TRUZAS[cod] ? '<?php echo base_url(); ?>' + TRUZAS[cod] : urls[i];
+        cad += '<img src="' + src + '" style="height:460px;width:auto;margin:3px;border:1px solid #ccc;border-radius:4px;background:#fff;">';
+    }
+
+    var $pop = $('#popup_fotos');
+    $pop.html(cad).css({top: '-9999px', left: '-9999px'}).show();
+    colocaPopupFotos($pop, el);
+
+    // El ancho real solo se conoce cuando cargan las imagenes: se reposiciona.
+    $pop.find('img').on('load', function(){ colocaPopupFotos($pop, el); });
+}
+
+$(document).on('mouseenter', '.ver_fotos', function(){
+    clearTimeout(tFoto);
+    hoverFotos = true;
+
+    // El boton señalado se captura ANTES del ajax: dentro del success ya no se
+    // puede usar "this".
+    var el   = this;
+    var urls = ($(this).attr('data-fotos') || '').split('|');
+
+    if(sexoProd !== null){          // ya consultado: sin llamada al servidor
+        pintaFotosVenta(el, urls);
+        return;
+    }
+
+    $.ajax({
+        data    : {id_product: '<?php echo (int) $producto->id; ?>'},
+        url     : '<?php echo base_url('products/getSexo'); ?>',
+        type    : 'get',
+        success : function(res){
+            sexoProd = String(res === null || res === undefined ? '' : res).trim();
+            // Si el mouse ya salio del boton no se muestra el popup.
+            if(!hoverFotos){ return; }
+            pintaFotosVenta(el, urls);
+        }
+    });
+});
+
+$(document).on('mouseleave', '.ver_fotos', function(){
+    hoverFotos = false;
+    tFoto = setTimeout(function(){ $('#popup_fotos').hide(); }, 250);
+});
+
+$('#popup_fotos').on('mouseenter', function(){ clearTimeout(tFoto); });
+$('#popup_fotos').on('mouseleave', function(){ $('#popup_fotos').hide(); });
+
 </script>

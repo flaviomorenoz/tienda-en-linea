@@ -30,6 +30,109 @@ if (!filter_var($correo_tienda, FILTER_VALIDATE_EMAIL)) {
         color: #b3aca6;
         opacity: 1;
     }
+    /* Agencias */
+    .agencia {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .agencia input[type="radio"] {
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
+    }
+
+    .agencia-nombre {
+        width: 70px;
+    }
+
+    .agencia-url {
+        margin-left: 5px;
+    }
+
+    /* Nota */
+    .nota {
+        margin-top: 30px;
+        line-height: 1.6;
+        font-weight: bold;
+        color: IndianRed;
+    }
+
+    .contacto {
+        margin-top: 12px;
+        font-weight: bold;
+    }
+
+    /* Separador */
+    .separador {
+        border-left: 5px solid #111;
+    }
+
+    .espaciado-carrito{
+        margin-bottom: 7px;
+    }
+
+    .enlace-agencia{
+        font-size:11px;
+    }
+
+    /* Flechitas rojas */
+    .flecha {
+        color: red;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 10px;
+        margin-left: 50px;
+        height: 8px;
+    }
+
+    .envio-container {
+        max-width: 1200px;
+        margin: 25px auto;
+    }
+
+    .opcion-envio {
+        padding: 10px 25px;
+    }
+
+    /* Títulos */
+    .titulo-envio {
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 5px;
+    }
+
+    .titulo-envio input[type="radio"] {
+        width: 25px;
+        height: 25px;
+        margin: 0;
+        cursor: pointer;
+    }
+
+
+    /* Responsive */
+    @media (max-width: 767px) {
+
+        .separador {
+            border-left: none;
+            border-top: 5px solid #111;
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+
+        .opcion-envio {
+            padding: 10px 15px;
+        }
+
+        .nota {
+            font-size: 14px;
+        }
+    }
 </style>
 <div id="form-pagos" class="row">
     <div class="col-sm-12">
@@ -86,16 +189,152 @@ if (!filter_var($correo_tienda, FILTER_VALIDATE_EMAIL)) {
                                     <div class="invalid-feedback">La dirección de envío es requerida.</div>
                                 </div>
                                 <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <input name="dpto" id="dpto" type="text"
+                                                   class="form-control"
+                                                   placeholder="Dpto">
+                                        </div>
+
+                                        <div class="col-4">
+                                            <input name="prov" id="prov" type="text"
+                                                   class="form-control"
+                                                   placeholder="Prov">
+                                        </div>
+
+                                        <div class="col-4">
+                                            <input name="distrito" id="distrito" type="text"
+                                                   class="form-control"
+                                                   placeholder="Distrito">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
                                     <label class="form-label" for="observaciones">Referencia / Observaciones</label>
                                     <textarea name="observaciones" id="observaciones" class="form-control" rows="2"
                                             placeholder="Cerca al parque, piso 2, etc."><?php echo set_value('observaciones'); ?></textarea>
                                 </div>
                             </div>
-                            <p class="text-muted small mt-3 mb-0">
-                                <i class="bi bi-shield-lock me-1"></i>
-                                Al pulsar <strong>PAGAR</strong> se abrirá la pasarela segura de Culqi
-                                para pagar con <strong>Yape</strong>.
-                            </p>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="titulo-envio">
+                                    <input type="radio"
+                                           name="tipo_envio"
+                                           id="delivery"
+                                           value="delivery" onchange="mostrar_agencias()">
+
+                                    <label for="delivery">Delivery</label>
+
+                                    <input type="radio"
+                                           name="tipo_envio"
+                                           id="agencias"
+                                           value="agencias" onchange="mostrar_agencias()">
+
+                                    <label for="agencias">Agencias</label>
+                                </div>
+
+                                <script>
+                                    const dpto = document.getElementById('dpto');
+                                    const prov = document.getElementById('prov');
+                                    const distrito = document.getElementById('distrito');
+  
+                                    dpto.addEventListener('input', function() { this.value = this.value.toUpperCase();});
+                                    prov.addEventListener('input', function() { this.value = this.value.toUpperCase();});
+                                    distrito.addEventListener('input', function() { this.value = this.value.toUpperCase();});
+
+                                    function mostrar_agencias() {
+                                        let tipo        = document.querySelector('input[name="tipo_envio"]:checked');
+                                        let div_agencia = document.getElementById("div-agencias");
+                                        let nota_deli   = document.getElementById("nota-delivery")
+                                        let nota_age    = document.getElementById("nota-agencia")
+
+                                        if (tipo.value === "delivery") {
+                                            div_agencia.style.display = "none";
+                                            nota_deli.style.display = "block";
+                                            nota_age.style.display = "none";
+                                        } else {
+                                            div_agencia.style.display = "block";
+                                            nota_deli.style.display = "none";
+                                            nota_age.style.display = "block";
+                                        }
+                                    }
+                                </script>
+
+                                <div id="div-agencias" class="row g-4" style="display:none; margin-top: 7px; margin-bottom: 7px; margin-left:10px;">
+                                    <!-- Agencia Shalom -->
+                                    <div class="col-sm-12" style="margin:10px 0px 0px 0px; padding-left:10px;">
+
+                                        <input type="radio"
+                                               name="agencia"
+                                               id="shalom"
+                                               value="shalom">
+                                        <span class="">
+                                            Shalom
+                                        </span>
+
+                                        <a href="shalom.com.pe" class="enlace-agencia">shalom.com.pe</a>
+
+                                    </div>
+
+                                    <!-- Agencia Marvisur -->
+                                    <div class="col-sm-12" style="margin:6px 0px 0px 0px; padding-left:10px;">
+
+                                        <input type="radio"
+                                               name="agencia"
+                                               id="marvisur"
+                                               value="marvisur">
+                                        <span class="">
+                                            Marvisur
+                                        </span>
+
+                                        <a href="https://www.expresomarvisur.com/" class="enlace-agencia">www.expresomarvisur.com/</a>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Contacto -->
+                                <div class="mt-2">
+                                    <input type="text"
+                                        name="quien_recibe"
+                                        class="form-control"
+                                        placeholder="Contacto quien recibe" maxlength="50">
+                                </div>
+
+                                <!-- Nota -->
+                                <div class="nota" id="nota-delivery">
+                                    <div>
+                                        Nota.- El costo del envío es asumido por el usuario es contra entrega
+                                        y depende del tamaño del paquete (a partir de 10 soles) Lima y Callao.
+                                    </div>
+
+                                    <div class="contacto">
+                                        Contactenos : 999-888-777
+                                    </div>
+                                </div>
+                                <div class="nota" id="nota-agencia" style="display:none">
+                                    <div>
+                                        Nota.- El costo del envío es asumido por el usuario es contra entrega
+                                        y depende del tamaño del paquete (a partir de 8 soles)
+                                    </div>
+
+                                    <div class="contacto">
+                                        Contactenos : 999-888-777
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =====================================================
+                                 AGENCIAS
+                            ====================================================== -->
+                            <div class="col-md-6 opcion-envio">
+                                <div class="titulo-envio">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,9 +378,15 @@ if (!filter_var($correo_tienda, FILTER_VALIDATE_EMAIL)) {
                             <i class="bi bi-arrow-repeat me-1"></i>PAGAR
                         </button>
                         <br>
+                        <p class="text-muted small mt-3 mb-0">
+                                <i class="bi bi-shield-lock me-1"></i>
+                                Al pulsar <strong>PAGAR</strong> se abrirá la pasarela segura de Culqi
+                                para pagar con <strong>Yape</strong>.
+                        </p>
+
                         <a href="<?php echo base_url('carrito'); ?>" class="btn btn-link btn-sm mt-2">
                             <i class="bi bi-arrow-left me-1"></i>Volver al carrito
-                        </a>
+                        </a>    
                     </div>
                 </div>
             </div>
