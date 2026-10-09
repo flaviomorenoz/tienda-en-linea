@@ -86,6 +86,10 @@ class Tienda extends CI_Controller {
         $relacionados = $this->Producto_model->get_relacionados($id, $producto->categoria);
         $imagenes    = $this->_imagenes_de($producto);
 
+        // Comentarios de la ficha: los escribe el cliente desde el popup
+        // "Comenta" (mostrar_popup_comentario) y aqui se muestran.
+        $this->load->model('Comentario_model');
+
         $data = array(
             'titulo'        => $producto->nombre . ' - ' . $this->config->item('tienda_nombre'),
             'producto'      => $producto,
@@ -94,7 +98,9 @@ class Tienda extends CI_Controller {
             'relacionados'  => $relacionados,
             'carrito_count' => $this->_carrito_count(),
             'descripcion'   => $this->db->query("select trim(descripcion) descripcion from tec_products where id = ?",$id)->row()->descripcion,
-            'precios'       => $this->db->where("id_producto",$id)->get("tec_precios")->result()
+            'precios'       => $this->db->where("id_producto",$id)->get("tec_precios")->result(),
+            'comentarios'       => $this->Comentario_model->get_por_producto($id, 20),
+            'comentarios_total' => $this->Comentario_model->contar_por_producto($id)
         );
 
         $this->load->view('layouts/header', $data);

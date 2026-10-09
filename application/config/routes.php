@@ -12,6 +12,9 @@ $route['tienda/producto/(:num)'] = 'tienda/detalle/$1';
 $route['quienes-somos'] = 'tienda/quienes_somos';
 $route['contacto'] = 'tienda/contacto';
 
+// Comentarios de productos (popup "Comenta" de las tarjetas del catalogo)
+$route['comentarios/guardar'] = 'comentarios/guardar';
+
 // Carrito
 $route['carrito'] = 'carrito/ver';
 $route['carrito/agregar'] = 'carrito/agregar';

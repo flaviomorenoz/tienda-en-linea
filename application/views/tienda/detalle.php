@@ -93,6 +93,14 @@
             text-decoration: none;
         }
 
+        /* Comentarios del producto (popup mostrar_popup_comentario) */
+        .comentario-item{
+            background: #fff; border: 1px solid #eee; border-radius: 10px;
+            padding: 12px 14px; margin-bottom: 10px;
+        }
+        .comentario-item .comentario-texto{ white-space: pre-wrap; margin-bottom: 6px; }
+        .comentario-item .comentario-fecha{ font-size: 0.8rem; color: #8a8a8a; }
+
     </style>
 
     <!-- Contenedor flotante para las miniaturas de imagenes -->
@@ -296,6 +304,40 @@
     <div class="row g-4">
         <div class="col_md-6">
             
+        </div>
+    </div>
+
+    <?php
+        // Comentarios del producto (tec_comentarios). Los envia Tienda::detalle();
+        // se escriben desde el popup "Comenta" (boton del catalogo y de esta ficha).
+        $com_lista = isset($comentarios) ? $comentarios : array();
+        $com_total = isset($comentarios_total) ? (int) $comentarios_total : count($com_lista);
+    ?>
+    <!-- Comentarios del producto -->
+    <hr class="my-5">
+    <div class="row g-4" id="bloque-comentarios">
+        <div class="col-lg-8">
+            <h4 class="fw-bold mb-3">
+                <i class="bi bi-chat-left-text me-2"></i>Comentarios
+                <span class="badge bg-light text-dark border align-middle"><?php echo $com_total; ?></span>
+                <a href="#" class="small ms-2 text-decoration-none"
+                   onclick="mostrar_popup_comentario(<?php echo (int) $producto->id; ?>); return false;">Comenta</a>
+            </h4>
+
+            <?php if (empty($com_lista)): ?>
+            <p class="text-muted small fst-italic mb-0">
+                Todavía no hay comentarios de este producto. ¡Sé la primera en opinar!
+            </p>
+            <?php else: ?>
+                <?php foreach ($com_lista as $com): ?>
+                <div class="comentario-item">
+                    <div class="comentario-texto"><?php echo nl2br(htmlspecialchars($com->comentario, ENT_QUOTES, 'UTF-8')); ?></div>
+                    <div class="comentario-fecha">
+                        <i class="bi bi-clock me-1"></i><?php echo date('d/m/Y H:i', strtotime($com->fecha)); ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 
