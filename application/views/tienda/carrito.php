@@ -135,8 +135,8 @@
                         <button type="submit" class="btn btn-outline-dark">
                             <i class="bi bi-arrow-repeat me-1"></i>Actualizar
                         </button>
-                        <a href="<?php echo base_url('carrito/vaciar'); ?>" class="btn btn-outline-danger"
-                           onclick="return confirm('¿Vaciar todo el carrito?')">
+                        <a href="<?php echo base_url('carrito/vaciar'); ?>" class="btn"
+                           onclick="return confirm('¿Vaciar todo el carrito?')" style="color:gray">
                             <i class="bi bi-trash me-1"></i>Vaciar
                         </a>
                     </div>
