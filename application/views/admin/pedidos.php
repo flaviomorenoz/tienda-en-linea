@@ -14,6 +14,7 @@
         #tabla-pedidos td, #tabla-pedidos th { font-size: 0.8rem; }
         .admin-sidebar { background: #2d3436; min-height: 100vh; width: 240px; position: fixed; left: 0; top: 0; z-index: 100; }
         .main-content { margin-left: 240px; padding: 2rem; }
+        .badge-POR_REALIZAR   { background: #d87adb; }
         .badge-EN_ORIGEN   { background: #dc3545; }
         .badge-EN_TRANSITO { background: #fd7e14; }
         .badge-EN_DESTINO  { background: #198754; }
@@ -79,9 +80,9 @@
                         <th>DNI</th>
                         <th class="text-end">Total</th>
                         <th class="text-center">Pago</th>
-                        <th class="text-center">Códigos / Envío</th>
                         <th>Ubicación</th>
                         <th>Envío / Recibe</th>
+                        <th class="text-center">Códigos / Envío</th>
                         <th class="text-center">Acción</th>
                     </tr>
                 </thead>
@@ -190,6 +191,7 @@
                     <p class="small text-muted mb-3" id="modal-cliente-info"></p>
                     <label class="form-label fw-semibold">Estado de envío</label>
                     <select name="estado_envio" class="form-select" id="select-estado">
+                        <option value="POR_REALIZAR">POR_REALIZAR</option>
                         <option value="EN_ORIGEN">EN_ORIGEN</option>
                         <option value="EN_TRANSITO">EN_TRANSITO</option>
                         <option value="EN_DESTINO">EN_DESTINO</option>
@@ -313,39 +315,6 @@ const table = $('#tabla-pedidos').DataTable({
             }
         },
         {
-            // Columna única: códigos de envío (Nro + Código) + estado de envío
-            data: null,
-            orderable: false,
-            className: 'text-center',
-            render: function(d, type, row) {
-                var estado = (row.estado_envio || '').trim();
-                var nro    = (row.nro_orden ? String(row.nro_orden) : '').trim();
-                var cod    = (row.codigo_transaccion || '').trim();
-
-                if (type !== 'display') {
-                    var partes = [];
-                    if (estado) partes.push(estado);
-                    if (nro)    partes.push('Nro: ' + nro);
-                    //if (cod)    partes.push('Cod: ' + cod);
-                    return partes.join(' | ');
-                }
-
-                var html = '';
-                if (estado) {
-                    html += '<div><span class="badge badge-' +
-                            estado.replace(/\s/g, '_').toUpperCase() + '">' +
-                            escHtml(estado) + '</span></div>';
-                }
-                if (nro || cod) {
-                    html += '<span class="small">';
-                    if (nro) html += '<div><strong>Nro: </strong>' + escHtml(nro) + '</div>';
-                    //if (cod) html += '<div><strong>Código: </strong>' + escHtml(cod) + '</div>';
-                    html += '</span>';
-                }
-                return html === '' ? '<span class="text-muted">—</span>' : html;
-            }
-        },
-        {
             // Columna única: Departamento / Provincia / Distrito
             data: null,
             className: 'small',
@@ -375,6 +344,39 @@ const table = $('#tabla-pedidos').DataTable({
                 }
                 if (recibe !== '') {
                     html += '<div class="text-muted">' + escHtml(recibe) + '</div>';
+                }
+                return html === '' ? '<span class="text-muted">—</span>' : html;
+            }
+        },
+        {
+            // Columna única: códigos de envío (Nro + Código) + estado de envío
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function(d, type, row) {
+                var estado = (row.estado_envio || '').trim();
+                var nro    = (row.nro_orden ? String(row.nro_orden) : '').trim();
+                var cod    = (row.codigo_transaccion || '').trim();
+
+                if (type !== 'display') {
+                    var partes = [];
+                    if (estado) partes.push(estado);
+                    if (nro)    partes.push('Nro: ' + nro);
+                    //if (cod)    partes.push('Cod: ' + cod);
+                    return partes.join(' | ');
+                }
+
+                var html = '';
+                if (estado) {
+                    html += '<div><span class="badge badge-' +
+                            estado.replace(/\s/g, '_').toUpperCase() + '">' +
+                            escHtml(estado) + '</span></div>';
+                }
+                if (nro || cod) {
+                    html += '<span class="small">';
+                    if (nro) html += '<div><strong>Nro: </strong>' + escHtml(nro) + '</div>';
+                    //if (cod) html += '<div><strong>Código: </strong>' + escHtml(cod) + '</div>';
+                    html += '</span>';
                 }
                 return html === '' ? '<span class="text-muted">—</span>' : html;
             }
