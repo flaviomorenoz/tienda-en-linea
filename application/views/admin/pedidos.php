@@ -4,7 +4,14 @@
     <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #f8f9fa;}
+        /* Arial en el panel: se reemplaza Poppins y se reduce el tamaño de la letra */
+        body, .main-content, #tabla-pedidos, #tabla-pedidos *,
+        .modal, .dt-buttons, .dataTables_wrapper {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+        body { background: #f8f9fa; font-size: 0.85rem; }
+        #tabla-pedidos { font-size: 0.8rem; }
+        #tabla-pedidos td, #tabla-pedidos th { font-size: 0.8rem; }
         .admin-sidebar { background: #2d3436; min-height: 100vh; width: 240px; position: fixed; left: 0; top: 0; z-index: 100; }
         .main-content { margin-left: 240px; padding: 2rem; }
         .badge-EN_ORIGEN   { background: #dc3545; }
@@ -72,8 +79,9 @@
                         <th>DNI</th>
                         <th class="text-end">Total</th>
                         <th class="text-center">Pago</th>
-                        <th class="text-center">Codigos</th>
-                        <th class="text-center">Envío</th>
+                        <th class="text-center">Códigos / Envío</th>
+                        <th>Ubicación</th>
+                        <th>Envío / Recibe</th>
                         <th class="text-center">Acción</th>
                     </tr>
                 </thead>
@@ -305,36 +313,70 @@ const table = $('#tabla-pedidos').DataTable({
             }
         },
         {
+            // Columna única: códigos de envío (Nro + Código) + estado de envío
             data: null,
             orderable: false,
-            searchable: false,
             className: 'text-center',
             render: function(d, type, row) {
+                var estado = (row.estado_envio || '').trim();
+                var nro    = (row.nro_orden ? String(row.nro_orden) : '').trim();
+                var cod    = (row.codigo_transaccion || '').trim();
+
                 if (type !== 'display') {
-                    return row.nro_orden
-                        ? 'Nro: ' + row.nro_orden + ' | Cod: ' + row.codigo_transaccion
-                        : '';
+                    var partes = [];
+                    if (estado) partes.push(estado);
+                    if (nro)    partes.push('Nro: ' + nro);
+                    //if (cod)    partes.push('Cod: ' + cod);
+                    return partes.join(' | ');
                 }
-                if (row.nro_orden) {
-                    return '<span class="small">' +
-                           '<div><strong>Nro: </strong>' + escHtml(row.nro_orden) + '</div>' +
-                           '<div><strong>Código: </strong>' + escHtml(row.codigo_transaccion) + '</div>' +
-                           '</span>';
+
+                var html = '';
+                if (estado) {
+                    html += '<div><span class="badge badge-' +
+                            estado.replace(/\s/g, '_').toUpperCase() + '">' +
+                            escHtml(estado) + '</span></div>';
                 }
-                return '';
-                /*return '<button type="button" class="btn btn-sm btn-outline-primary" ' +
-                       'data-bs-toggle="modal" data-bs-target="#modalCodigos" ' +
-                       'data-id="' + row.id + '" data-nro="" data-cod="">' +
-                       '<i class="bi bi-plus-circle me-1"></i>Ingresar</button>';*/
+                if (nro || cod) {
+                    html += '<span class="small">';
+                    if (nro) html += '<div><strong>Nro: </strong>' + escHtml(nro) + '</div>';
+                    //if (cod) html += '<div><strong>Código: </strong>' + escHtml(cod) + '</div>';
+                    html += '</span>';
+                }
+                return html === '' ? '<span class="text-muted">—</span>' : html;
             }
         },
         {
-            data: 'estado_envio',
-            className: 'text-center',
-            render: function(d, type) {
-                return type === 'display'
-                    ? '<span class="badge badge-' + String(d).replace(/\s/g, '_').toUpperCase() + '">' + escHtml(d) + '</span>'
-                    : d;
+            // Columna única: Departamento / Provincia / Distrito
+            data: null,
+            className: 'small',
+            render: function(d, type, row) {
+                var partes = [row.dpto, row.prov, row.distrito]
+                    .map(function(v) { return (v || '').trim(); })
+                    .filter(function(v) { return v !== ''; });
+                var txt = partes.join(' / ');
+                if (type !== 'display') return txt;
+                return txt === ''
+                    ? '<span class="text-muted">—</span>'
+                    : '<span class="small">' + escHtml(txt) + '</span>';
+            }
+        },
+        {
+            // Columna única: tipo de envío + quién recibe
+            data: null,
+            className: 'small',
+            render: function(d, type, row) {
+                var tipo   = (row.tipo_envio || '').trim();
+                var recibe = (row.quien_recibe || '').trim();
+                var txt    = tipo + (tipo !== '' && recibe !== '' ? ' · ' : '') + recibe;
+                if (type !== 'display') return txt;
+                var html = '';
+                if (tipo !== '') {
+                    html += '<div><span class="badge bg-secondary text-uppercase">' + escHtml(tipo) + '</span></div>';
+                }
+                if (recibe !== '') {
+                    html += '<div class="text-muted">' + escHtml(recibe) + '</div>';
+                }
+                return html === '' ? '<span class="text-muted">—</span>' : html;
             }
         },
         {
@@ -369,25 +411,25 @@ const table = $('#tabla-pedidos').DataTable({
             extend: 'excel',
             text: '<i class="bi bi-file-earmark-excel me-1"></i>Excel',
             className: 'btn btn-success btn-sm',
-            exportOptions: { columns: [0,1,2,3,4,5,6,7,8] }
+            exportOptions: { columns: [0,1,2,3,4,5,6,7,8,9] }
         },
         {
             extend: 'pdf',
             text: '<i class="bi bi-file-earmark-pdf me-1"></i>PDF',
             className: 'btn btn-danger btn-sm',
-            exportOptions: { columns: [0,1,2,3,4,5,6,7,8] }
+            exportOptions: { columns: [0,1,2,3,4,5,6,7,8,9] }
         },
         {
             extend: 'csv',
             text: '<i class="bi bi-filetype-csv me-1"></i>CSV',
             className: 'btn btn-secondary btn-sm',
-            exportOptions: { columns: [0,1,2,3,4,5,6,7,8] }
+            exportOptions: { columns: [0,1,2,3,4,5,6,7,8,9] }
         },
         {
             extend: 'print',
             text: '<i class="bi bi-printer me-1"></i>Imprimir',
             className: 'btn btn-info btn-sm text-white',
-            exportOptions: { columns: [0,1,2,3,4,5,6,7,8] }
+            exportOptions: { columns: [0,1,2,3,4,5,6,7,8,9] }
         }
     ],
     language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
@@ -406,9 +448,9 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
         const filtro = this.dataset.filtro;
         if (filtro === 'todos') {
-            table.column(6).search('').draw();
+            table.column(5).search('').draw();
         } else {
-            table.column(6).search('^' + filtro + '$', true, false).draw();
+            table.column(5).search('^' + filtro + '$', true, false).draw();
         }
         document.querySelectorAll('.filter-btn').forEach(function(b) {
             b.classList.remove('btn-dark');

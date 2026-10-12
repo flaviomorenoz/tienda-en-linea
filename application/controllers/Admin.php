@@ -129,6 +129,12 @@ class Admin extends CI_Controller {
                 'direccion_envio'    => $p->direccion_envio,
                 'dni'                => $p->dni,
                 'celular'            => $p->celular,
+                // Ubicación y forma de envío (columnas char() en BD: se recortan los espacios de relleno)
+                'dpto'               => trim($p->dpto),
+                'prov'               => trim($p->prov),
+                'distrito'           => trim($p->distrito),
+                'tipo_envio'         => trim($p->tipo_envio),
+                'quien_recibe'       => trim($p->quien_recibe),
                 'total'              => (float)$p->total,
                 'moneda'             => $moneda,
                 'estado_pago'        => $p->estado_pago,
