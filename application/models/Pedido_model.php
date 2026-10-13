@@ -71,17 +71,21 @@ class Pedido_model extends CI_Model {
         ));
     }
 
-    public function actualizar_codigos($id, $nro_orden, $codigo_transaccion) {
+    public function actualizar_codigos($id, $nro_orden, $estado_envio) {
+        $estados_validos = array('POR_REALIZAR', 'EN_ORIGEN', 'EN_TRANSITO', 'EN_DESTINO', 'ENTREGADO');
+        if (!in_array($estado_envio, $estados_validos)) {
+            return FALSE;
+        }
         $this->db->where('id', (int)$id);
         $this->db->update('pedidos_web', array(
-            'nro_orden'           => $nro_orden,
-            'codigo_transaccion'  => $codigo_transaccion,
+            'nro_orden'    => $nro_orden,
+            'estado_envio' => $estado_envio,
         ));
         return $this->db->affected_rows() > 0;
     }
 
     public function actualizar_estado($id, $estado_envio) {
-        $estados_validos = array('EN_ORIGEN', 'EN_TRANSITO', 'EN_DESTINO', 'ENTREGADO');
+        $estados_validos = array('POR_REALIZAR', 'EN_ORIGEN', 'EN_TRANSITO', 'EN_DESTINO', 'ENTREGADO');
         if (!in_array($estado_envio, $estados_validos)) {
             return FALSE;
         }

@@ -158,26 +158,28 @@ class Admin extends CI_Controller {
             return;
         }
 
-        $id_pedido           = (int)$id_pedido;
-        $nro_orden           = trim($this->input->post('nro_orden', TRUE));
-        $codigo_transaccion  = trim($this->input->post('codigo_transaccion', TRUE));
+        $id_pedido    = (int)$id_pedido;
+        $nro_orden    = trim($this->input->post('nro_orden', TRUE));
+        $estado_envio = $this->input->post('estado_envio', TRUE);
+
+        $estados_validos = array('POR_REALIZAR', 'EN_ORIGEN', 'EN_TRANSITO', 'EN_DESTINO', 'ENTREGADO');
+        if (!in_array($estado_envio, $estados_validos)) {
+            $this->session->set_flashdata('error', 'El Estado de envío seleccionado no es válido.');
+            redirect('admin/pedidos');
+            return;
+        }
 
         if (!preg_match('/^\d{8,10}$/', $nro_orden)) {
-            $this->session->set_flashdata('error', 'El Nro de Orden debe tener entre 8 y 10 dígitos.');
-            redirect('admin/pedidos');
-            return;
+            //$this->session->set_flashdata('error', 'El Nro de Orden debe tener entre 8 y 10 dígitos.');
+            //redirect('admin/pedidos');
+            //return;
+            $nro_orden = 0;
         }
 
-        if (!preg_match('/^[A-Za-z0-9]{4}$/', $codigo_transaccion)) {
-            $this->session->set_flashdata('error', 'El Código de envío debe tener exactamente 4 caracteres alfanuméricos.');
-            redirect('admin/pedidos');
-            return;
-        }
-
-        $ok = $this->Pedido_model->actualizar_codigos($id_pedido, $nro_orden, strtoupper($codigo_transaccion));
+        $ok = $this->Pedido_model->actualizar_codigos($id_pedido, $nro_orden, $estado_envio);
 
         if ($ok) {
-            $this->session->set_flashdata('success', 'Códigos registrados correctamente.');
+            $this->session->set_flashdata('success', 'Códigos / estado de envío actualizados correctamente.');
         } else {
             $this->session->set_flashdata('error', 'No se pudo actualizar el pedido.');
         }

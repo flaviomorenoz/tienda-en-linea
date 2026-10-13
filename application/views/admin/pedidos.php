@@ -92,12 +92,12 @@
     </div>
 </div>
 
-<!-- Modal ingreso de códigos de envío -->
+<!-- Modal actualizar códigos / estado de envío -->
 <div class="modal fade" id="modalCodigos" tabindex="-1" aria-labelledby="modalCodigosLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 class="modal-title fw-bold" id="modalCodigosLabel">Códigos de envío</h6>
+                <h6 class="modal-title fw-bold" id="modalCodigosLabel">Códigos / Envío</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="" method="POST" id="form-codigos" novalidate>
@@ -109,15 +109,19 @@
                         <label class="form-label fw-semibold">Nro de Orden <span class="text-danger">*</span></label>
                         <input type="text" name="nro_orden" id="input-nro-orden" class="form-control"
                                placeholder="8 a 10 dígitos"
-                               inputmode="numeric" pattern="\d{8,10}" minlength="8" maxlength="10" required>
+                               inputmode="numeric" pattern="\d{8,10}" minlength="8" maxlength="10">
                         <div class="invalid-feedback">Ingrese entre 8 y 10 dígitos numéricos.</div>
                     </div>
                     <div class="mb-1">
-                        <label class="form-label fw-semibold">Código de envío <span class="text-danger">*</span></label>
-                        <input type="text" name="codigo_transaccion" id="input-codigo" class="form-control"
-                               placeholder="4 caracteres (ej: A1B2)"
-                               pattern="[A-Za-z0-9]{4}" minlength="4" maxlength="4" required>
-                        <div class="invalid-feedback">Ingrese exactamente 4 caracteres alfanuméricos.</div>
+                        <label class="form-label fw-semibold">Estado de envío <span class="text-danger">*</span></label>
+                        <select name="estado_envio" id="select-estado-envio" class="form-select" required>
+                            <option value="POR_REALIZAR">POR_REALIZAR</option>
+                            <option value="EN_ORIGEN">EN_ORIGEN</option>
+                            <option value="EN_TRANSITO">EN_TRANSITO</option>
+                            <option value="EN_DESTINO">EN_DESTINO</option>
+                            <option value="ENTREGADO">ENTREGADO</option>
+                        </select>
+                        <div class="invalid-feedback">Seleccione un estado de envío.</div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -397,7 +401,7 @@ const table = $('#tabla-pedidos').DataTable({
                        'data-bs-toggle="modal" data-bs-target="#modalCodigos" ' +
                        'data-id="' + row.id + '" ' +
                        'data-nro="' + escHtml(row.nro_orden || '') + '" ' +
-                       'data-cod="' + escHtml(row.codigo_transaccion || '') + '">' +
+                       'data-estado="' + escHtml((row.estado_envio || '').trim()) + '">' +
                        '<i class="bi bi-pencil-square" style="font-size:18px!important"></i></a>';
                 
                 return cad0 + cad1 + cad2;
@@ -465,26 +469,29 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
 
 document.getElementById('modalCodigos').addEventListener('show.bs.modal', function(e) {
     const btn = e.relatedTarget;
-    const id  = btn.getAttribute('data-id');
-    const nro = btn.getAttribute('data-nro');
-    const cod = btn.getAttribute('data-cod');
+    const id     = btn.getAttribute('data-id');
+    const nro    = btn.getAttribute('data-nro');
+    const estado = btn.getAttribute('data-estado');
 
     document.getElementById('form-codigos').action = codigosUrl + id;
     document.getElementById('input-nro-orden').value = nro;
-    document.getElementById('input-codigo').value = cod;
+    document.getElementById('select-estado-envio').value = estado;
     document.getElementById('modal-codigos-info').textContent = 'Pedido #' + id;
     document.getElementById('form-codigos').classList.remove('was-validated');
 });
 
+/*
 document.getElementById('form-codigos').addEventListener('submit', function(e) {
+    const estadosValidos = ['POR_REALIZAR', 'EN_ORIGEN', 'EN_TRANSITO', 'EN_DESTINO', 'ENTREGADO'];
     const nroOk = /^\d{8,10}$/.test(document.getElementById('input-nro-orden').value.trim());
-    const codOk = /^[A-Za-z0-9]{4}$/.test(document.getElementById('input-codigo').value.trim());
-    if (!nroOk || !codOk) {
+    const estadoOk = estadosValidos.indexOf(document.getElementById('select-estado-envio').value) !== -1;
+    if (!estadoOk) {
         e.preventDefault();
         e.stopPropagation();
     }
     this.classList.add('was-validated');
 });
+*/
 
 document.getElementById('modalEstado').addEventListener('show.bs.modal', function(e) {
     const btn    = e.relatedTarget;
