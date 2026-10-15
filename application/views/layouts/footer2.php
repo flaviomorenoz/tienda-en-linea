@@ -100,7 +100,7 @@
 
       <!-- Columna 1: Marca + "Disfruta! d f" -->
       <div class="col-md-3">
-        <div class="brand-footer">Bella Rose</div>
+        <div class="brand-footer">Bella Rosse</div>
         <div class="brand-sub"><a href="<?php echo base_url('quienes-somos'); ?>">Quiénes somos</a></div>
         <div class="brand-sub">Tiendas Otros</div>
         <!-- líneas que aparecen en la imagen: "Disfruta!" y "d f" -->
