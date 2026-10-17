@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($titulo) ? htmlspecialchars($titulo, ENT_QUOTES, 'UTF-8') : $this->config->item('tienda_nombre'); ?></title>
+    <title><?php echo isset($titulo) ? htmlspecialchars($titulo, ENT_QUOTES, 'UTF-8') : tienda_nombre(); ?></title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -316,8 +316,9 @@
 <div class="container" style="display:block!important">
     <div class="row">
         <div class="col-sm-12 banner0">
-            <span class="texto-completo"><?= isset($texto_banner) ? $texto_banner : "" ?></span>
-            <span class="texto-corto"><?= isset($texto_banner) ? $texto_banner : "" ?></span>
+            <?php $banner_tienda = (isset($texto_banner) && trim((string)$texto_banner) !== '') ? trim((string)$texto_banner) : texto_banner(); ?>
+            <span class="texto-completo"><?= htmlspecialchars($banner_tienda, ENT_QUOTES, 'UTF-8') ?></span>
+            <span class="texto-corto"><?= htmlspecialchars($banner_tienda, ENT_QUOTES, 'UTF-8') ?></span>
         </div>
     </div>
 
@@ -326,7 +327,7 @@
             <a class="navbar-brand fw-bold tol-logo" href="<?php echo base_url(); ?>">
                 <!--<i class="bi bi-bag-heart-fill me-2"></i>-->
                 <img src="<?=base_url()?>assets/img/rallas.png" id="btn-menu-lateral" role="button" tabindex="0" alt="Abrir menú" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu-lateral" style="height:25px;margin-bottom:4px;">
-                <?php echo $this->config->item('tienda_nombre'); ?>
+                <?php echo tienda_nombre(); ?>
             </a>
         </div>
         <div class="col-8 col-sm-5 col-md-6 col-lg-4 banner2a" id="busqueda" style="padding-top:15px;">

@@ -18,7 +18,7 @@ class Carrito extends CI_Controller {
         $total   = $this->_calcular_total($carrito);
 
         $data = array(
-            'titulo'        => 'Mi Carrito - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Mi Carrito - ' . tienda_nombre(),
             'carrito'       => $carrito,
             'total'         => $total,
             'carrito_count' => array_sum(array_column($carrito, 'cantidad')),
@@ -354,7 +354,7 @@ class Carrito extends CI_Controller {
             "email"           => $email,
             "source_id"       => $token,
             "capture"         => true,
-            "description"     => "Pedido tienda en línea - " . $this->config->item('tienda_nombre'),
+            "description"     => "Pedido tienda en línea - " . tienda_nombre(),
             "antifraud_details" => array(
                 "address"        => $datos_pedido['direccion_envio'],
                 "address_city"   => "Lima",

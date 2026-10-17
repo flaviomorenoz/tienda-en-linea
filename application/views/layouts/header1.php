@@ -43,7 +43,7 @@
 <body>
 
 <!-- Sidebar -->
-<?=menu_principal($this->config->item('tienda_nombre'), $admin_nombre ?? NULL)?>
+<?=menu_principal(tienda_nombre(), $admin_nombre ?? NULL)?>
 
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">

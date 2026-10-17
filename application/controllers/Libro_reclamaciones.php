@@ -21,7 +21,7 @@ class Libro_reclamaciones extends CI_Controller {
      */
     public function index() {
         $data = array(
-            'titulo'        => 'Libro de Reclamaciones - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Libro de Reclamaciones - ' . tienda_nombre(),
             'carrito_count' => $this->_carrito_count(),
             'texto_banner'  => $this->_texto_banner(),
             'registrado'    => FALSE,
@@ -42,7 +42,7 @@ class Libro_reclamaciones extends CI_Controller {
 
         if ($this->form_validation->run() === FALSE) {
             $data = array(
-                'titulo'        => 'Libro de Reclamaciones - ' . $this->config->item('tienda_nombre'),
+                'titulo'        => 'Libro de Reclamaciones - ' . tienda_nombre(),
                 'carrito_count' => $this->_carrito_count(),
                 'texto_banner'  => $this->_texto_banner(),
                 'registrado'    => FALSE,
@@ -86,7 +86,7 @@ class Libro_reclamaciones extends CI_Controller {
         if ($id) {
             $reclamo = $this->Reclamo_model->get_por_id($id);
             $data = array(
-                'titulo'        => 'Solicitud registrada - ' . $this->config->item('tienda_nombre'),
+                'titulo'        => 'Solicitud registrada - ' . tienda_nombre(),
                 'carrito_count' => $this->_carrito_count(),
                 'texto_banner'  => $this->_texto_banner(),
                 'registrado'    => TRUE,
@@ -105,7 +105,7 @@ class Libro_reclamaciones extends CI_Controller {
      */
     public function verificar() {
         $data = array(
-            'titulo'        => 'Consultar reclamo - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Consultar reclamo - ' . tienda_nombre(),
             'carrito_count' => $this->_carrito_count(),
             'texto_banner'  => $this->_texto_banner(),
             'reclamo'       => NULL,
@@ -128,7 +128,7 @@ class Libro_reclamaciones extends CI_Controller {
         $codigo = strtoupper(trim($this->input->post('codigo', TRUE)));
 
         $data = array(
-            'titulo'        => 'Consultar reclamo - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Consultar reclamo - ' . tienda_nombre(),
             'carrito_count' => $this->_carrito_count(),
             'texto_banner'  => $this->_texto_banner(),
             'reclamo'       => NULL,
@@ -230,7 +230,7 @@ class Libro_reclamaciones extends CI_Controller {
         if (!isset($this->Ajustes_model)) {
             $this->load->model('Ajustes_model');
         }
-        return $this->Ajustes_model->get_config('texto_banner');
+        return $this->Ajustes_model->get_texto_banner();
     }
 }
 

@@ -212,6 +212,65 @@ function acceso_denegado($msg=""){
     }
 }
 
+/**
+ * Nombre del negocio que se muestra en la tienda y en el panel admin.
+ *
+ * Lo toma de la variable NOMBRE_NEGOCIO (tabla tec_variables, modulo AJUSTES).
+ * Si la variable no existe o esta vacia se conserva el valor de
+ * config/settings.php (tienda_nombre), de modo que la tienda sigue funcionando
+ * igual que antes de registrar la variable.
+ *
+ * @return string
+ */
+function tienda_nombre() {
+    static $nombre = NULL;
+
+    if ($nombre !== NULL) {
+        return $nombre;
+    }
+
+    $CI =& get_instance();
+
+    if (!isset($CI->ajustes_model)) {
+        $CI->load->model('ajustes_model');
+    }
+
+    $nombre = trim((string)$CI->ajustes_model->get_nombre_negocio());
+
+    if ($nombre === '') {
+        $nombre = $CI->config->item('tienda_nombre');
+    }
+
+    return $nombre;
+}
+
+/**
+ * Texto del banner superior de la tienda.
+ *
+ * Lo toma de la variable TEXTO_BANNER (tabla tec_variables, modulo AJUSTES).
+ * Si la variable no existe se conserva el valor historico de config_ajustes
+ * (texto_banner), de modo que la tienda sigue funcionando igual que antes.
+ *
+ * @return string
+ */
+function texto_banner() {
+    static $banner = NULL;
+
+    if ($banner !== NULL) {
+        return $banner;
+    }
+
+    $CI =& get_instance();
+
+    if (!isset($CI->ajustes_model)) {
+        $CI->load->model('ajustes_model');
+    }
+
+    $banner = trim((string)$CI->ajustes_model->get_texto_banner());
+
+    return $banner;
+}
+
 function menu_principal($tienda_nombre="", $admin_nombre=NULL){
     ?>
 <div class="admin-sidebar text-white d-flex flex-column py-4 px-3">

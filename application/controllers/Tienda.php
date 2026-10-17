@@ -20,7 +20,7 @@ class Tienda extends CI_Controller {
         $this->_adjuntar_imagenes($productos);
 
         $this->_render_catalogo(
-            $this->config->item('tienda_nombre'),
+            tienda_nombre(),
             $productos,
             $categorias,
             $categoria,
@@ -38,7 +38,7 @@ class Tienda extends CI_Controller {
         // Vista de categoría: todos los productos de la categoría en un solo bloque,
         // sin agrupar por sección (por eso se envían $secciones vacías).
         $this->_render_catalogo(
-            $cat . ' - ' . $this->config->item('tienda_nombre'),
+            $cat . ' - ' . tienda_nombre(),
             $productos,
             $categorias,
             $cat,
@@ -64,7 +64,7 @@ class Tienda extends CI_Controller {
             'categoria_activa' => $categoria_activa,
             'termino_busqueda' => $termino_busqueda,
             'carrito_count'    => $this->_carrito_count(),
-            'texto_banner'     => $this->ajustes_model->get_config('texto_banner'),
+            'texto_banner'     => $this->ajustes_model->get_texto_banner(),
         );
 
         $this->load->view('layouts/header2', $data);
@@ -91,7 +91,7 @@ class Tienda extends CI_Controller {
         $this->load->model('Comentario_model');
 
         $data = array(
-            'titulo'        => $producto->nombre . ' - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => $producto->nombre . ' - ' . tienda_nombre(),
             'producto'      => $producto,
             'imagenes'      => $imagenes,
             'tallas'        => $tallas,
@@ -114,9 +114,9 @@ class Tienda extends CI_Controller {
         $this->session->unset_userdata(array('success', 'error'));
 
         $data = array(
-            'titulo'        => 'Quiénes somos - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Quiénes somos - ' . tienda_nombre(),
             'carrito_count' => $this->_carrito_count(),
-            'texto_banner'  => $this->ajustes_model->get_config('texto_banner'),
+            'texto_banner'  => $this->ajustes_model->get_texto_banner(),
         );
 
         $this->load->view('layouts/header2', $data);
@@ -126,9 +126,9 @@ class Tienda extends CI_Controller {
 
     public function contacto() {
         $data = array(
-            'titulo'        => 'Contacto - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Contacto - ' . tienda_nombre(),
             'carrito_count' => $this->_carrito_count(),
-            'texto_banner'  => $this->ajustes_model->get_config('texto_banner'),
+            'texto_banner'  => $this->ajustes_model->get_texto_banner(),
         );
 
         $this->load->view('layouts/header2', $data);
@@ -177,8 +177,9 @@ class Tienda extends CI_Controller {
 
     function devoluciones(){
         $data = array(
-            'titulo'        => 'Políticas de Cambio y Devoluciones - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Políticas de Cambio y Devoluciones - ' . tienda_nombre(),
             'carrito_count' => $this->_carrito_count(),
+            'texto_banner'  => $this->ajustes_model->get_texto_banner(),
         );
         $this->load->view('layouts/header2', $data);
         $this->load->view('tienda/devoluciones', $data);

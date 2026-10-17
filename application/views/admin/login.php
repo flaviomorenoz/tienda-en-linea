@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - <?php echo $this->config->item('tienda_nombre'); ?></title>
+    <title>Admin - <?php echo tienda_nombre(); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
     <div class="login-card card border-0 shadow-lg">
         <div class="login-header text-white text-center p-4">
             <i class="bi bi-bag-heart-fill fs-1 mb-2 d-block"></i>
-            <h4 class="fw-bold mb-0"><?php echo $this->config->item('tienda_nombre'); ?></h4>
+            <h4 class="fw-bold mb-0"><?php echo tienda_nombre(); ?></h4>
             <p class="text-white-50 small mb-0">Panel de Administración</p>
         </div>
         <div class="card-body p-4">

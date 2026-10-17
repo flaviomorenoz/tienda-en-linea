@@ -18,7 +18,7 @@ class Admin extends CI_Controller {
         }
 
         $data = array(
-            'titulo'        => 'Admin - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Admin - ' . tienda_nombre(),
             'carrito_count' => 0,
         );
         $this->load->view('admin/login', $data);

@@ -53,7 +53,7 @@ class Notificador_pedido {
         traza_inicio('correo', 'pedido=' . $id_pedido);
 
         $moneda    = $this->CI->config->item('moneda_simbolo');
-        $tienda    = $this->CI->config->item('tienda_nombre');
+        $tienda    = tienda_nombre();
         $destino   = trim((string)$this->CI->config->item('tienda_email'));
         $remitente = trim((string)$this->CI->config->item('email_remitente'));
         traza("remitente/destino : {$remitente}/{$destino}");

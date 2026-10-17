@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($titulo) ? htmlspecialchars($titulo, ENT_QUOTES, 'UTF-8') : $this->config->item('tienda_nombre'); ?></title>
+    <title><?php echo isset($titulo) ? htmlspecialchars($titulo, ENT_QUOTES, 'UTF-8') : tienda_nombre(); ?></title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -55,7 +55,7 @@
         <!-- Logo / Nombre tienda -->
         <a class="navbar-brand fw-bold" href="<?php echo base_url(); ?>">
             <i class="bi bi-bag-heart-fill me-2"></i>
-            <?php echo $this->config->item('tienda_nombre'); ?>
+            <?php echo tienda_nombre(); ?>
         </a>
 
         <!-- Toggler móvil -->

@@ -30,7 +30,7 @@
     </style>
 
 <!-- Sidebar -->
-<?=menu_principal($this->config->item('tienda_nombre'))?>
+<?=menu_principal(tienda_nombre())?>
 
 <!-- Contenido principal -->
 <div class="main-content">

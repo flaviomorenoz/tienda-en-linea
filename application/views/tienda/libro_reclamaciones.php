@@ -417,7 +417,7 @@
                     <li class="mb-2">
                         <i class="bi bi-building me-2 text-muted"></i>
                         <strong>Razón social:</strong>
-                        <?php echo htmlspecialchars($this->config->item('tienda_razon_social') ?: $this->config->item('tienda_nombre'), ENT_QUOTES, 'UTF-8'); ?>
+                        <?php echo htmlspecialchars($this->config->item('tienda_razon_social') ?: tienda_nombre(), ENT_QUOTES, 'UTF-8'); ?>
                     </li>
                     <li class="mb-2">
                         <i class="bi bi-card-text me-2 text-muted"></i>

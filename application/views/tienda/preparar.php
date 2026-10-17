@@ -518,7 +518,7 @@ if (!filter_var($correo_tienda, FILTER_VALIDATE_EMAIL)) {
     // Culqi Checkout v4 (js.culqi.com/checkout-js), solo Yape
     // --------------------------------------------------------------------
     const settings = {
-        title: '<?php echo $this->config->item('tienda_nombre'); ?>',
+        title: '<?php echo tienda_nombre(); ?>',
         currency: "PEN",
         amount: <?php echo (int)round($total * 100); ?>,   // céntimos; lo confirma pago/crear_orden
         order: "",                                         // lo asigna pago/crear_orden

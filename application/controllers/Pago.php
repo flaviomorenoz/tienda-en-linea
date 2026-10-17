@@ -55,7 +55,7 @@ class Pago extends CI_Controller {
         $total = $this->_calcular_total($carrito);
 
         $data = array(
-            'titulo'        => 'Finalizar compra - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Finalizar compra - ' . tienda_nombre(),
             'carrito'       => $carrito,
             'total'         => $total,
             'carrito_count' => array_sum(array_column($carrito, 'cantidad')),
@@ -88,7 +88,7 @@ class Pago extends CI_Controller {
         traza_paso('2. total del carrito', 'total=' . $total, 'pago/preparar');
 
         $data = array(
-            'titulo'        => 'Datos de envío y pago - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Datos de envío y pago - ' . tienda_nombre(),
             'carrito'       => $carrito,
             'total'         => $total,
             'carrito_count' => array_sum(array_column($carrito, 'cantidad')),
@@ -169,7 +169,7 @@ class Pago extends CI_Controller {
         $payload = array(
             'amount'          => $amount,
             'currency_code'   => 'PEN',
-            'description'     => 'Pedido tienda en línea - ' . $this->config->item('tienda_nombre'),
+            'description'     => 'Pedido tienda en línea - ' . tienda_nombre(),
             'order_number'    => $order_number,
             'expiration_date' => time() + 86400,   // 24 h de vigencia para completar el pago
             'confirm'         => TRUE,
@@ -391,7 +391,7 @@ class Pago extends CI_Controller {
         }
 
         $data = array(
-            'titulo'        => 'Pedido confirmado - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Pedido confirmado - ' . tienda_nombre(),
             'pedido'        => $pedido,
             'detalle'       => $detalle,
             'carrito_count' => 0,
@@ -407,7 +407,7 @@ class Pago extends CI_Controller {
 
     public function cancelado() {
         $data = array(
-            'titulo'        => 'Pago cancelado - ' . $this->config->item('tienda_nombre'),
+            'titulo'        => 'Pago cancelado - ' . tienda_nombre(),
             'carrito_count' => $this->_carrito_count(),
         );
         $this->load->view('layouts/header', $data);

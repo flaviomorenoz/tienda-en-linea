@@ -140,7 +140,7 @@ class Wts extends CI_Controller {
     }
 
     private function _system_prompt() {
-        $nombre_tienda = $this->config->item('tienda_nombre');
+        $nombre_tienda = tienda_nombre();
         $catalogo      = $this->Asistente_model->get_catalogo_contexto();
 
         $prompt = "Eres el asistente virtual por WhatsApp de {$nombre_tienda}, una tienda que vende " .

@@ -63,6 +63,9 @@ $route['pedido/cancelado'] = 'pago/cancelado';
 // Ajustes (configuración)
 $route['ajustes'] = 'ajustes/index';
 $route['ajustes/guardar_tema'] = 'ajustes/guardar_tema';
+// CRUD de variables de la tienda (tabla tec_variables)
+$route['ajustes/guardar_variable'] = 'ajustes/guardar_variable';
+$route['ajustes/eliminar_variable/(:num)'] = 'ajustes/eliminar_variable/$1';
 
 // Admin
 $route['admin'] = 'admin/login';

@@ -7,7 +7,7 @@
             <div class="col-md-4">
                 <h5 class="fw-bold mb-3">
                     <i class="bi bi-bag-heart-fill me-2"></i>
-                    <?php echo $this->config->item('tienda_nombre'); ?>
+                    <?php echo tienda_nombre(); ?>
                 </h5>
                 <p class="small color-fuente-bella"><?php echo $this->config->item('tienda_slogan'); ?></p>
             </div>
@@ -48,7 +48,7 @@
         </div>
         <hr class="border-secondary mt-4">
         <div class="text-center text-white-50 small">
-            &copy; <?php echo date('Y'); ?> <?php echo $this->config->item('tienda_nombre'); ?>. Todos los derechos reservados.
+            &copy; <?php echo date('Y'); ?> <?php echo tienda_nombre(); ?>. Todos los derechos reservados.
         </div>
     </div>
 </footer>
@@ -60,7 +60,7 @@
     </button>
     <div id="chat-ia-panel" class="chat-ia-panel d-none">
         <div class="chat-ia-header">
-            <span><i class="bi bi-robot me-2"></i>Asistente <?php echo htmlspecialchars($this->config->item('tienda_nombre'), ENT_QUOTES, 'UTF-8'); ?></span>
+            <span><i class="bi bi-robot me-2"></i>Asistente <?php echo htmlspecialchars(tienda_nombre(), ENT_QUOTES, 'UTF-8'); ?></span>
             <button id="chat-ia-cerrar" type="button" class="btn-close btn-close-white" aria-label="Cerrar"></button>
         </div>
         <div id="chat-ia-mensajes" class="chat-ia-mensajes"></div>

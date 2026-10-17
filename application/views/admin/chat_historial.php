@@ -32,7 +32,7 @@
 <div class="admin-sidebar text-white d-flex flex-column py-4 px-3">
     <div class="text-center mb-4">
         <i class="bi bi-bag-heart-fill fs-2 d-block mb-1"></i>
-        <span class="fw-bold small"><?php echo $this->config->item('tienda_nombre'); ?></span>
+        <span class="fw-bold small"><?php echo tienda_nombre(); ?></span>
         <div class="text-white-50 x-small">Admin Panel</div>
     </div>
     <nav class="flex-grow-1">
